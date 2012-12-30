@@ -92,6 +92,12 @@ Returning edges from chain by adding `<` on the last line:
 	var edge = hercules --> "battled" --> hydra <
 	edge.set("time", 2)
 
+Using transaction:
+
+	transact {
+		hercules --> "father" --> jupiter
+	}
+
 
 Install
 --------
