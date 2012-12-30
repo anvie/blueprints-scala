@@ -45,6 +45,19 @@ object BlueprintsWrapper {
             }
         }
 
+        /**
+         * Syntactic sugar property getter with
+         * default value if not defined.
+         *
+         * Example:
+         *
+         * val x = vertex.getOrElse[String]("phone", "-")
+         *
+         * @param key property key.
+         * @param default default value when empty.
+         * @tparam T return type.
+         * @return
+         */
         def getOrElse[T](key:String, default:T):T = {
             o.getProperty(key) match {
                 case v:T => v
@@ -67,45 +80,105 @@ object BlueprintsWrapper {
         }
     }
 
-    case class VertexWrapper(private val vertex:Vertex, var label:String, db:Graph)
-            extends Wrapper with ScalasticPropertyAccessor[Vertex] {
-
-        implicit var o = vertex
+    /**
+     * Edge wrapper on arrow chain.
+     * This wrapper automatic used via ToVertexWrapper.
+     * @param vertex vertex
+     * @param label label
+     * @param db database
+     */
+    case class ToEdgeWrapper(var vertex:Vertex, var label:String, db:Graph) extends Wrapper {
         private var lastEdge:Edge = null
+        var prev:Option[ToVertexWrapper] = None
 
-        def -->(label:String):VertexWrapper = {
-            new VertexWrapper(vertex, label, db)
+        def -->(inV:Vertex) = {
+            lastEdge = db.addEdge(null, vertex, inV, label)
+
+            // for performance reason
+            // we using previous object if any
+
+            val p = prev.getOrElse {
+                ToVertexWrapper(inV, label, db)
+            }
+
+            p.prev = Some(this)
+            p.o = inV
+            p
         }
 
-        def <--(outV:Vertex):VertexWrapper = {
-            assert(label != null, "no label?")
-            // update current vertex chain
-            lastEdge = db.addEdge(null, outV, o, label)
-            o = outV
-            this
-        }
+        def <--(outV:Vertex) = {
+            lastEdge = db.addEdge(null, outV, vertex, label)
 
-        def -->(inV:Vertex):VertexWrapper = {
-            assert(label != null, "no label?")
-            // update current vertex chain
-            lastEdge = db.addEdge(null, o, inV, label)
-            o = inV
-            this
-        }
+            // for performance reason
+            // we using previous object if any
 
-        def <--(label:String):VertexWrapper = {
-            this.label = label
-            this
+            val p = prev.getOrElse {
+                ToVertexWrapper(outV, label, db)
+            }
+            p.prev = Some(this)
+            p.o = outV
+            p
         }
 
         def < = this.lastEdge
+    }
+
+    /**
+     * Vertex wrapper on arrow chain.
+     * This wrapper automatically called via implicit vertexWrapper function.
+     * @param vertex vertex.
+     * @param label label.
+     * @param db database object.
+     */
+    case class ToVertexWrapper(private val vertex:Vertex, var label:String, db:Graph)
+            extends Wrapper with ScalasticPropertyAccessor[Vertex] {
+
+        implicit var o = vertex
+        var prev:Option[ToEdgeWrapper] = None
+
+        def -->(label:String):ToEdgeWrapper = {
+            this.label = label
+
+            // for performance reason
+            // we using previous object if any
+
+            val next = prev.getOrElse {
+                ToEdgeWrapper(o, label, db)
+            }
+            next.prev = Some(this)
+            next.vertex = o
+            next.label = label
+            next
+        }
+
+        def <--(label:String):ToEdgeWrapper = {
+            this.label = label
+
+            // for performance reason
+            // we using previous object if any
+
+            val next = prev.getOrElse {
+                ToEdgeWrapper(o, label, db)
+            }
+            next.prev = Some(this)
+            next.vertex = o
+            next.label = label
+            next
+        }
+
+        def < = {
+            if (this.prev.isDefined)
+                this.prev.get <
+            else
+                null
+        }
 
         /**
          * Create mutual connection.
          * @param label edge label.
          * @return
          */
-        def <-->(label:String):VertexWrapper = {
+        def <-->(label:String):ToVertexWrapper = {
             this.label = label
             this
         }
@@ -115,7 +188,7 @@ object BlueprintsWrapper {
          * @param bothV another vertex to connect.
          * @return
          */
-        def <-->(bothV:Vertex):VertexWrapper = {
+        def <-->(bothV:Vertex):ToVertexWrapper = {
             assert(label != null, "no label?")
             db.addEdge(null, o, bothV, label)
             db.addEdge(null, bothV, o, label)
@@ -165,13 +238,13 @@ object BlueprintsWrapper {
             EdgeWrapperRight(v, o, label, db)
         }
 
-        def <--(label:String):VertexWrapper = {
+        def <--(label:String):ToVertexWrapper = {
             val v = edge.getVertex(Direction.IN)
-            VertexWrapper(v, label, db)
+            ToVertexWrapper(v, label, db)
         }
     }
 
-    implicit def vertexWrapper(vertex:Vertex)(implicit db:Graph) = VertexWrapper(vertex, null, db)
+    implicit def vertexWrapper(vertex:Vertex)(implicit db:Graph) = ToVertexWrapper(vertex, null, db)
     implicit def edgeWrapper(edge:Edge)(implicit db:Graph) = EdgeWrapperLeft(edge, db)
     implicit def edgeFormatter(edge:Edge) = new {
         def prettyPrint(key:String) = {

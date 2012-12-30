@@ -36,7 +36,8 @@ class BlueprintsWrapperSpec extends Specification {
         "neptune" -> "god",
         "sky" -> "location",
         "sea" -> "location",
-        "tartarus" -> "location"
+        "tartarus" -> "location",
+        "saturn" -> "titan"
     )
 
     val vertices = for((name, kind) <- data) yield {
@@ -46,7 +47,7 @@ class BlueprintsWrapperSpec extends Specification {
         (name, vertex)
     }
 
-    vertices("hercules") --> "father" --> vertices("jupiter")
+    vertices("hercules") --> "father" --> vertices("jupiter") --> "father" --> vertices("saturn")
     vertices("hercules") --> "mother" --> vertices("alcmene")
     vertices("jupiter") <--> "brother" <--> vertices("pluto")
     vertices("jupiter") <--> "brother" <--> vertices("neptune") <--> "brother" <--> vertices("pluto")
@@ -66,10 +67,10 @@ class BlueprintsWrapperSpec extends Specification {
             val father = vertices("hercules").getVertices(Direction.OUT,"father").iterator().next()
             father.getProperty("name") must beEqualTo("jupiter")
         }
-        "able to using getter" in {
+        "handle defined field" in {
             vertices("hercules").get[String]("kind").isDefined must beTrue
         }
-        "getter not-exist" in {
+        "handle undefined field" in {
             vertices("hercules").get[String]("not_exists").isDefined must beFalse
         }
         "able to using getter or else exists" in {
@@ -131,14 +132,18 @@ class BlueprintsWrapperSpec extends Specification {
         "iterate and map both vertices" in {
             val jupiterBrother = jupiter.pipe.out("brother").iterator()
                 .toList.map( v =>  v.getOrElse[String]("name", "") )
+
+            println("jupiterBrother: ")
+            jupiterBrother.foreach(b => println(" + " + b))
+
             jupiterBrother.length == 2 &&
-            jupiterBrother(0) == "neptune" &&
-            jupiterBrother(1) == "pluto" must beTrue
+            jupiterBrother.contains("pluto") &&
+            jupiterBrother.contains("neptune") must beTrue
         }
         "get count of out edges" in {
             hercules.pipe.outE("battled").count() must beEqualTo(3)
         }
-        "using currying filter / gremlin pipe wrapper" in {
+        "able to using currying filter / gremlin pipe wrapper" in {
             val vx = hercules.pipe.outE("battled").wrap.filter { edge =>
                 edge.getOrElse[Int]("time", 0).toString.toInt > 5
             }
