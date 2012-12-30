@@ -87,7 +87,7 @@ Syntactic sugar filtering on Gremlin Pipeline:
 	   edge.getOrElse[Int]("time", 0).toString.toInt > 5
 	}
 
-Returning edges from chain by adding `<` on last line:
+Returning edges from chain by adding `<` on the last line:
 
 	var edge = hercules --> "battled" --> hydra <
 	edge.set("time", 2)

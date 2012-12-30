@@ -274,12 +274,12 @@ object BlueprintsWrapper {
     case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
         def wrap = GremlinPipeWrapperVertex(innerPipe)
         def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
-            innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
+            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
                 def compute(v: Vertex):java.lang.Boolean = {
                     gpf.apply(v)
                 }
             })
-            innerPipe
+            rv
         }
     }
     case class GremlinPipeWrapperEdge[Vertex, Edge](innerPipe:GremlinPipeline[Vertex, Edge]){
