@@ -78,6 +78,15 @@ object BlueprintsWrapper {
         def set(key:String, value:Any){
             o.setProperty(key, value)
         }
+
+        /**
+         * Check is has key
+         * @param key property key
+         * @return
+         */
+        def has(key:String):Boolean = {
+            o.getProperty(key) != null
+        }
     }
 
     /**
@@ -295,4 +304,25 @@ object BlueprintsWrapper {
     }
     implicit def gremlinPipeWrapperVertex(pipe:GremlinPipeline[Vertex, Vertex]) = GremlinPipeWrapperVertex(pipe)
     implicit def gremlinPipeWrapperEdge(pipe:GremlinPipeline[Vertex, Edge]) = GremlinPipeWrapperEdge(pipe)
+
+    /**
+     * Working in transactional fashion.
+     * @param wrappedFunc function
+     * @param db implicit db
+     * @return
+     */
+    def transact(wrappedFunc: => Unit)(implicit db:TransactionalGraph){
+//        val dbx = db.startTransaction()
+        try {
+
+            wrappedFunc
+
+            db.stopTransaction(TransactionalGraph.Conclusion.SUCCESS)
+        }catch{
+            case e:Exception =>
+                e.printStackTrace()
+                db.stopTransaction(TransactionalGraph.Conclusion.FAILURE)
+        }
+    }
+
 }

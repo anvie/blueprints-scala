@@ -168,4 +168,6 @@ class BlueprintsWrapperSpec extends Specification {
             multiFilterResult.contains(edge3) must beFalse
         }
     }
+
+
 }
