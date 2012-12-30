@@ -62,9 +62,9 @@ object BlueprintsWrapper {
             o.getProperty(key) match {
                 case v:T => v
                 case x => {
-                    if (x != null){
-                        println("x: " + x.getClass.getName)
-                    }
+//                    if (x != null){
+//                        println("x: " + x.getClass.getName)
+//                    }
                     default
                 }
             }

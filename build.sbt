@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.2.0",
     "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.2.0",
     "com.tinkerpop.gremlin" % "gremlin-java" % "2.2.0",
-    "org.specs2" %%  "specs2" % "1.9"
+    "org.specs2" %%  "specs2" % "1.9" % "test"
     )
 
 publishTo <<= version { (v:String) =>

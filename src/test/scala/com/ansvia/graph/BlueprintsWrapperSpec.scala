@@ -123,7 +123,13 @@ class BlueprintsWrapperSpec extends Specification {
     edge2.set("time", 2)
     edge3.set("time", 12)
 
-    "Blueprints gremline pipe" should {
+    val multiFilterResult = hercules.pipe.outE("battled").wrap.filter {
+        _.getOrElse[Int]("time", 0).toString.toInt < 12
+    }.wrap.filter {
+        _.getOrElse[Int]("time", 0).toString.toInt > 1
+    }.toList
+
+    "Blueprints Gremlin pipe wrapper" should {
         "do simple query" in {
             val vx = vertices("tartarus").pipe.in("lives")
             val lst = vx.printDumpGetList("they are lives in tartarus:", "name")
@@ -148,6 +154,18 @@ class BlueprintsWrapperSpec extends Specification {
                 edge.getOrElse[Int]("time", 0).toString.toInt > 5
             }
             vx.iterator().next().getOrElse[Int]("time", 0) must beEqualTo(12)
+        }
+        "use multi filtering #1" in {
+            multiFilterResult.length must beEqualTo(1)
+        }
+        "use multi filtering #2 must not contains nemean" in {
+            multiFilterResult.contains(edge1) must beFalse
+        }
+        "use multi filtering #3 must contains hydra" in {
+            multiFilterResult.contains(edge2) must beTrue
+        }
+        "use multi filtering #4 must not contains cerberus" in {
+            multiFilterResult.contains(edge3) must beFalse
         }
     }
 }
