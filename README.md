@@ -95,7 +95,7 @@ Returning edges from chain by adding `<` on the last line:
 Using transaction:
 
 	transact {
-		hercules --> "father" --> jupiter
+		hercules -->"father"--> jupiter
 	}
 
 

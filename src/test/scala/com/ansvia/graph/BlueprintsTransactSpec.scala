@@ -59,10 +59,16 @@ class BlueprintsTransactSpec extends Specification {
     }
 
     // test fail transaction
-    transact {
-        edge2.set("win", true)
-        edge3.set("win", false)
-        throw new Exception("oops error man!")
+    try {
+        transact {
+            edge2.set("win", true)
+            edge3.set("win", false)
+            throw new Exception("oops error man!")
+        }
+    }catch{
+        case e:Exception =>
+    }finally {
+
     }
 
     "Transaction wrapper" should {

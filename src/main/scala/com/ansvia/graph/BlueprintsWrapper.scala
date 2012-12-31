@@ -8,6 +8,8 @@ import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import scala.Some
+import collection.mutable
+import util.CaseClassSigParser
 
 object BlueprintsWrapper {
     import scala.collection.JavaConverters._
@@ -23,6 +25,7 @@ object BlueprintsWrapper {
          * will return Option[T].
          * example usage:
          *
+         * <pre>
          * val x = vertex.get[String]("location")
          * if (x.isDefined){
          *      // do here if defined
@@ -33,6 +36,7 @@ object BlueprintsWrapper {
          * vertex.get[String]("location") map { location =>
          *      // do with naked location (String)
          * }
+         * </pre>
          *
          * @param key property key.
          * @tparam T template to return.
@@ -51,7 +55,9 @@ object BlueprintsWrapper {
          *
          * Example:
          *
+         * <pre>
          * val x = vertex.getOrElse[String]("phone", "-")
+         * </pre>
          *
          * @param key property key.
          * @param default default value when empty.
@@ -75,8 +81,9 @@ object BlueprintsWrapper {
          * @param key property key.
          * @param value property value.
          */
-        def set(key:String, value:Any){
+        def set(key:String, value:Any) = {
             o.setProperty(key, value)
+            this
         }
 
         /**
@@ -311,17 +318,28 @@ object BlueprintsWrapper {
      * @param db implicit db
      * @return
      */
-    def transact(wrappedFunc: => Unit)(implicit db:TransactionalGraph){
+    def transact(wrappedFunc: => AnyRef)(implicit db:TransactionalGraph) = {
 //        val dbx = db.startTransaction()
+        var rv:AnyRef = null
         try {
 
-            wrappedFunc
+            rv = wrappedFunc
 
             db.stopTransaction(TransactionalGraph.Conclusion.SUCCESS)
         }catch{
             case e:Exception =>
-                e.printStackTrace()
                 db.stopTransaction(TransactionalGraph.Conclusion.FAILURE)
+                throw e
+        }
+        rv
+    }
+
+    implicit def dbWrapper(db:Graph) = new {
+        def save[T:Manifest](cc:T):Vertex = {
+//            transact {
+            val o = db.addVertex(null)
+            ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o)
+//            }.asInstanceOf[Vertex]
         }
     }
 
