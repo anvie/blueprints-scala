@@ -2,6 +2,8 @@ package com.ansvia.graph
 
 import org.specs2.mutable.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+import com.ansvia.graph.BlueprintsWrapper.DbObject
+import com.tinkerpop.blueprints.Vertex
 
 /**
  * Copyright (C) 2011-2012 Ansvia Inc.
@@ -28,6 +30,8 @@ class ObjectConverterSpec extends Specification {
     val v2 = db.save(ccU)
 
     val vtcc2 = ObjectConverter.toCC[User](v2)
+
+    val v3 = Motor("Honda").save()
 
     "Object converter" should {
         "convert vertex to case class #1" in {
@@ -56,6 +60,25 @@ class ObjectConverterSpec extends Specification {
         }
     }
 
+    "DbObject inherited class" should {
+        "save directly using .save()" in {
+            v3.isInstanceOf[Vertex] must beTrue
+        }
+        "has expected field" in {
+            v3.has("mark") must beTrue
+        }
+        "get back saved field data" in {
+            v3.get[String]("mark").getOrElse("mark", "esemka") must beEqualTo("Honda")
+        }
+        "deserializable" in {
+            v3.toCC[Motor].isDefined must beTrue
+        }
+        "has expected data in deserialized object" in {
+            v3.toCC[Motor].get.mark  must beEqualTo("Honda")
+        }
+    }
+
 }
 
 case class User(name:String, age:Int)
+case class Motor(mark:String) extends DbObject

@@ -15,10 +15,10 @@ object BlueprintsWrapper {
     import scala.collection.JavaConverters._
     import scala.collection.JavaConversions._
 
+//    trait DbObject
     sealed trait Wrapper
 
-    trait ScalasticPropertyAccessor[A <: Element] {
-        implicit var o:A
+    case class ScalasticPropertyAccessor[A <: Element](obj:A) {
 
         /**
          * Syntactic sugar property getter.
@@ -43,7 +43,7 @@ object BlueprintsWrapper {
          * @return
          */
         def get[T](key:String):Option[T] = {
-            o.getProperty(key) match {
+            obj.getProperty(key) match {
                 case v:T => Some(v)
                 case x => None
             }
@@ -65,7 +65,7 @@ object BlueprintsWrapper {
          * @return
          */
         def getOrElse[T](key:String, default:T):T = {
-            o.getProperty(key) match {
+            obj.getProperty(key) match {
                 case v:T => v
                 case x => {
 //                    if (x != null){
@@ -82,7 +82,7 @@ object BlueprintsWrapper {
          * @param value property value.
          */
         def set(key:String, value:Any) = {
-            o.setProperty(key, value)
+            obj.setProperty(key, value)
             this
         }
 
@@ -92,9 +92,32 @@ object BlueprintsWrapper {
          * @return
          */
         def has(key:String):Boolean = {
-            o.getProperty(key) != null
+            obj.getProperty(key) != null
+        }
+
+        /**
+         * Deserialize object to case class.
+         * @tparam T case class type.
+         * @return
+         */
+        def toCC[T : Manifest]:Option[T] = {
+            ObjectConverter.toCC[T](obj)
         }
     }
+
+    implicit def elmToPropertyAccessor(elm:Element) = ScalasticPropertyAccessor(elm)
+
+//
+//    case class DbObjectSaver(elm:DbObject, db:Graph){
+//        /**
+//         * Save this object to database.
+//         */
+//        def save() = {
+//            db.save(elm)
+//        }
+//    }
+//
+//    implicit def elmToObjectSaver(elm:DbObject)(implicit db:Graph) = DbObjectSaver(elm, db)
 
     /**
      * Edge wrapper on arrow chain.
@@ -118,7 +141,7 @@ object BlueprintsWrapper {
             }
 
             p.prev = Some(this)
-            p.o = inV
+            p.vertex = inV
             p
         }
 
@@ -132,7 +155,7 @@ object BlueprintsWrapper {
                 ToVertexWrapper(outV, label, db)
             }
             p.prev = Some(this)
-            p.o = outV
+            p.vertex = outV
             p
         }
 
@@ -146,10 +169,9 @@ object BlueprintsWrapper {
      * @param label label.
      * @param db database object.
      */
-    case class ToVertexWrapper(private val vertex:Vertex, var label:String, db:Graph)
-            extends Wrapper with ScalasticPropertyAccessor[Vertex] {
+    case class ToVertexWrapper(var vertex:Vertex, var label:String, db:Graph)
+            extends Wrapper {
 
-        implicit var o = vertex
         var prev:Option[ToEdgeWrapper] = None
 
         def -->(label:String):ToEdgeWrapper = {
@@ -159,10 +181,10 @@ object BlueprintsWrapper {
             // we using previous object if any
 
             val next = prev.getOrElse {
-                ToEdgeWrapper(o, label, db)
+                ToEdgeWrapper(vertex, label, db)
             }
             next.prev = Some(this)
-            next.vertex = o
+            next.vertex = vertex
             next.label = label
             next
         }
@@ -174,10 +196,10 @@ object BlueprintsWrapper {
             // we using previous object if any
 
             val next = prev.getOrElse {
-                ToEdgeWrapper(o, label, db)
+                ToEdgeWrapper(vertex, label, db)
             }
             next.prev = Some(this)
-            next.vertex = o
+            next.vertex = vertex
             next.label = label
             next
         }
@@ -206,10 +228,10 @@ object BlueprintsWrapper {
          */
         def <-->(bothV:Vertex):ToVertexWrapper = {
             assert(label != null, "no label?")
-            db.addEdge(null, o, bothV, label)
-            db.addEdge(null, bothV, o, label)
+            db.addEdge(null, vertex, bothV, label)
+            db.addEdge(null, bothV, vertex, label)
             // update current vertex in chain
-            o = bothV
+            vertex = bothV
             this
         }
 
@@ -221,7 +243,7 @@ object BlueprintsWrapper {
         def mutual(label:String):Iterable[Vertex] = {
             val vx = this.pipe.both(label).toList
             vx.filter { v =>
-                v.getId != o.getId &&
+                v.getId != vertex.getId &&
                 vx.count( vv => v == vv ) == 2
             }
         }
@@ -232,31 +254,27 @@ object BlueprintsWrapper {
          */
         def pipe = {
             val pipe = new GremlinPipeline[Vertex, AnyRef]()
-            pipe.start(o)
+            pipe.start(vertex)
         }
 
     }
 
 
-    case class EdgeWrapperRight(v1:Vertex, edge:Edge, label:String, db:Graph) extends Wrapper with ScalasticPropertyAccessor[Edge] {
-        implicit var o = edge
-
+    case class EdgeWrapperRight(vertex:Vertex, edge:Edge, label:String, db:Graph) extends Wrapper {
         def -->(v2:Vertex) = {
-            db.addEdge(null, v1, v2, label)
+            db.addEdge(null, vertex, v2, label)
         }
     }
 
-    case class EdgeWrapperLeft(edge:Edge, db:Graph) extends Wrapper with ScalasticPropertyAccessor[Edge] {
-        implicit var o = edge
-
+    case class EdgeWrapperLeft(edge:Edge, db:Graph) extends Wrapper {
         def -->(label:String):EdgeWrapperRight = {
             val v = edge.getVertex(Direction.OUT)
-            EdgeWrapperRight(v, o, label, db)
+            EdgeWrapperRight(v, edge, label, db)
         }
 
         def <--(label:String):ToVertexWrapper = {
-            val v = edge.getVertex(Direction.IN)
-            ToVertexWrapper(v, label, db)
+            val vertex = edge.getVertex(Direction.IN)
+            ToVertexWrapper(vertex, label, db)
         }
     }
 
@@ -343,4 +361,12 @@ object BlueprintsWrapper {
         }
     }
 
+    trait DbObject {
+        /**
+         * Save this object to database.
+         */
+        def save()(implicit db:Graph) = {
+            db.save(this)
+        }
+    }
 }

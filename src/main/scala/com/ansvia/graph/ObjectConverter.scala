@@ -13,18 +13,14 @@ import util.CaseClassDeserializer
 
 object ObjectConverter {
 
-    import BlueprintsWrapper.ScalasticPropertyAccessor
-
-    implicit def elementToScalasticAccessor(_o:Element) = new ScalasticPropertyAccessor[Element] {
-        implicit var o = _o
-    }
+//    import BlueprintsWrapper._
 
     /**
      * this name will be used to store the class name of
      * the serialized case class that will be verified
      * in deserialization
      */
-    val ClassPropertyName = "_class_"
+    val CLASS_PROPERTY_NAME = "_class_"
 
     /**
      * serializes a given case class into a Node instance
@@ -35,7 +31,7 @@ object ObjectConverter {
             case (name, null) =>
             case (name, value) => pc.setProperty(name, value)
         }
-        pc.setProperty(ClassPropertyName, cc.getClass.getName)
+        pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
         pc.asInstanceOf[T]
     }
 
@@ -54,7 +50,7 @@ object ObjectConverter {
         }
 
     private def _toCCPossible[T: Manifest](pc: Element): Option[Class[_]] = {
-        val cpn = pc.getProperty(ClassPropertyName).toString
+        val cpn = pc.getProperty(CLASS_PROPERTY_NAME).toString
         val c = Class.forName(cpn)
         if (manifest[T].erasure.isAssignableFrom(c))
             Some(c)

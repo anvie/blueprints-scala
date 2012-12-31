@@ -16,91 +16,134 @@ This example data based on graph of the gods https://github.com/thinkaurelius/ti
 
 Creating new vertex:
 
-	case class Hercules(name:String, kind:String)
+```scala
+case class Person(name:String, kind:String)
 
-	hercules = Hercules("hercules", "demigod")
-	
-	db.save(hercules)
+val hercules = Person("hercules", "demigod")
 
+db.save(hercules)
+```
+
+If your class subclassing from `DbObject` you will have more sweet code like using `save()` directly:
+
+```scala
+
+case class Person(name:String, kind:String) extends DbObject
+
+val hercules = Person("hercules", "demigod").save()
+```
+
+The `save()` method return a Vertex object, if you want to get class back just:
+
+```scala
+val herculesObject = hercules.toCC[Person].get
+```
 
 Creating edges:
 
-	hercules --> "father" --> jupiter
-	hercules --> "mother" --> alcmene
-
+```scala
+hercules --> "father" --> jupiter
+hercules --> "mother" --> alcmene
+```
 Or you can also add multiple edges in one line:
 
-	hercules --> "father" --> jupiter --> "father" --> "saturn"
+```scala
+hercules --> "father" --> jupiter --> "father" --> saturn
+```
 
 Creating mutual (both) edges:
 
-	jupiter <--> "brother" <--> neptune
+```scala
+jupiter <--> "brother" <--> neptune
+```
 
 Or more complex mutual edges:
 
-	jupiter <--> "brother" <--> neptune <--> "brother" <--> pluto
-	
+```scala
+jupiter <--> "brother" <--> neptune <--> "brother" <--> pluto
+```	
 
 Shorthand property getter and setter:
 
-	jupiter.set("kind", "god")
-	
-	val kind = jupiter.get[String]("kind").get
+```scala
+jupiter.set("kind", "god")
+
+val kind = jupiter.get[String]("kind").get
+```
 	
 Getter `get` return Option instance, so you can handle unexpected return data efficiently using map:
 
-	jupiter.get[String]("kind") map { kind =>
-		// do with kind here
-	}
+```scala
+jupiter.get[String]("kind") map { kind =>
+	// do with kind here
+}
+```
 
 Or getting value by using default value if empty:
 
-	jupiter.getOrElse[String]("status", "live")
+```scala
+jupiter.getOrElse[String]("status", "live")
+```
 
 Easy getting mutual connection, for example jupiter and pluto is brother both has IN and OUT edges,
 is very easy to get mutual connection using `mutual` method:
 
-	val jupitersBrothers = jupiter.mutual('brother')
+```scala
+val jupitersBrothers = jupiter.mutual("brother")
+```
 	
 Inspect helpers to print vertex list:
 
-	jupitersBrothers.printDump("jupiter brothers:", "name")
-	
-	// will produce output:
+```scala
+jupitersBrothers.printDump("jupiter brothers:", "name")
 
-	jupiter brothers:
-	 + neptune
-	 + pluto
+// will produce output:
+
+jupiter brothers:
+ + neptune
+ + pluto
+```
 
 Using Gremlin Pipeline like a boss:
 
-	val battled = hercules.pipe.out("battled")
-	battled.printDump("hercules battled:", "name")
-	
-	// output:
-	
-	hercules battled:
-	 + nemean
-	 + hydra
-	 + cerberus
+```scala
+val battled = hercules.pipe.out("battled")
+battled.printDump("hercules battled:", "name")
+
+// output:
+
+hercules battled:
+ + nemean
+ + hydra
+ + cerberus
+```
 
 Syntactic sugar filtering on Gremlin Pipeline:
 
-	// get monster battled with hercules more than 5 times
-	val monsters = hercules.pipe.outE("battled").wrap.filter { edge =>
-	   edge.getOrElse[Int]("time", 0).toString.toInt > 5
-	}
+```scala
+// get monster battled with hercules more than 5 times
+val monsters = hercules.pipe.outE("battled").wrap.filter { edge =>
+   edge.getOrElse[Int]("time", 0).toString.toInt > 5
+}
+```
 
 Returning edges from chain by adding `<` on the last line:
 
-	var edge = hercules --> "battled" --> hydra <
-	edge.set("time", 2)
+```scala
+var edge = hercules --> "battled" --> hydra <
+edge.set("time", 2)
+```
 
 Using transaction:
 
-	transact {
-		hercules -->"father"--> jupiter
-	}
+```scala
+transact {
+	hercules --> "father" --> jupiter
+	hercules --> "mother" --> alcmene
+	val edge = hercules --> "battled" --> hydra <
+	edge.set("time", 15)
+}
+```
 
 How it work? All you needs is to adding dependency (see install), import it, and summon Graph db instance with implicit:
 
@@ -111,7 +154,7 @@ import com.ansvia.graph.BlueprintsWrapper._
 // here is i'm using simple in-memory Tinkergraph db for example.
 implicit val db = TinkerGraphFactory.createTinkerGraph()
 
-... work here ....
+//... work here ....
 ```
 
 Done, now you can using Scalastic sweet syntactic sugar code.
