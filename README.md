@@ -13,11 +13,15 @@ This example data based on graph of the gods https://github.com/thinkaurelius/ti
 
 ![](https://github.com/thinkaurelius/titan/raw/master/doc/images/graph-of-the-gods.png)
 
-Import all needed implicit definition:
 
-	import com.ansvia.graph.BlueprintsWrapper._
+Creating new vertex:
 
-Done, now you can using Scalastic sweet syntactic sugar code.
+	case class Hercules(name:String, kind:String)
+
+	hercules = Hercules("hercules", "demigod")
+	
+	db.save(hercules)
+
 
 Creating edges:
 
@@ -98,6 +102,20 @@ Using transaction:
 		hercules -->"father"--> jupiter
 	}
 
+How it work? All you needs is to adding dependency (see install), import it, and summon Graph db instance with implicit:
+
+```scala
+import com.ansvia.graph.BlueprintsWrapper._
+
+// you can use any graph database that support tinkerpop blueprints
+// here is i'm using simple in-memory Tinkergraph db for example.
+implicit val db = TinkerGraphFactory.createTinkerGraph()
+
+... work here ....
+```
+
+Done, now you can using Scalastic sweet syntactic sugar code.
+
 
 Install
 --------
@@ -106,7 +124,7 @@ Add resolvers:
 
 	"Ansvia repo" at "http://scala.repo.ansvia.com/releases/"
 
-Add dependencies:
+Add dependency:
 
 	"com.ansvia.graph" % "blueprints-scala" % "0.0.1"
 
