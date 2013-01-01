@@ -8,10 +8,13 @@ package com.ansvia.graph
  * 
  */
 import collection.JavaConversions._
-import com.tinkerpop.blueprints.Element
+import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
+import com.ansvia.graph.BlueprintsWrapper.DbObject
 
 object ObjectConverter {
+
+    class Persistent extends scala.annotation.Annotation
 
 //    import BlueprintsWrapper._
 
@@ -32,6 +35,9 @@ object ObjectConverter {
             case (name, value) => pc.setProperty(name, value)
         }
         pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
+
+        // save non case class accessor
+
         pc.asInstanceOf[T]
     }
 
@@ -43,9 +49,17 @@ object ObjectConverter {
     def toCC[T: Manifest](pc: Element): Option[T] =
         _toCCPossible(pc) match {
             case Some(serializedClass) =>
+
                 val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
+
                 val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
+
+                if (o.isInstanceOf[DbObject]){
+                    o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                }
+
                 Some(o)
+
             case _ => None
         }
 

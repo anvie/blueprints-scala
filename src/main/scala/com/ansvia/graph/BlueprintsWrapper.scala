@@ -3,19 +3,13 @@ package com.ansvia.graph
 
 import com.tinkerpop.blueprints._
 import java.lang.Iterable
-import java.util
 import com.tinkerpop.pipes.PipeFunction
-import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import scala.Some
-import collection.mutable
-import util.CaseClassSigParser
 
 object BlueprintsWrapper {
-    import scala.collection.JavaConverters._
     import scala.collection.JavaConversions._
 
-//    trait DbObject
     sealed trait Wrapper
 
     case class ScalasticPropertyAccessor[A <: Element](obj:A) {
@@ -241,7 +235,7 @@ object BlueprintsWrapper {
          * @return
          */
         def mutual(label:String):Iterable[Vertex] = {
-            val vx = this.pipe.both(label).toList
+            val vx = vertex.getVertices(Direction.BOTH, label).toList
             vx.filter { v =>
                 v.getId != vertex.getId &&
                 vx.count( vv => v == vv ) == 2
@@ -362,11 +356,28 @@ object BlueprintsWrapper {
     }
 
     trait DbObject {
+
+        private var vertex:Vertex = null
+
         /**
          * Save this object to database.
          */
         def save()(implicit db:Graph) = {
             db.save(this)
         }
+
+        /**
+         * override this for custom load routine
+         * @param vertex vertex object.
+         */
+        def __load__(vertex:Vertex){
+           this.vertex = vertex
+        }
+
+        /**
+         * get bounded vertex.
+         * @return
+         */
+        def getVertex = vertex
     }
 }
