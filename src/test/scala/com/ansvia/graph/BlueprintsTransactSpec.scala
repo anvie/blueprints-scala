@@ -1,10 +1,7 @@
 package com.ansvia.graph
 
-import org.specs2.mutable.{After, Specification}
-import com.ansvia.graph.BlueprintsWrapper._
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.blueprints.{Vertex, Direction}
-import java.lang.Iterable
+import org.specs2.mutable.Specification
+import com.tinkerpop.blueprints.Edge
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph
 
 /**
@@ -18,8 +15,6 @@ class BlueprintsTransactSpec extends Specification {
 
 
     import BlueprintsWrapper._
-    import scala.collection.JavaConversions._
-    import scala.collection.JavaConverters._
 
     sequential
 
@@ -45,17 +40,28 @@ class BlueprintsTransactSpec extends Specification {
 
     // test with property mutator
 
-    val edge1 = hercules -->"battled"--> vertices("nemean") <
-    val edge2 = hercules -->"battled"--> vertices("hydra") <
-    val edge3 = hercules -->"battled"--> vertices("cerberus") <
+    val edge1 = hercules -->"battled"--> vertices("nemean") <()
+    val edge2 = hercules -->"battled"--> vertices("hydra") <()
+    val edge3 = hercules -->"battled"--> vertices("cerberus") <()
 
     edge1.set("time", 1)
     edge2.set("time", 2)
     edge3.set("time", 12)
 
+    var edge4:Edge = null
+
+    val edge = hercules --> "test" --> vertices("cerberus") <()
+    edge.set("timestamp", 1)
+
     // test success transaction
     transact {
         edge1.set("win", true)
+
+        // test set datetime
+        val edge = hercules --> "test" --> vertices("cerberus") <()
+        edge.set("timestamp", 1)
+
+        edge4 = edge
     }
 
     // test fail transaction
@@ -80,6 +86,12 @@ class BlueprintsTransactSpec extends Specification {
         }
         "handle failed transaction correctly #2" in {
             edge3.has("win") must beFalse
+        }
+        "create edge and set inside transact" in {
+            edge4.has("timestamp") must beTrue
+        }
+        "create edge and set inside transact return expected data" in {
+            edge4.get[Int]("timestamp") must beEqualTo(Some(1))
         }
     }
 

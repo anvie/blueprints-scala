@@ -153,7 +153,7 @@ object BlueprintsWrapper {
             p
         }
 
-        def < = this.lastEdge
+        def <():Edge = this.lastEdge
     }
 
     /**
@@ -198,9 +198,9 @@ object BlueprintsWrapper {
             next
         }
 
-        def < = {
+        def <():Edge = {
             if (this.prev.isDefined)
-                this.prev.get <
+                this.prev.get <()
             else
                 null
         }
@@ -330,28 +330,27 @@ object BlueprintsWrapper {
      * @param db implicit db
      * @return
      */
-    def transact(wrappedFunc: => AnyRef)(implicit db:TransactionalGraph) = {
+    def transact[T](wrappedFunc: => T)(implicit db:TransactionalGraph):T = {
 //        val dbx = db.startTransaction()
-        var rv:AnyRef = null
         try {
 
-            rv = wrappedFunc
+            val x = wrappedFunc
 
             db.stopTransaction(TransactionalGraph.Conclusion.SUCCESS)
+
+            x
+
         }catch{
             case e:Exception =>
                 db.stopTransaction(TransactionalGraph.Conclusion.FAILURE)
                 throw e
         }
-        rv
     }
 
     implicit def dbWrapper(db:Graph) = new {
         def save[T:Manifest](cc:T):Vertex = {
-//            transact {
             val o = db.addVertex(null)
             ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o)
-//            }.asInstanceOf[Vertex]
         }
     }
 
