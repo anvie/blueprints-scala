@@ -131,6 +131,7 @@ Returning edges from chain by adding `<` on the last line:
 
 ```scala
 var edge = hercules --> "battled" --> hydra <
+
 edge.set("time", 2)
 ```
 
@@ -141,6 +142,7 @@ transact {
 	hercules --> "father" --> jupiter
 	hercules --> "mother" --> alcmene
 	val edge = hercules --> "battled" --> hydra <
+
 	edge.set("time", 15)
 }
 ```
