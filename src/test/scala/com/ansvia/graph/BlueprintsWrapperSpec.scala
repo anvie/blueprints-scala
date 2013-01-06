@@ -167,7 +167,21 @@ class BlueprintsWrapperSpec extends Specification {
         "use multi filtering #4 must not contains cerberus" in {
             multiFilterResult.contains(edge3) must beFalse
         }
+        "use inFirst" in {
+            sea.pipe.inFirst("lives").get.getOrElse("name", "") must beEqualTo("neptune")
+        }
+        "not throwing any error when inFirst didn't returning any values" in {
+            sea.pipe.inFirst("destroy").isEmpty must beTrue
+        }
+        "use outFirst" in {
+            hercules.pipe.outFirst("battled").get.getOrElse("name", "") must beEqualTo("nemean")
+        }
+        "not throwing any error when outFirst didn't returning any values" in {
+            hercules.pipe.outFirst("destroy").isEmpty must beTrue
+        }
     }
 
 
 }
+
+

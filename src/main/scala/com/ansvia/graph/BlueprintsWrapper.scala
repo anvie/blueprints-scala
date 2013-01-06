@@ -6,6 +6,7 @@ import java.lang.Iterable
 import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import scala.Some
+import com.tinkerpop.pipes.util.FastNoSuchElementException
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
@@ -299,8 +300,15 @@ object BlueprintsWrapper {
             vxList
         }
     }
+
+
+    /**
+     * Gremlin pipe wrapper.
+     * @param innerPipe raw gremlin pipe.
+     */
     case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
         def wrap = GremlinPipeWrapperVertex(innerPipe)
+
         def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
             val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
                 def compute(v: Vertex):java.lang.Boolean = {
@@ -309,7 +317,34 @@ object BlueprintsWrapper {
             })
             rv
         }
+
+        /**
+         * Get first in direction for label vertex.
+         * @param label edge label.
+         * @return
+         */
+        def inFirst(label:String):Option[Vertex] = {
+            try {
+                Some(innerPipe.in(label).next())
+            }catch{
+                case e:FastNoSuchElementException => None
+            }
+        }
+
+        /**
+         * Get first head out direction for label vertex.
+         * @param label edge label.
+         * @return
+         */
+        def outFirst(label:String):Option[Vertex] = {
+            try {
+                Some(innerPipe.out(label).next())
+            }catch{
+                case e:FastNoSuchElementException => None
+            }
+        }
     }
+
     case class GremlinPipeWrapperEdge[Vertex, Edge](innerPipe:GremlinPipeline[Vertex, Edge]){
         def wrap = GremlinPipeWrapperEdge[Vertex, Edge](innerPipe)
         def filter(gpf: Edge => Boolean):GremlinPipeline[Vertex, Edge] = {
