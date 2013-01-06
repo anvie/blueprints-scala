@@ -36,6 +36,8 @@ class ObjectConverterSpec extends Specification {
     val v4 = v4o.save()
     val v4ob = v4.toCC[Animal].get
 
+    v3 --> "hit" --> v4ob
+
     "Object converter" should {
         "convert vertex to case class #1" in {
             vtcc1.isDefined must beTrue
@@ -90,6 +92,12 @@ class ObjectConverterSpec extends Specification {
         }
         "able to get raw vertex from case class" in {
             v4ob.getVertex must beEqualTo(v4)
+        }
+        "make relation DbObject to DbObject #1" in {
+            v4ob.getVertex.pipe.inFirst("hit").isDefined must beTrue
+        }
+        "make relation DbObject to DbObject #2" in {
+            v4ob.getVertex.pipe.inFirst("hit").get.toCC[Motor].get.mark must beEqualTo("Honda")
         }
     }
 

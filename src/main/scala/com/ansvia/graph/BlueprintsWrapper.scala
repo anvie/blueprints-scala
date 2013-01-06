@@ -7,6 +7,7 @@ import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import scala.Some
 import com.tinkerpop.pipes.util.FastNoSuchElementException
+import com.ansvia.graph.Exc.NotBoundException
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
@@ -116,23 +117,23 @@ object BlueprintsWrapper {
 
     /**
      * Edge wrapper on arrow chain.
-     * This wrapper automatic used via ToVertexWrapper.
+     * This wrapper automatic used via VertexWrapper.
      * @param vertex vertex
      * @param label label
      * @param db database
      */
-    case class ToEdgeWrapper(var vertex:Vertex, var label:String, db:Graph) extends Wrapper {
+    case class EdgeWrapper(var vertex:Vertex, var label:String, db:Graph) extends Wrapper {
         private var lastEdge:Edge = null
-        var prev:Option[ToVertexWrapper] = None
+        var prev:Option[VertexWrapper] = None
 
-        def -->(inV:Vertex) = {
+        def -->(inV:Vertex):VertexWrapper = {
             lastEdge = db.addEdge(null, vertex, inV, label)
 
             // for performance reason
             // we using previous object if any
 
             val p = prev.getOrElse {
-                ToVertexWrapper(inV, label, db)
+                VertexWrapper(inV, label, db)
             }
 
             p.prev = Some(this)
@@ -140,18 +141,22 @@ object BlueprintsWrapper {
             p
         }
 
-        def <--(outV:Vertex) = {
+        def <--(outV:Vertex):VertexWrapper = {
             lastEdge = db.addEdge(null, outV, vertex, label)
 
             // for performance reason
             // we using previous object if any
 
             val p = prev.getOrElse {
-                ToVertexWrapper(outV, label, db)
+                VertexWrapper(outV, label, db)
             }
             p.prev = Some(this)
             p.vertex = outV
             p
+        }
+
+        def -->(o:DbObject):VertexWrapper = {
+            this.-->(o.getVertex)
         }
 
         def <():Edge = this.lastEdge
@@ -164,19 +169,19 @@ object BlueprintsWrapper {
      * @param label label.
      * @param db database object.
      */
-    case class ToVertexWrapper(var vertex:Vertex, var label:String, db:Graph)
+    case class VertexWrapper(var vertex:Vertex, var label:String, db:Graph)
             extends Wrapper {
 
-        var prev:Option[ToEdgeWrapper] = None
+        var prev:Option[EdgeWrapper] = None
 
-        def -->(label:String):ToEdgeWrapper = {
+        def -->(label:String):EdgeWrapper = {
             this.label = label
 
             // for performance reason
             // we using previous object if any
 
             val next = prev.getOrElse {
-                ToEdgeWrapper(vertex, label, db)
+                EdgeWrapper(vertex, label, db)
             }
             next.prev = Some(this)
             next.vertex = vertex
@@ -184,14 +189,14 @@ object BlueprintsWrapper {
             next
         }
 
-        def <--(label:String):ToEdgeWrapper = {
+        def <--(label:String):EdgeWrapper = {
             this.label = label
 
             // for performance reason
             // we using previous object if any
 
             val next = prev.getOrElse {
-                ToEdgeWrapper(vertex, label, db)
+                EdgeWrapper(vertex, label, db)
             }
             next.prev = Some(this)
             next.vertex = vertex
@@ -211,7 +216,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
-        def <-->(label:String):ToVertexWrapper = {
+        def <-->(label:String):VertexWrapper = {
             this.label = label
             this
         }
@@ -221,7 +226,7 @@ object BlueprintsWrapper {
          * @param bothV another vertex to connect.
          * @return
          */
-        def <-->(bothV:Vertex):ToVertexWrapper = {
+        def <-->(bothV:Vertex):VertexWrapper = {
             assert(label != null, "no label?")
             db.addEdge(null, vertex, bothV, label)
             db.addEdge(null, bothV, vertex, label)
@@ -267,13 +272,13 @@ object BlueprintsWrapper {
             EdgeWrapperRight(v, edge, label, db)
         }
 
-        def <--(label:String):ToVertexWrapper = {
+        def <--(label:String):VertexWrapper = {
             val vertex = edge.getVertex(Direction.IN)
-            ToVertexWrapper(vertex, label, db)
+            VertexWrapper(vertex, label, db)
         }
     }
 
-    implicit def vertexWrapper(vertex:Vertex)(implicit db:Graph) = ToVertexWrapper(vertex, null, db)
+    implicit def vertexWrapper(vertex:Vertex)(implicit db:Graph) = VertexWrapper(vertex, null, db)
     implicit def edgeWrapper(edge:Edge)(implicit db:Graph) = EdgeWrapperLeft(edge, db)
     implicit def edgeFormatter(edge:Edge) = new {
         def prettyPrint(key:String) = {
@@ -412,6 +417,16 @@ object BlueprintsWrapper {
          * get bounded vertex.
          * @return
          */
-        def getVertex = vertex
+        def getVertex = {
+            if (vertex == null)
+                throw NotBoundException("object %s not bound to existing vertex, unsaved vertex?".format(this))
+            vertex
+        }
+
+        def -->(label:String)(implicit db:Graph) = {
+            vertex --> label
+        }
+
     }
 }
+
