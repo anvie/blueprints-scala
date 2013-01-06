@@ -99,6 +99,12 @@ class ObjectConverterSpec extends Specification {
         "make relation DbObject to DbObject #2" in {
             v4ob.getVertex.pipe.inFirst("hit").get.toCC[Motor].get.mark must beEqualTo("Honda")
         }
+        "unsaved DbObject return false in isSaved" in {
+            v4o.isSaved must beFalse
+        }
+        "saved DbObject return true in isSaved" in {
+            v4ob.isSaved must beTrue
+        }
     }
 
 }
