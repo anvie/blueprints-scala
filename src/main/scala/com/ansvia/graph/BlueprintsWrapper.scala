@@ -415,6 +415,8 @@ object BlueprintsWrapper {
 
         /**
          * get bounded vertex.
+         * throw [[com.ansvia.graph.Exc.NotBoundException]] if object not saved
+         * see [[com.ansvia.graph.BlueprintsWrapper.DbObject#isSaved]] for checking is object saved or not.
          * @return
          */
         def getVertex = {
@@ -423,6 +425,17 @@ object BlueprintsWrapper {
             vertex
         }
 
+        /**
+         * Check is object saved.
+         * @return
+         */
+        def isSaved = vertex != null
+
+        /**
+         * Create edge label.
+         * @param label edge label.
+         * @return
+         */
         def -->(label:String)(implicit db:Graph) = {
             vertex --> label
         }
