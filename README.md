@@ -167,11 +167,17 @@ Install
 
 Add resolvers:
 
-	"Ansvia repo" at "http://scala.repo.ansvia.com/releases/"
+	"Ansvia release repo" at "http://scala.repo.ansvia.com/releases/"
 
 Add dependency:
 
 	"com.ansvia.graph" % "blueprints-scala" % "0.0.1"
+
+For Snapshot:
+
+	"Ansvia snapshot repo" at "http://scala.repo.ansvia.com/snapshots/"
+
+	"com.ansvia.graph" % "blueprints-scala" % "0.0.2-SNAPSHOT"
 
 
 ***[] Robin Sy.***
