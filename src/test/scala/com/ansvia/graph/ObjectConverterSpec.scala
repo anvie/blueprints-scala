@@ -105,6 +105,9 @@ class ObjectConverterSpec extends Specification {
         "saved DbObject return true in isSaved" in {
             v4ob.isSaved must beTrue
         }
+        "class contain lazy or val should not raising invocation error" in {
+            ContainLazy(1).save() must not equalTo(null)
+        }
     }
 
 }
@@ -124,6 +127,12 @@ case class Animal(name:String) extends DbObject {
         age = vertex.getOrElse[Int]("age", 0)
         kind = vertex.getOrElse[String]("kind", "")
     }
+}
+case class ContainLazy(test:Long) extends DbObject {
+    lazy val x = {
+        2
+    }
+    val z = 3
 }
 
 

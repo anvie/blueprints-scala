@@ -153,7 +153,7 @@ object CaseClassSigParser {
     def parse[A](clazz: Class[A]) = {
         findSym(clazz).children
             .filter{ c =>
-            (c.isCaseAccessor || c.isAccessor) && !c.isPrivate
+            (c.isCaseAccessor || c.isAccessor) && !c.isPrivate && !c.isLazy
         }.map(_.asInstanceOf[MethodSymbol])
             .zipWithIndex
             .flatMap {
