@@ -6,7 +6,7 @@ version := "0.0.2-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
-scalacOptions := Seq("-unchecked")
+scalacOptions := Seq("-unchecked", "-deprecation")
 
 resolvers ++= Seq(
     "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",

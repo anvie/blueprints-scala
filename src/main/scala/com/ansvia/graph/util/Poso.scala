@@ -2,6 +2,7 @@ package com.ansvia.graph.util
 
 import scalax.rules.scalasig._
 import collection.mutable.{SynchronizedMap, ArrayBuffer, HashMap}
+import java.lang.reflect
 
 /**
  * helper class to store Class object
@@ -46,6 +47,7 @@ object CaseClassDeserializer {
      */
     def deserialize(m: Map[String, AnyRef], javaTypeTarget: JavaType) = {
         require(javaTypeTarget.c.getConstructors.length == 1, "Case classes must only have one constructor.")
+
         val constructor = javaTypeTarget.c.getConstructors.head
         val params = sigParserCache.getOrElseUpdate(javaTypeTarget.c, CaseClassSigParser.parse(javaTypeTarget.c))
 
@@ -73,7 +75,48 @@ object CaseClassDeserializer {
         val paramsCount = constructor.getParameterTypes.length
         val ccParams = values.slice(0, paramsCount)
 
-        constructor.newInstance(ccParams.toArray: _*).asInstanceOf[AnyRef]
+        val summoned = constructor.newInstance(ccParams.toArray: _*).asInstanceOf[AnyRef]
+//
+//        if (values.length > paramsCount){
+//            val clazz = javaTypeTarget.c.getClass
+//
+//            val methods = {
+//
+//                //            val clazz = o.getClass
+//                var symbols = Map.empty[String, reflect.Method]
+//                var curClazz:Class[_] = clazz
+//                var done = false
+//
+//                while(!done){
+//                    val rv: Map[String, reflect.Method] =
+//                        methodCache.getOrElseUpdate(curClazz,
+//                            curClazz.getDeclaredMethods.filter {
+//                                _.getParameterTypes.isEmpty
+//                            }.map {
+//                                m => m.getName -> m
+//                            }.toMap)
+//
+//                    symbols ++= rv
+//
+//                    curClazz = curClazz.getSuperclass
+//                    done = curClazz == classOf[java.lang.Object] || curClazz == null
+//                }
+//
+//                symbols
+//            }
+//
+//            for (v <- values; if !ccParams.contains(v)){
+//                //            methods.get(paramName).get.invoke(o)
+//
+//                val params: Seq[(String, JavaType)] = sigParserCache.getOrElseUpdate(clazz, CaseClassSigParser.parse(clazz))
+//                for ((paramName, _) <- params){
+//                    methods.get(paramName).get.invoke(clazz)
+//                }
+//            }
+//
+//        }
+
+        summoned
     }
 
     /**
@@ -81,16 +124,37 @@ object CaseClassDeserializer {
      * @param o AnyRef case class instance
      */
     def serialize(o: AnyRef): Map[String, AnyRef] = {
-        val methods = methodCache.getOrElseUpdate(o.getClass,
-            o.getClass.getDeclaredMethods
-                .filter {
-                _.getParameterTypes.isEmpty
+
+        val methods = {
+
+//            val clazz = o.getClass
+            var symbols = Map.empty[String, reflect.Method]
+            var curClazz:Class[_] = o.getClass
+            var done = false
+
+            while(!done){
+                val rv: Map[String, reflect.Method] =
+                    methodCache.getOrElseUpdate(curClazz,
+                        curClazz.getDeclaredMethods.filter {
+                            _.getParameterTypes.isEmpty
+                        }.map {
+                            m => m.getName -> m
+                        }.toMap)
+
+                symbols ++= rv
+
+                curClazz = curClazz.getSuperclass
+                done = curClazz == classOf[java.lang.Object] || curClazz == null
             }
-                .map {
-                m => m.getName -> m
-            }.toMap)
+
+            symbols
+        }
+
         val params: Seq[(String, JavaType)] = sigParserCache.getOrElseUpdate(o.getClass, CaseClassSigParser.parse(o.getClass))
-        val l = for ((paramName, _) <- params; value = methods.get(paramName).get.invoke(o)) yield (paramName, value)
+        val l = for {
+            (paramName, _) <- params;
+            value = methods.get(paramName).get.invoke(o)
+        } yield (paramName, value)
         l.toMap
     }
 
@@ -126,7 +190,7 @@ object CaseClassSigParser {
         }
     }
 
-    protected def findSym[A](clazz: Class[A]) = {
+    protected def findSym[A](clazz: Class[A]): SymbolInfoSymbol with Product with Serializable = {
         val pss = parseScalaSig(clazz)
         pss match {
             case Some(x) => {
@@ -150,20 +214,35 @@ object CaseClassSigParser {
         }
     }
 
-    def parse[A](clazz: Class[A]) = {
-        findSym(clazz).children
-            .filter{ c =>
-            (c.isCaseAccessor || c.isAccessor) && !c.isPrivate && !c.isLazy && !c.isProtected
-        }.map(_.asInstanceOf[MethodSymbol])
-            .zipWithIndex
-            .flatMap {
-            case (ms, idx) => {
-                ms.infoType match {
-                    case NullaryMethodType(t: TypeRefType) => Some(ms.name -> typeRef2JavaType(t))
-                    case _ => None
+    def parse[A](clazz: Class[A]): Seq[(String, JavaType)] = {
+
+        var symbols = Array.empty[(String, JavaType)]
+        var curClazz:Class[_] = clazz
+        var done = false
+
+        while(!done){
+
+            val rv =
+                findSym(curClazz).children
+                .filter{ c =>
+                    (c.isCaseAccessor || c.isAccessor) && !c.isPrivate && !c.isLazy && !c.isProtected
+                }.map(_.asInstanceOf[MethodSymbol])
+                .zipWithIndex
+                .flatMap {
+                    case (ms, idx) => {
+                        ms.infoType match {
+                            case NullaryMethodType(t: TypeRefType) => Some(ms.name -> typeRef2JavaType(t))
+                            case _ => None
+                        }
+                    }
                 }
-            }
+            symbols ++= rv
+
+            curClazz = curClazz.getSuperclass
+            done = curClazz == classOf[java.lang.Object] || curClazz == null
+
         }
+        symbols.toSeq
     }
 
     protected def typeRef2JavaType(ref: TypeRefType): JavaType = {

@@ -38,6 +38,17 @@ class ObjectConverterSpec extends Specification {
 
     v3 --> "hit" --> v4ob
 
+
+    val nemoDraft = SeaFish("yellow")
+    nemoDraft.name = "nemo"
+    val nemo = nemoDraft.save().toCC[SeaFish].get
+
+    val sharkDraft = Shark("Hammer head")
+    sharkDraft.name = "the killer"
+    sharkDraft.lives = "Atlantica"
+    val shark = sharkDraft.save().toCC[Shark].get
+
+
     "Object converter" should {
         "convert vertex to case class #1" in {
             vtcc1.isDefined must beTrue
@@ -108,6 +119,24 @@ class ObjectConverterSpec extends Specification {
         "class contain lazy or val should not raising invocation error" in {
             ContainLazy(1).save() must not equalTo(null)
         }
+        "access upper variable #1" in {
+            nemo.name must beEqualTo("nemo")
+        }
+        "access upper variable #2" in {
+            nemo.color must beEqualTo("yellow")
+        }
+        "access upper-upper variable #1" in {
+            shark.color must beEqualTo("blue")
+        }
+        "access upper-upper variable #2" in {
+            shark.name must beEqualTo("the killer")
+        }
+        "access upper-upper variable #3" in {
+            shark.kind must beEqualTo("Hammer head")
+        }
+        "access lower variable via loader from upper-upper" in {
+            shark.lives must beEqualTo("Atlantica")
+        }
     }
 
 }
@@ -135,6 +164,32 @@ case class ContainLazy(test:Long) extends DbObject {
     val z = 3
 }
 
+abstract class Fish extends DbObject{
+    var name:String = ""
+
+    /**
+     * override this for custom load routine
+     * @param vertex vertex object.
+     */
+    override def __load__(vertex: Vertex) {
+        super.__load__(vertex)
+        name = vertex.getOrElse("name", "")
+    }
+}
+
+case class SeaFish(color:String) extends Fish
+case class Shark(kind:String) extends SeaFish("blue"){
+    var lives:String = ""
+
+    /**
+     * override this for custom load routine
+     * @param vertex vertex object.
+     */
+    override def __load__(vertex: Vertex) {
+        super.__load__(vertex)
+        lives = vertex.getOrElse("lives", "")
+    }
+}
 
 
 
