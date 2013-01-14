@@ -14,6 +14,8 @@ import com.ansvia.graph.BlueprintsWrapper._
  */
 class ObjectConverterSpec extends Specification {
 
+    import com.ansvia.graph.testing.models._
+
     implicit val db = TinkerGraphFactory.createTinkerGraph()
 
     val v = db.addVertex(null)
@@ -138,67 +140,11 @@ class ObjectConverterSpec extends Specification {
         "access lower variable via loader from upper-upper" in {
             shark.lives must beEqualTo("Atlantica")
         }
-        "access from trait variable" in {
+        "access trait variable" in {
             shark.eatable must beFalse
         }
     }
 
-}
-
-case class User(name:String, age:Int)
-case class Motor(mark:String) extends DbObject
-case class Animal(name:String) extends DbObject {
-    var age:Int = 0
-    var kind:String = ""
-
-    /**
-     * override  this for custom load routine
-     * @param vertex vertex object.
-     */
-    override def __load__(vertex: Vertex) {
-        super.__load__(vertex)
-        age = vertex.getOrElse[Int]("age", 0)
-        kind = vertex.getOrElse[String]("kind", "")
-    }
-}
-case class ContainLazy(test:Long) extends DbObject {
-    lazy val x = {
-        2
-    }
-    val z = 3
-}
-
-abstract class Fish extends DbObject {
-    var name:String = ""
-
-    /**
-     * override this for custom load routine
-     * @param vertex vertex object.
-     */
-    override def __load__(vertex: Vertex) {
-        super.__load__(vertex)
-        name = vertex.getOrElse("name", "")
-    }
-}
-
-trait Eatable {
-    var eatable:Boolean = true
-}
-
-case class SeaFish(color:String) extends Fish
-
-case class Shark(kind:String) extends SeaFish("blue") with Eatable {
-    var lives:String = ""
-
-    /**
-     * override this for custom load routine
-     * @param vertex vertex object.
-     */
-    override def __load__(vertex: Vertex) {
-        super.__load__(vertex)
-        lives = vertex.getOrElse("lives", "")
-        eatable = vertex.getOrElse("eatable", true)
-    }
 }
 
 
