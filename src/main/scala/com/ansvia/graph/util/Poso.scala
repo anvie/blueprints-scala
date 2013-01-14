@@ -4,6 +4,7 @@ import scalax.rules.scalasig._
 import collection.mutable.{SynchronizedMap, ArrayBuffer, HashMap}
 import java.lang.reflect
 import com.ansvia.graph.BlueprintsWrapper.DbObject
+import collection.mutable
 
 /**
  * helper class to store Class object
@@ -18,14 +19,14 @@ object CaseClassDeserializer {
     /**
      * Method Map cache for method serialize
      */
-    private val methodCache = new HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
-        with SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+    private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
     /**
      * signature parser cache
      */
-    private val sigParserCache = new HashMap[Class[_], Seq[(String, JavaType)]]()
-        with SynchronizedMap[Class[_], Seq[(String, JavaType)]]
+    private val sigParserCache = new mutable.HashMap[Class[_], Seq[(String, JavaType)]]()
+        with mutable.SynchronizedMap[Class[_], Seq[(String, JavaType)]]
 
     /**
      * default behaviour for T == serialized class
