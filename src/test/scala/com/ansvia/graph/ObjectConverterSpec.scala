@@ -66,7 +66,7 @@ class ObjectConverterSpec extends Specification {
             v2.get("_class_").isDefined must beTrue
         }
         "convert case class to vertex #3" in {
-            v2.get[String]("_class_").get must beEqualTo("com.ansvia.graph.User")
+            v2.get[String]("_class_").get must beEqualTo("com.ansvia.graph.testing.model.User")
         }
         "convert back from vertex to case class #1" in {
             vtcc2.isDefined must beTrue
