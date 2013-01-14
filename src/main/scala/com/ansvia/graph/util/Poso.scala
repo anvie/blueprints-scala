@@ -3,6 +3,7 @@ package com.ansvia.graph.util
 import scalax.rules.scalasig._
 import collection.mutable.{SynchronizedMap, ArrayBuffer, HashMap}
 import java.lang.reflect
+import com.ansvia.graph.BlueprintsWrapper.DbObject
 
 /**
  * helper class to store Class object
@@ -219,6 +220,7 @@ object CaseClassSigParser {
         var symbols = Array.empty[(String, JavaType)]
         var curClazz:Class[_] = clazz
         var done = false
+        val traitIterator = curClazz.getInterfaces.toIterator
 
         while(!done){
 
@@ -240,6 +242,19 @@ object CaseClassSigParser {
 
             curClazz = curClazz.getSuperclass
             done = curClazz == classOf[java.lang.Object] || curClazz == null
+
+            if (done && traitIterator.hasNext){
+
+                // try searching interfaces / traits
+                curClazz = traitIterator.next()
+
+                done = curClazz == classOf[java.lang.Object] ||
+                    curClazz == classOf[scala.ScalaObject] ||
+                    curClazz == classOf[scala.Product] ||
+                    curClazz == classOf[scala.Serializable] ||
+                    curClazz == classOf[DbObject] ||
+                    curClazz == null
+            }
 
         }
         symbols.toSeq

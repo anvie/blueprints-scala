@@ -46,6 +46,7 @@ class ObjectConverterSpec extends Specification {
     val sharkDraft = Shark("Hammer head")
     sharkDraft.name = "the killer"
     sharkDraft.lives = "Atlantica"
+    sharkDraft.eatable = false
     val shark = sharkDraft.save().toCC[Shark].get
 
 
@@ -137,6 +138,9 @@ class ObjectConverterSpec extends Specification {
         "access lower variable via loader from upper-upper" in {
             shark.lives must beEqualTo("Atlantica")
         }
+        "access from trait variable" in {
+            shark.eatable must beFalse
+        }
     }
 
 }
@@ -164,7 +168,7 @@ case class ContainLazy(test:Long) extends DbObject {
     val z = 3
 }
 
-abstract class Fish extends DbObject{
+abstract class Fish extends DbObject {
     var name:String = ""
 
     /**
@@ -177,8 +181,13 @@ abstract class Fish extends DbObject{
     }
 }
 
+trait Eatable {
+    var eatable:Boolean = true
+}
+
 case class SeaFish(color:String) extends Fish
-case class Shark(kind:String) extends SeaFish("blue"){
+
+case class Shark(kind:String) extends SeaFish("blue") with Eatable {
     var lives:String = ""
 
     /**
@@ -188,6 +197,7 @@ case class Shark(kind:String) extends SeaFish("blue"){
     override def __load__(vertex: Vertex) {
         super.__load__(vertex)
         lives = vertex.getOrElse("lives", "")
+        eatable = vertex.getOrElse("eatable", true)
     }
 }
 
