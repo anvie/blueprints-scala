@@ -14,14 +14,14 @@ import com.ansvia.graph.BlueprintsWrapper._
  */
 class ObjectConverterSpec extends Specification {
 
-    import com.ansvia.graph.testing.models._
+    import com.ansvia.graph.testing.model._
 
     implicit val db = TinkerGraphFactory.createTinkerGraph()
 
     val v = db.addVertex(null)
     v.set("name", "robin")
     v.set("age", 25)
-    v.set("_class_", "com.ansvia.graph.User")
+    v.set("_class_", "com.ansvia.graph.testing.model.User")
 
     val vtcc1 = ObjectConverter.toCC[User](v)
 
