@@ -229,8 +229,8 @@ object CaseClassSigParser {
 
     private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
         with mutable.SynchronizedMap[Class[_], Array[String]]
-    private val traitItCache = new mutable.HashMap[Class[_], Seq[Class[_]]]()
-        with mutable.SynchronizedMap[Class[_], Seq[Class[_]]]
+//    private val traitItCache = new mutable.HashMap[Class[_], Seq[Class[_]]]()
+//        with mutable.SynchronizedMap[Class[_], Seq[Class[_]]]
 
     private def isExcluded(clazz: Class[_]) = {
         clazz == classOf[java.lang.Object] ||
@@ -246,7 +246,7 @@ object CaseClassSigParser {
         var symbols = Array.empty[(String, JavaType)]
         var curClazz:Class[_] = clazz
         var done = false
-        var traitIterator: Iterator[Class[_]] = traitItCache.getOrElseUpdate(clazz, curClazz.getInterfaces.toIterator.toSeq).toIterator
+        var traitIterator = curClazz.getInterfaces.toIterator
         val mainClazz = clazz
 
         // fill cache
@@ -274,7 +274,7 @@ object CaseClassSigParser {
             persistedVarCache.update(mainClazz, fieldNames)
         }
 
-        traitIterator = traitItCache.getOrElseUpdate(clazz, curClazz.getInterfaces.toIterator.toSeq).toIterator
+        traitIterator = curClazz.getInterfaces.toIterator
         curClazz = mainClazz
         done = false
 
