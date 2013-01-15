@@ -6,6 +6,7 @@ import java.lang.reflect
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import collection.mutable
 import com.ansvia.graph.annotation.Persistent
+import annotation.tailrec
 
 /**
  * helper class to store Class object
@@ -232,6 +233,9 @@ object CaseClassSigParser {
 //    private val traitItCache = new mutable.HashMap[Class[_], Seq[Class[_]]]()
 //        with mutable.SynchronizedMap[Class[_], Seq[Class[_]]]
 
+    private val classesTreeCache = new mutable.HashMap[Class[_], Array[Class[_]]]()
+        with mutable.SynchronizedMap[Class[_], Array[Class[_]]]
+
     private def isExcluded(clazz: Class[_]) = {
         clazz == classOf[java.lang.Object] ||
             clazz == classOf[scala.ScalaObject] ||
@@ -240,6 +244,33 @@ object CaseClassSigParser {
             clazz == classOf[DbObject] ||
             clazz == null
     }
+
+//    @tailrec
+    private def crawlClassesTree(clazz:Class[_]):Array[Class[_]] = {
+
+        classesTreeCache.getOrElseUpdate(clazz,
+            {
+                var rv:Array[Class[_]] = clazz.getInterfaces.flatMap { c =>
+                    if (c!=null && !isExcluded(c))
+                        crawlClassesTree(c) ++ Array(c)
+                    //            else if (!isExcluded(c))
+                    //                Seq(c)
+                    else
+                        Array.empty[Class[_]]
+                }
+
+                val sp = clazz.getSuperclass
+                if (!isExcluded(sp)){
+                    rv ++= crawlClassesTree(sp)
+                }
+
+                rv
+            }
+        )
+
+
+    }
+
 
     def parse[A](clazz: Class[A]): Seq[(String, JavaType)] = {
 
@@ -274,8 +305,8 @@ object CaseClassSigParser {
             persistedVarCache.update(mainClazz, fieldNames)
         }
 
-        traitIterator = curClazz.getInterfaces.toIterator
         curClazz = mainClazz
+        traitIterator = crawlClassesTree(curClazz).toIterator
         done = false
 
         while(!done){
@@ -321,13 +352,9 @@ object CaseClassSigParser {
                 // try searching interfaces / traits
                 curClazz = traitIterator.next()
 
-                done = curClazz == classOf[java.lang.Object] ||
-                    curClazz == classOf[scala.ScalaObject] ||
-                    curClazz == classOf[scala.Product] ||
-                    curClazz == classOf[scala.Serializable] ||
-                    curClazz == classOf[DbObject] ||
-                    curClazz == null
+                done = isExcluded(curClazz)
             }
+
 
         }
         symbols.toSeq
