@@ -280,7 +280,7 @@ object CaseClassSigParser {
 
         while(!done){
 
-            println("curClazz: " + curClazz.getSimpleName)
+//            println("curClazz: " + curClazz.getSimpleName)
 
             val rv =
                 findSym(curClazz).children
@@ -291,8 +291,8 @@ object CaseClassSigParser {
 
                         val pv = persistedVarCache.get(mainClazz).get
 
-                        if (pv.length > 0)
-                            println(curClazz.getSimpleName + ": " + pv.reduceOption(_ + ", " + _).getOrElse("") + " contains " + c.name + "?")
+//                        if (pv.length > 0)
+//                            println(curClazz.getSimpleName + ": " + pv.reduceOption(_ + ", " + _).getOrElse("") + " contains " + c.name + "?")
 
                         pv.contains(c.name)
 
