@@ -23,8 +23,8 @@ object CaseClassDeserializer {
     private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
         with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
-    val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
-        with mutable.SynchronizedMap[Class[_], Array[String]]
+//    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
+//        with mutable.SynchronizedMap[Class[_], Array[String]]
 
     /**
      * signature parser cache
@@ -139,11 +139,11 @@ object CaseClassDeserializer {
 
             while(!done){
 
-                val varData = persistedVarCache.getOrElseUpdate(curClazz,
-                    curClazz.getDeclaredFields.filter { v =>
-                        v.isAnnotationPresent(classOf[Persistent])
-                    }.map(_.getName)
-                )
+//                val varData = persistedVarCache.getOrElseUpdate(curClazz,
+//                    curClazz.getDeclaredFields.filter { v =>
+//                        v.isAnnotationPresent(classOf[Persistent])
+//                    }.map(_.getName)
+//                )
 
                 val rv: Map[String, reflect.Method] =
                     methodCache.getOrElseUpdate(curClazz,
@@ -227,12 +227,56 @@ object CaseClassSigParser {
         }
     }
 
+    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
+        with mutable.SynchronizedMap[Class[_], Array[String]]
+    private val traitItCache = new mutable.HashMap[Class[_], Seq[Class[_]]]()
+        with mutable.SynchronizedMap[Class[_], Seq[Class[_]]]
+
+    private def isExcluded(clazz: Class[_]) = {
+        clazz == classOf[java.lang.Object] ||
+            clazz == classOf[scala.ScalaObject] ||
+            clazz == classOf[scala.Product] ||
+            clazz == classOf[scala.Serializable] ||
+            clazz == classOf[DbObject] ||
+            clazz == null
+    }
+
     def parse[A](clazz: Class[A]): Seq[(String, JavaType)] = {
 
         var symbols = Array.empty[(String, JavaType)]
         var curClazz:Class[_] = clazz
         var done = false
-        val traitIterator = curClazz.getInterfaces.toIterator
+        var traitIterator: Iterator[Class[_]] = traitItCache.getOrElseUpdate(clazz, curClazz.getInterfaces.toIterator.toSeq).toIterator
+        val mainClazz = clazz
+
+        // fill cache
+        if (persistedVarCache.get(mainClazz).isEmpty){
+
+            var fieldNames = Array.empty[String]
+
+            while(!done){
+                fieldNames ++= curClazz.getDeclaredFields.filter { v =>
+                    v.isAnnotationPresent(classOf[Persistent])
+                }.map(_.getName)
+
+                curClazz = curClazz.getSuperclass
+                done = isExcluded(curClazz)
+
+                if (done && traitIterator.hasNext){
+
+                    // try searching interfaces / traits
+                    curClazz = traitIterator.next()
+
+                    done = isExcluded(curClazz)
+                }
+
+            }
+            persistedVarCache.update(mainClazz, fieldNames)
+        }
+
+        traitIterator = traitItCache.getOrElseUpdate(clazz, curClazz.getInterfaces.toIterator.toSeq).toIterator
+        curClazz = mainClazz
+        done = false
 
         while(!done){
 
@@ -244,14 +288,14 @@ object CaseClassSigParser {
                     if (c.isCaseAccessor && !c.isPrivate){
                         true
                     }else if (c.isAccessor && !c.isPrivate && !c.isLazy && !c.isProtected){
-                        val pv = CaseClassDeserializer.persistedVarCache.getOrElseUpdate(curClazz,
-                            curClazz.getDeclaredFields.filter { v =>
-                                v.isAnnotationPresent(classOf[Persistent])
-                            }.map(_.getName))
-//                        val pv = CaseClassDeserializer.persistedVarCache.values.flatMap(x => x).toArray
+
+                        val pv = persistedVarCache.get(mainClazz).get
+
                         if (pv.length > 0)
                             println(curClazz.getSimpleName + ": " + pv.reduceOption(_ + ", " + _).getOrElse("") + " contains " + c.name + "?")
+
                         pv.contains(c.name)
+
                     }else{
                         false
                     }
