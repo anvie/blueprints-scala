@@ -2,6 +2,7 @@ package com.ansvia.graph.testing.model
 
 import com.tinkerpop.blueprints.Vertex
 import com.ansvia.graph.BlueprintsWrapper._
+import com.ansvia.graph.annotation.Persistent
 
 
 /**
@@ -11,7 +12,7 @@ import com.ansvia.graph.BlueprintsWrapper._
 *
 */
 abstract class Fish extends DbObject {
-    var name:String = ""
+    @Persistent var name:String = ""
 
     /**
      * override this for custom load routine

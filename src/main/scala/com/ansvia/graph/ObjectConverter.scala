@@ -14,7 +14,7 @@ import com.ansvia.graph.BlueprintsWrapper.DbObject
 
 object ObjectConverter {
 
-    class Persistent extends scala.annotation.Annotation
+//    class Persistent extends scala.annotation.Annotation
 
 //    import BlueprintsWrapper._
 

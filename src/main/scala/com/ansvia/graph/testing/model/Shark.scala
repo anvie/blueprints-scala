@@ -2,6 +2,7 @@ package com.ansvia.graph.testing.model
 
 import com.tinkerpop.blueprints.Vertex
 import com.ansvia.graph.BlueprintsWrapper._
+import com.ansvia.graph.annotation.Persistent
 
 
 /**
@@ -11,7 +12,11 @@ import com.ansvia.graph.BlueprintsWrapper._
 *
 */
 case class Shark(kind:String) extends SeaFish("blue") with Eatable {
-    var lives:String = ""
+
+    @Persistent var lives:String = ""
+    @Persistent var hungry:Boolean = false
+
+    var children:Int = 0
 
     /**
      * override this for custom load routine
@@ -21,5 +26,6 @@ case class Shark(kind:String) extends SeaFish("blue") with Eatable {
         super.__load__(vertex)
         lives = vertex.getOrElse("lives", "")
         eatable = vertex.getOrElse("eatable", true)
+        children = vertex.getOrElse("children", 0)
     }
 }

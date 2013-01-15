@@ -1,10 +1,11 @@
 package com.ansvia.graph.util
 
 import scalax.rules.scalasig._
-import collection.mutable.{SynchronizedMap, ArrayBuffer, HashMap}
+import collection.mutable.ArrayBuffer
 import java.lang.reflect
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import collection.mutable
+import com.ansvia.graph.annotation.Persistent
 
 /**
  * helper class to store Class object
@@ -21,6 +22,9 @@ object CaseClassDeserializer {
      */
     private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
         with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+
+    val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
+        with mutable.SynchronizedMap[Class[_], Array[String]]
 
     /**
      * signature parser cache
@@ -129,19 +133,24 @@ object CaseClassDeserializer {
 
         val methods = {
 
-//            val clazz = o.getClass
             var symbols = Map.empty[String, reflect.Method]
             var curClazz:Class[_] = o.getClass
             var done = false
 
             while(!done){
+
+                val varData = persistedVarCache.getOrElseUpdate(curClazz,
+                    curClazz.getDeclaredFields.filter { v =>
+                        v.isAnnotationPresent(classOf[Persistent])
+                    }.map(_.getName)
+                )
+
                 val rv: Map[String, reflect.Method] =
                     methodCache.getOrElseUpdate(curClazz,
-                        curClazz.getDeclaredMethods.filter {
-                            _.getParameterTypes.isEmpty
-                        }.map {
-                            m => m.getName -> m
-                        }.toMap)
+                        curClazz.getDeclaredMethods
+                            .filter(_.getParameterTypes.isEmpty).map {
+                                m => m.getName -> m
+                            }.toMap)
 
                 symbols ++= rv
 
@@ -154,9 +163,11 @@ object CaseClassDeserializer {
 
         val params: Seq[(String, JavaType)] = sigParserCache.getOrElseUpdate(o.getClass, CaseClassSigParser.parse(o.getClass))
         val l = for {
-            (paramName, _) <- params;
+            (paramName, jt) <- params;
             value = methods.get(paramName).get.invoke(o)
-        } yield (paramName, value)
+        } yield {
+            (paramName, value)
+        }
         l.toMap
     }
 
@@ -225,17 +236,34 @@ object CaseClassSigParser {
 
         while(!done){
 
+            println("curClazz: " + curClazz.getSimpleName)
+
             val rv =
                 findSym(curClazz).children
                 .filter{ c =>
-                    (c.isCaseAccessor || c.isAccessor) && !c.isPrivate && !c.isLazy && !c.isProtected
+                    if (c.isCaseAccessor && !c.isPrivate){
+                        true
+                    }else if (c.isAccessor && !c.isPrivate && !c.isLazy && !c.isProtected){
+                        val pv = CaseClassDeserializer.persistedVarCache.getOrElseUpdate(curClazz,
+                            curClazz.getDeclaredFields.filter { v =>
+                                v.isAnnotationPresent(classOf[Persistent])
+                            }.map(_.getName))
+//                        val pv = CaseClassDeserializer.persistedVarCache.values.flatMap(x => x).toArray
+                        if (pv.length > 0)
+                            println(curClazz.getSimpleName + ": " + pv.reduceOption(_ + ", " + _).getOrElse("") + " contains " + c.name + "?")
+                        pv.contains(c.name)
+                    }else{
+                        false
+                    }
                 }.map(_.asInstanceOf[MethodSymbol])
                 .zipWithIndex
                 .flatMap {
                     case (ms, idx) => {
                         ms.infoType match {
-                            case NullaryMethodType(t: TypeRefType) => Some(ms.name -> typeRef2JavaType(t))
-                            case _ => None
+                            case NullaryMethodType(t: TypeRefType) =>
+                                Some(ms.name -> typeRef2JavaType(t))
+                            case _ =>
+                                None
                         }
                     }
                 }

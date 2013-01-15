@@ -1,5 +1,7 @@
 package com.ansvia.graph.testing.model
 
+import com.ansvia.graph.annotation.Persistent
+
 
 /**
 * Author: robin
@@ -8,5 +10,5 @@ package com.ansvia.graph.testing.model
 *
 */
 trait Eatable {
-    var eatable:Boolean = true
+    @Persistent var eatable:Boolean = true
 }
