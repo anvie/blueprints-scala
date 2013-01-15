@@ -390,7 +390,17 @@ object BlueprintsWrapper {
     implicit def dbWrapper(db:Graph) = new {
         def save[T:Manifest](cc:T):Vertex = {
             val o = db.addVertex(null)
-            ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o)
+            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o)
+
+            cc match {
+                case ccDbo:DbObject =>
+                    val kv = ccDbo.__save__()
+                    for ( (k, v) <- kv ){
+                        elm.set(k, v)
+                    }
+                case _ =>
+            }
+            elm
         }
     }
 
@@ -406,11 +416,23 @@ object BlueprintsWrapper {
         }
 
         /**
+         * this method called when loading data from database.
          * override this for custom load routine
          * @param vertex vertex object.
          */
         def __load__(vertex:Vertex){
            this.vertex = vertex
+        }
+
+        /**
+         * this method called before saving into database,
+         * override this for custom kv properties.
+         * all return from this method will be saved.
+         * by default this is just return empty map.
+         * @return Map[String, Any]
+         */
+        def __save__():Map[String, Any] = {
+            Map.empty[String, Any]
         }
 
         /**

@@ -50,6 +50,7 @@ class ObjectConverterSpec extends Specification {
     sharkDraft.lives = "Atlantica"
     sharkDraft.eatable = false
     sharkDraft.children = 3 // this should not saved
+    sharkDraft.animalProtected = true // should saved using custom __save__()
     val shark = sharkDraft.save().toCC[Shark].get
 
 
@@ -144,8 +145,11 @@ class ObjectConverterSpec extends Specification {
         "access trait variable" in {
             shark.eatable must beFalse
         }
-        "non persisted var should not saved" in {
+        "not saving non persisted var" in {
             shark.children must beEqualTo(0)
+        }
+        "saved via __save__()" in {
+            shark.animalProtected must beTrue
         }
     }
 

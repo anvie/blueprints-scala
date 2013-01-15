@@ -36,6 +36,8 @@ object ObjectConverter {
         }
         pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
 
+
+
         // save non case class accessor
 
         pc.asInstanceOf[T]
