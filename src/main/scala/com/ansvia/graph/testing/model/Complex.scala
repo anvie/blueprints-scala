@@ -2,6 +2,7 @@ package com.ansvia.graph.testing.model
 
 import com.ansvia.graph.annotation.Persistent
 import com.ansvia.graph.BlueprintsWrapper.DbObject
+import com.tinkerpop.blueprints.Vertex
 
 /**
  * Author: robin
@@ -22,7 +23,21 @@ abstract class A extends DbObject with B with C {
     @Persistent var a:Int = 0
 }
 
-class Complex extends A {
+case class Complex(x:String) extends A {
+    import com.ansvia.graph.BlueprintsWrapper._
 
-    @Persistent var me = "complex"
+    @Persistent var me = ""
+
+    /**
+     * this method called when loading data from database.
+     * override this for custom load routine
+     * @param vertex vertex object.
+     */
+    override def __load__(vertex: Vertex) {
+        super.__load__(vertex)
+        me = vertex.getOrElse("me", "")
+        a = vertex.getOrElse("a", 0)
+        b = vertex.getOrElse("b", 0)
+        c = vertex.getOrElse("c", 0)
+    }
 }
