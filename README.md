@@ -1,4 +1,4 @@
-Tinkerpop Blueprints Scala [![Build Status](https://travis-ci.org/anvie/blueprints-scala.png?branch=master)](http://travis-ci.org/anvie/blueprints-scala)
+Tinkerpop Blueprints Scala [![Build Status](https://travis-ci.org/anvie/blueprints-scala.png?branch=master)](https://travis-ci.org/anvie/blueprints-scala)
 ===================================
 
 Scala wrapper for tinkerpop blueprints, this library provide more scalastic code when working with graph database
