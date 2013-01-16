@@ -24,6 +24,9 @@ object CaseClassDeserializer {
     private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
         with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
+    private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+
 //    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
 //        with mutable.SynchronizedMap[Class[_], Array[String]]
 
@@ -83,45 +86,56 @@ object CaseClassDeserializer {
         val ccParams = values.slice(0, paramsCount)
 
         val summoned = constructor.newInstance(ccParams.toArray: _*).asInstanceOf[AnyRef]
-//
-//        if (values.length > paramsCount){
-//            val clazz = javaTypeTarget.c.getClass
-//
-//            val methods = {
-//
-//                //            val clazz = o.getClass
-//                var symbols = Map.empty[String, reflect.Method]
-//                var curClazz:Class[_] = clazz
-//                var done = false
-//
-//                while(!done){
-//                    val rv: Map[String, reflect.Method] =
-//                        methodCache.getOrElseUpdate(curClazz,
-//                            curClazz.getDeclaredMethods.filter {
-//                                _.getParameterTypes.isEmpty
-//                            }.map {
-//                                m => m.getName -> m
-//                            }.toMap)
-//
-//                    symbols ++= rv
-//
-//                    curClazz = curClazz.getSuperclass
-//                    done = curClazz == classOf[java.lang.Object] || curClazz == null
-//                }
-//
-//                symbols
-//            }
-//
-//            for (v <- values; if !ccParams.contains(v)){
-//                //            methods.get(paramName).get.invoke(o)
-//
-//                val params: Seq[(String, JavaType)] = sigParserCache.getOrElseUpdate(clazz, CaseClassSigParser.parse(clazz))
-//                for ((paramName, _) <- params){
-//                    methods.get(paramName).get.invoke(clazz)
-//                }
-//            }
-//
-//        }
+
+        val methods = {
+
+            var symbols = Map.empty[String, reflect.Method]
+            var curClazz:Class[_] = javaTypeTarget.c
+            var done = false
+
+            while(!done){
+
+                val rv: Map[String, reflect.Method] =
+                    methodSetterCache.getOrElseUpdate(curClazz,
+                        curClazz.getDeclaredMethods
+                         .filter{ z =>
+                            z.getParameterTypes.length == 1
+                        }.map {
+                            m => m.getName -> m
+                        }.toMap)
+
+                symbols ++= rv
+
+                curClazz = curClazz.getSuperclass
+                done = curClazz == classOf[java.lang.Object] || curClazz == null
+            }
+
+            symbols
+        }
+
+
+        for ((paramName, paramType) <- params){
+            val field = m.getOrElse(paramName, null)
+
+            // scala using _$eq suffix for setter method name
+            val paramNameSet = paramName + "_$eq"
+
+            field match {
+                // use null if the property does not exist
+                case null =>
+                    methods.get(paramNameSet).map(_.invoke(summoned, null))
+                // if the value is directly assignable: use it
+                case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
+                    methods.get(paramNameSet).map(_.invoke(summoned, x))
+                case x: Array[_] =>
+                    methods.get(paramNameSet).map(_.invoke(summoned, x))
+                // otherwise try to create an instance using der String Constructor
+                case x: AnyRef =>
+                    val paramCtor = paramType.c.getConstructor(classOf[String])
+                    val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
+                    methods.get(paramNameSet).map(_.invoke(summoned, value))
+            }
+        }
 
         summoned
     }
@@ -140,16 +154,12 @@ object CaseClassDeserializer {
 
             while(!done){
 
-//                val varData = persistedVarCache.getOrElseUpdate(curClazz,
-//                    curClazz.getDeclaredFields.filter { v =>
-//                        v.isAnnotationPresent(classOf[Persistent])
-//                    }.map(_.getName)
-//                )
-
                 val rv: Map[String, reflect.Method] =
                     methodCache.getOrElseUpdate(curClazz,
                         curClazz.getDeclaredMethods
-                            .filter(_.getParameterTypes.isEmpty).map {
+                            .filter{ z =>
+                                z.getParameterTypes.isEmpty
+                            }.map {
                                 m => m.getName -> m
                             }.toMap)
 
@@ -253,8 +263,6 @@ object CaseClassSigParser {
                 var rv:Array[Class[_]] = clazz.getInterfaces.flatMap { c =>
                     if (c!=null && !isExcluded(c))
                         crawlClassesTree(c) ++ Array(c)
-                    //            else if (!isExcluded(c))
-                    //                Seq(c)
                     else
                         Array.empty[Class[_]]
                 }

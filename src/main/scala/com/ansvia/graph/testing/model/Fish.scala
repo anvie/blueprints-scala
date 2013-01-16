@@ -14,12 +14,12 @@ import com.ansvia.graph.annotation.Persistent
 abstract class Fish extends DbObject {
     @Persistent var name:String = ""
 
-    /**
-     * override this for custom load routine
-     * @param vertex vertex object.
-     */
-    override def __load__(vertex: Vertex) {
-        super.__load__(vertex)
-        name = vertex.getOrElse("name", "")
-    }
+//    /**
+//     * override this for custom load routine
+//     * @param vertex vertex object.
+//     */
+//    override def __load__(vertex: Vertex) {
+//        super.__load__(vertex)
+//        name = vertex.getOrElse("name", "")
+//    }
 }

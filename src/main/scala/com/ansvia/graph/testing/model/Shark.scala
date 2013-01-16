@@ -25,7 +25,7 @@ case class Shark(kind:String) extends SeaFish("blue") with Eatable {
      */
     override def __load__(vertex: Vertex) {
         super.__load__(vertex)
-        lives = vertex.getOrElse("lives", "")
+//        lives = vertex.getOrElse("lives", "")
         eatable = vertex.getOrElse("eatable", true)
         children = vertex.getOrElse("children", 0)
         animalProtected = vertex.getOrElse("protected", false)

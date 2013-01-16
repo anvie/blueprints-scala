@@ -19,7 +19,7 @@ class DbObjectComplexSpec extends Specification {
         "Complex DbObject inheritance should" ^
         p ^
             "get level 1 var" ! cdbo.getLevel1Var ^
-            "get level 1 var 2" ! cdbo.getLevel1Var2 ^
+            "get level 1b var" ! cdbo.getLevel1bVar ^
             "get level 2 var" ! cdbo.getLevel2Var ^
             "get level 2b var" ! cdbo.getLevel2bVar ^
             "get level 2c var" ! cdbo.getLevel2cVar ^
@@ -40,7 +40,7 @@ class DbObjectComplexSpec extends Specification {
         }
 
         def getLevel1Var = complex.x must beEqualTo("complex1")
-        def getLevel1Var2 = complex.me must beEqualTo("complex")
+        def getLevel1bVar = complex.me must beEqualTo("complex")
         def getLevel2Var = complex.a must beEqualTo(1)
         def getLevel2bVar = complex.b must beEqualTo(2)
         def getLevel2cVar = complex.c must beEqualTo(3)
