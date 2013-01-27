@@ -179,6 +179,14 @@ class BlueprintsWrapperSpec extends Specification {
         "not throwing any error when outFirst didn't returning any values" in {
             hercules.pipe.outFirst("destroy").isEmpty must beTrue
         }
+        "using sorting method" in {
+            val orderedMonsters = hercules.pipe.out("battled").wrap.sort { (v1, v2) =>
+                v1.get[String]("name").get.compareTo(v2.get[String]("name").get)
+            }.iterator().map(_.getProperty("name")).toArray
+            orderedMonsters(0) must beEqualTo("cerberus")
+            orderedMonsters(1) must beEqualTo("hydra")
+            orderedMonsters(2) must beEqualTo("nemean")
+        }
     }
 
 

@@ -8,6 +8,9 @@ import com.tinkerpop.gremlin.java.GremlinPipeline
 import scala.Some
 import com.tinkerpop.pipes.util.FastNoSuchElementException
 import com.ansvia.graph.Exc.NotBoundException
+import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
+import com.ansvia.graph.Exc.NotBoundException
+import scala.Some
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
@@ -314,10 +317,41 @@ object BlueprintsWrapper {
     case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
         def wrap = GremlinPipeWrapperVertex(innerPipe)
 
+        /**
+         * Filter vertex out.
+         * Example:
+         *
+         * vertex.pipe.out("friend").wrap.filter { v =>
+         *      v.get[String]("name").get != "andrie"
+         * }
+         *
+         * @param gpf
+         * @return
+         */
         def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
             val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
                 def compute(v: Vertex):java.lang.Boolean = {
                     gpf.apply(v)
+                }
+            })
+            rv
+        }
+
+        /**
+         * Order vertices.
+         * Example:
+         *
+         * vertex.pipe.out("friend").wrap.order{ (a,b) =>
+         *      a.getProperty("name").compare(b.getProperty("name"))
+         * }
+         *
+         * @param gpf
+         * @return
+         */
+        def sort(gpf: (Vertex, Vertex) => Int):GremlinPipeline[Vertex, Vertex] = {
+            val rv = innerPipe.order(new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
+                def compute(argument: BPPair[Vertex, Vertex]):java.lang.Integer = {
+                    gpf.apply(argument.getA, argument.getB)
                 }
             })
             rv
@@ -352,10 +386,30 @@ object BlueprintsWrapper {
 
     case class GremlinPipeWrapperEdge[Vertex, Edge](innerPipe:GremlinPipeline[Vertex, Edge]){
         def wrap = GremlinPipeWrapperEdge[Vertex, Edge](innerPipe)
+
+        /**
+         * Filter edge out.
+         * @param gpf
+         * @return
+         */
         def filter(gpf: Edge => Boolean):GremlinPipeline[Vertex, Edge] = {
             val rv = innerPipe.filter(new PipeFunction[Edge,java.lang.Boolean] {
                 def compute(e: Edge):java.lang.Boolean = {
                     gpf.apply(e)
+                }
+            })
+            rv
+        }
+
+        /**
+         * Order edges.
+         * @param gpf
+         * @return
+         */
+        def sort(gpf: (Edge, Edge) => Int):GremlinPipeline[Vertex, Edge] = {
+            val rv = innerPipe.order(new PipeFunction[BPPair[Edge, Edge], java.lang.Integer] {
+                def compute(argument: BPPair[Edge, Edge]):java.lang.Integer = {
+                    gpf.apply(argument.getA, argument.getB)
                 }
             })
             rv
@@ -417,7 +471,7 @@ object BlueprintsWrapper {
 
         /**
          * this method called when loading data from database.
-         * override this for custom load routine
+         * override this for custom load routine.
          * @param vertex vertex object.
          */
         def __load__(vertex:Vertex){
