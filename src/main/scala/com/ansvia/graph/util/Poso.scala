@@ -123,7 +123,7 @@ object CaseClassDeserializer {
             field match {
                 // use null if the property does not exist
                 case null =>
-                    methods.get(paramNameSet).map(_.invoke(summoned, null))
+                    // skip null
                 // if the value is directly assignable: use it
                 case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
                     methods.get(paramNameSet).map(_.invoke(summoned, x))
