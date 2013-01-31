@@ -177,7 +177,7 @@ For Snapshot:
 
 	"Ansvia snapshot repo" at "http://scala.repo.ansvia.com/snapshots/"
 
-	"com.ansvia.graph" % "blueprints-scala" % "0.0.4-SNAPSHOT"
+	"com.ansvia.graph" % "blueprints-scala" % "0.0.5-SNAPSHOT"
 
 
 ***[] Robin Sy.***
