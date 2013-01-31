@@ -444,10 +444,14 @@ object BlueprintsWrapper {
     implicit def dbWrapper(db:Graph) = new {
         def save[T:Manifest](cc:T):Vertex = {
             val o = {
-                if (cc.asInstanceOf[DbObject].isSaved)
-                    cc.asInstanceOf[DbObject].getVertex
-                else
-                    db.addVertex(null)
+                cc match {
+                    case dbo:DbObject if dbo.isSaved =>
+                        dbo.getVertex
+                    case dbo:DbObject if !dbo.isSaved =>
+                        db.addVertex(null)
+                    case _ =>
+                        db.addVertex(null)
+                }
             }
 
             val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o)
@@ -501,7 +505,7 @@ object BlueprintsWrapper {
          * see [[com.ansvia.graph.BlueprintsWrapper.DbObject#isSaved]] for checking is object saved or not.
          * @return
          */
-        def getVertex = {
+        def getVertex:Vertex = {
             if (vertex == null)
                 throw NotBoundException("object %s not bound to existing vertex, unsaved vertex?".format(this))
             vertex
