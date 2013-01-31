@@ -446,7 +446,7 @@ object BlueprintsWrapper {
             val o = {
                 cc match {
                     case dbo:DbObject if dbo.isSaved =>
-                        dbo.getVertex
+                        db.getVertex(dbo.getVertex.getId)
                     case dbo:DbObject if !dbo.isSaved =>
                         db.addVertex(null)
                     case _ =>
