@@ -443,7 +443,13 @@ object BlueprintsWrapper {
 
     implicit def dbWrapper(db:Graph) = new {
         def save[T:Manifest](cc:T):Vertex = {
-            val o = db.addVertex(null)
+            val o = {
+                if (cc.asInstanceOf[DbObject].isSaved)
+                    cc.asInstanceOf[DbObject].getVertex
+                else
+                    db.addVertex(null)
+            }
+
             val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o)
 
             cc match {
@@ -471,7 +477,7 @@ object BlueprintsWrapper {
 
         /**
          * this method called when loading data from database.
-         * override this for custom load routine.
+         * override this for custom load routine
          * @param vertex vertex object.
          */
         def __load__(vertex:Vertex){
