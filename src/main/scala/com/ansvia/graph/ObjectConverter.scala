@@ -11,6 +11,7 @@ import collection.JavaConversions._
 import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
+import reflect.ClassTag
 
 object ObjectConverter {
 
@@ -48,7 +49,7 @@ object ObjectConverter {
      * Some(T) if possible
      * None if not
      */
-    def toCC[T: Manifest](pc: Element): Option[T] =
+    def toCC[T: ClassTag](pc: Element): Option[T] =
         _toCCPossible(pc) match {
             case Some(serializedClass) =>
 
@@ -65,10 +66,10 @@ object ObjectConverter {
             case _ => None
         }
 
-    private def _toCCPossible[T: Manifest](pc: Element): Option[Class[_]] = {
+    private def _toCCPossible[T](pc: Element)(implicit tag: ClassTag[T]): Option[Class[_]] = {
         val cpn = pc.getProperty(CLASS_PROPERTY_NAME).toString
         val c = Class.forName(cpn)
-        if (manifest[T].erasure.isAssignableFrom(c))
+        if (tag.runtimeClass.isAssignableFrom(c))
             Some(c)
         else
             None
@@ -78,7 +79,7 @@ object ObjectConverter {
      * only checks if this property container has been serialized
      * with T
      */
-    def toCCPossible[T: Manifest](pc: Element): Boolean =
+    def toCCPossible[T: ClassTag](pc: Element): Boolean =
         _toCCPossible(pc) match {
             case Some(_) => true
             case _ => false
@@ -89,11 +90,11 @@ object ObjectConverter {
      * throws a IllegalArgumentException if a Nodes properties
      * do not fit to the case class properties
      */
-    def deSerialize[T: Manifest](pc: Element): T = {
+    def deSerialize[T](pc: Element)(implicit tag: ClassTag[T]): T = {
         toCC[T](pc) match {
             case Some(t) => t
             case _ => throw new IllegalArgumentException("given Case Class: " +
-                manifest[T].erasure.getName + " does not fit to serialized properties")
+                tag.runtimeClass.getName + " does not fit to serialized properties")
         }
     }
 }

@@ -2,3 +2,7 @@
 target
 .idea/
 .idea_modules/
+sbt/
+atlassian-ide-plugin.xml
+.history
+project/plugins.sbt

@@ -11,6 +11,8 @@ import com.ansvia.graph.Exc.NotBoundException
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import com.ansvia.graph.Exc.NotBoundException
 import scala.Some
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
@@ -41,7 +43,7 @@ object BlueprintsWrapper {
          * @tparam T template to return.
          * @return
          */
-        def get[T](key:String):Option[T] = {
+        def get[T](key:String)(implicit tag: TypeTag[T]):Option[T] = {
             obj.getProperty(key) match {
                 case v:T => Some(v)
                 case x => None
@@ -63,7 +65,7 @@ object BlueprintsWrapper {
          * @tparam T return type.
          * @return
          */
-        def getOrElse[T](key:String, default:T):T = {
+        def getOrElse[T](key:String, default:T)(implicit tag: TypeTag[T]):T = {
             obj.getProperty(key) match {
                 case v:T => v
                 case x => {
@@ -99,7 +101,7 @@ object BlueprintsWrapper {
          * @tparam T case class type.
          * @return
          */
-        def toCC[T : Manifest]:Option[T] = {
+        def toCC[T: ClassTag]:Option[T] = {
             ObjectConverter.toCC[T](obj)
         }
     }
@@ -442,7 +444,7 @@ object BlueprintsWrapper {
     }
 
     implicit def dbWrapper(db:Graph) = new {
-        def save[T:Manifest](cc:T):Vertex = {
+        def save[T: ClassTag](cc:T):Vertex = {
             val o = {
                 cc match {
                     case dbo:DbObject if dbo.isSaved =>

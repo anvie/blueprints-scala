@@ -11,7 +11,7 @@ import com.ansvia.graph.annotation.Persistent
 * Time: 9:07 PM
 *
 */
-case class Shark(kind:String) extends SeaFish("blue") with Eatable {
+case class Shark(kind:String, color: String = "blue") extends ColoredFish(color) with Eatable {
 
     @Persistent var lives:String = ""
     @Persistent var hungry:Boolean = false

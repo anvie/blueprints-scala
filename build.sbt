@@ -2,9 +2,9 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.0.5-SNAPSHOT"
+version := "0.0.6-SNAPSHOT"
 
-scalaVersion := "2.9.1"
+scalaVersion := "2.10.0"
 
 scalacOptions := Seq("-unchecked", "-deprecation")
 
@@ -17,8 +17,9 @@ libraryDependencies ++= Seq(
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.2.0",
     "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.2.0",
     "com.tinkerpop.gremlin" % "gremlin-java" % "2.2.0",
-    "org.specs2" %%  "specs2" % "1.9" % "test",
-    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.0.0" % "test"
+    "org.scala-lang" % "scala-reflect" % "2.10.0",
+    "org.specs2" % "specs2_2.10" % "1.13" % "test",
+    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.2.0" % "test"
     )
 
 publishTo <<= version { (v:String) =>
@@ -51,5 +52,10 @@ pomExtra := (
         <id>robin</id>
         <name>Robin Syihab</name>
         <url>http://mindtalk.com/u/robin</url>
+      </developer>
+      <developer>
+        <id>tysonjh</id>
+        <name>Tyson Hamilton</name>
+        <url>http://tysonhamilton.com</url>
       </developer>
     </developers>)

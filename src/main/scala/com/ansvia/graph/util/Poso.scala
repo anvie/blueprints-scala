@@ -7,6 +7,7 @@ import com.ansvia.graph.BlueprintsWrapper.DbObject
 import collection.mutable
 import com.ansvia.graph.annotation.Persistent
 import annotation.tailrec
+import scala.reflect.ClassTag
 
 /**
  * helper class to store Class object
@@ -39,14 +40,14 @@ object CaseClassDeserializer {
     /**
      * default behaviour for T == serialized class
      */
-    def deserialize[T: Manifest](m: Map[String, AnyRef]): T =
-        deserialize[T](manifest[T].erasure, m)
+    def deserialize[T](m: Map[String, AnyRef])(implicit tag: ClassTag[T]): T =
+        deserialize[T](tag.runtimeClass, m)
 
     /**
      * convenience method using class manifest
      * use it like <code>val test = deserialize[Test](myMap)<code>
      */
-    def deserialize[T: Manifest](serializedClass: Class[_], m: Map[String, AnyRef]): T =
+    def deserialize[T](serializedClass: Class[_], m: Map[String, AnyRef])(implicit tag: ClassTag[T]): T =
         deserialize(m, JavaType(serializedClass)).asInstanceOf[T]
 
     /**
