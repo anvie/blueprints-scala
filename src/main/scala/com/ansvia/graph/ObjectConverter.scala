@@ -12,7 +12,6 @@ import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import reflect.ClassTag
-import com.tinkerpop.gremlin.Tokens.T
 
 object ObjectConverter {
 
