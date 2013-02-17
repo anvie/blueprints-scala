@@ -9,7 +9,7 @@ import com.ansvia.graph.BlueprintsWrapper._
 * Time: 9:07 PM
 *
 */
-case class ContainLazy(test:Long) extends DbObject {
+private[graph] case class ContainLazy(test:Long) extends DbObject {
     lazy val x = {
         2
     }

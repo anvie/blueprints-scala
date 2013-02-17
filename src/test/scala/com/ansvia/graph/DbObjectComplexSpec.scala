@@ -2,7 +2,6 @@ package com.ansvia.graph
 
 import org.specs2.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import testing.model.Complex
 
 /**
  * Author: robin

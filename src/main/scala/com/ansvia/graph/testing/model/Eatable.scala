@@ -9,6 +9,6 @@ import com.ansvia.graph.annotation.Persistent
 * Time: 9:07 PM
 *
 */
-trait Eatable {
+private[graph] trait Eatable {
     @Persistent var eatable:Boolean = true
 }

@@ -7,4 +7,4 @@ package com.ansvia.graph.testing.model
 * Time: 9:07 PM
 *
 */
-case class SeaFish(color:String) extends Fish
+private[graph] case class SeaFish(color:String) extends Fish

@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
@@ -23,11 +25,19 @@ libraryDependencies ++= Seq(
 
 publishTo <<= version { (v:String) =>
       val ansviaRepo = "http://scala.repo.ansvia.com/nexus"
-      if(v.trim.endsWith("SNAPSHOT"))
+      if(v.trim.endsWith("SNAPSHOT") || """.+\-\d{8}+$""".r.pattern.matcher(v.trim).matches())
           Some("snapshots" at ansviaRepo + "/content/repositories/snapshots")
       else
           Some("releases" at ansviaRepo + "/content/repositories/releases")
   }
+
+version <<= version { (v:String) =>
+    if (v.trim.endsWith("-SNAPSHOT")){
+        val dateFormatter = new SimpleDateFormat("yyyyMMdd")
+        v.trim.split("-").apply(0) + "-" + dateFormatter.format(new java.util.Date()) + "-SNAPSHOT"
+    }else
+        v
+}
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 

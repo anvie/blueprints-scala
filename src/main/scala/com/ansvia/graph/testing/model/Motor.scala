@@ -9,4 +9,4 @@ import com.ansvia.graph.BlueprintsWrapper._
 * Time: 9:07 PM
 *
 */
-case class Motor(mark:String) extends DbObject
+private[graph] case class Motor(mark:String) extends DbObject

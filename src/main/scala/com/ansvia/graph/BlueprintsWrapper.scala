@@ -7,9 +7,8 @@ import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import scala.Some
 import com.tinkerpop.pipes.util.FastNoSuchElementException
-import com.ansvia.graph.Exc.NotBoundException
+import com.ansvia.graph.Exc.{BlueprintsScalaException, NotBoundException}
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
-import com.ansvia.graph.Exc.NotBoundException
 import scala.Some
 
 object BlueprintsWrapper {
@@ -526,6 +525,22 @@ object BlueprintsWrapper {
             vertex --> label
         }
 
+        /**
+         * Reload object from db.
+         * @param db implicit Graph db object.
+         * @return this object with updated vertex.
+         */
+        def reload()(implicit db:Graph):this.type = {
+            if (!isSaved)
+                throw NotBoundException("object %s not saved yet".format(this))
+
+            val vertex = db.getVertex(this.vertex.getId)
+
+            if (vertex == null)
+                throw NotBoundException("object %s not bound to any vertex".format(this))
+
+            vertex.toCC[this.type].get
+        }
     }
 }
 

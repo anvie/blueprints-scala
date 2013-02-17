@@ -11,7 +11,7 @@ import com.ansvia.graph.annotation.Persistent
 * Time: 9:07 PM
 *
 */
-case class Animal(name:String) extends DbObject {
+private[graph] case class Animal(name:String) extends DbObject {
 
     @Persistent var age:Int = 0
     @Persistent var kind:String = ""

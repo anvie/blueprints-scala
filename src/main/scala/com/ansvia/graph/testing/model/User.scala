@@ -9,9 +9,7 @@ package com.ansvia.graph.testing.model
 * used for testing only.
 *
 */
-
-
-case class User(name:String, age:Int)
+private[graph] case class User(name:String, age:Int)
 
 
 

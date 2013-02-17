@@ -11,7 +11,7 @@ import com.ansvia.graph.annotation.Persistent
 * Time: 9:07 PM
 *
 */
-abstract class Fish extends DbObject {
+private[graph] abstract class Fish extends DbObject {
     @Persistent var name:String = ""
 
 //    /**

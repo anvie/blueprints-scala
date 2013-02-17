@@ -11,19 +11,19 @@ import com.tinkerpop.blueprints.Vertex
  * 
  */
 
-trait B {
+private[graph] trait B {
     @Persistent var b:Int = 0
 }
 
-trait C {
+private[graph] trait C {
     @Persistent var c:Int = 0
 }
 
-abstract class A extends DbObject with B with C {
+private[graph] abstract class A extends DbObject with B with C {
     @Persistent var a:Int = 0
 }
 
-case class Complex(x:String) extends A {
+private[graph] case class Complex(x:String) extends A {
 //    import com.ansvia.graph.BlueprintsWrapper._
 
     @Persistent var me = ""
@@ -41,3 +41,5 @@ case class Complex(x:String) extends A {
 //        c = vertex.getOrElse("c", 0)
     }
 }
+
+
