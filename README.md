@@ -8,6 +8,9 @@ Usage
 ---------
 
 For installation see install section.
+
+For Scala 2.9 see https://github.com/anvie/blueprints-scala/tree/scala-2.9
+
 More working and complete examples can be found on specs test.
 This example data based on graph of the gods https://github.com/thinkaurelius/titan/wiki/Getting-Started
 
@@ -171,13 +174,13 @@ Add resolvers:
 
 Add dependency:
 
-	"com.ansvia.graph" % "blueprints-scala" % "0.0.3"
+	"com.ansvia.graph" % "blueprints-scala" % "0.0.5"
 
 For Snapshot:
 
 	"Ansvia snapshot repo" at "http://scala.repo.ansvia.com/snapshots/"
 
-	"com.ansvia.graph" % "blueprints-scala" % "0.0.5-20130218-SNAPSHOT"
+	"com.ansvia.graph" % "blueprints-scala" % "0.0.6-20130218-SNAPSHOT"
 
 
 ***[] Robin Sy.***
