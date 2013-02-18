@@ -4,7 +4,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.0.6"
+version := "0.0.7-SNAPSHOT"
 
 scalaVersion := "2.10.0"
 
@@ -46,7 +46,7 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-crossPaths := false
+crossPaths := true
 
 pomExtra := (
     <url>http://ansvia.com</url>
