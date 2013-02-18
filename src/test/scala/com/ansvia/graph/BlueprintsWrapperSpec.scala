@@ -2,7 +2,7 @@ package com.ansvia.graph
 
 import org.specs2.mutable.Specification
 import com.tinkerpop.blueprints.impls.tg.{TinkerGraphFactory, TinkerGraph}
-import com.tinkerpop.blueprints.{Vertex, Direction}
+import com.tinkerpop.blueprints.{TransactionalGraph, Vertex, Direction}
 import java.lang.Iterable
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import org.specs2.execute.Skipped
@@ -187,6 +187,17 @@ class BlueprintsWrapperSpec extends Specification {
             orderedMonsters(1) must beEqualTo("hydra")
             orderedMonsters(2) must beEqualTo("nemean")
         }
+//        "using reload in edge" in {
+//            edge1.set("time", 2)
+//            db.asInstanceOf[TransactionalGraph].stopTransaction(TransactionalGraph.Conclusion.FAILURE)
+//            edge1.reload()
+//            edge1.get[Int]("time").get must beEqualTo(1)
+//        }
+//        "using reload in vertex" in {
+//            hercules.set("kind", "human")
+//            hercules.reload()
+//            hercules.get[String]("kind").get must beEqualTo("demigod")
+//        }
     }
 
 

@@ -16,7 +16,7 @@ object BlueprintsWrapper {
 
     sealed trait Wrapper
 
-    case class ScalasticPropertyAccessor[A <: Element](obj:A) {
+    case class ScalasticPropertyAccessor[A <: Element : Manifest](var obj:A) {
 
         /**
          * Syntactic sugar property getter.
@@ -94,6 +94,20 @@ object BlueprintsWrapper {
         }
 
         /**
+         * Reload
+         * @param db
+         * @return
+         */
+        def reload()(implicit db:Graph) = {
+            obj =
+            manifest[A].erasure.toString match {
+                case "interface com.tinkerpop.blueprints.Vertex" => db.getVertex(obj.asInstanceOf[Vertex].getId).asInstanceOf[A]
+                case "interface com.tinkerpop.blueprints.Edge" => db.getEdge(obj.asInstanceOf[Edge].getId).asInstanceOf[A]
+            }
+            this
+        }
+
+        /**
          * Deserialize object to case class.
          * @tparam T case class type.
          * @return
@@ -103,7 +117,8 @@ object BlueprintsWrapper {
         }
     }
 
-    implicit def elmToPropertyAccessor(elm:Element) = ScalasticPropertyAccessor(elm)
+    implicit def vertexToPropertyAccessor(elm:Vertex) = ScalasticPropertyAccessor(elm)
+    implicit def edgeToPropertyAccessor(elm:Edge) = ScalasticPropertyAccessor(elm)
 
 //
 //    case class DbObjectSaver(elm:DbObject, db:Graph){
