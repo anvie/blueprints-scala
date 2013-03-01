@@ -18,7 +18,9 @@ class DbObjectSimpleSpec extends Specification {
         "DbObject should" ^
         p ^
             "able to reload" ! dboTrees.reload ^
-    end
+            "change property and save" ! dboTrees.changeProperty ^
+            "use getId" ! dboTrees.useGetId ^
+        end
 
     object dboTrees {
         implicit val db = TinkerGraphFactory.createTinkerGraph()
@@ -36,6 +38,16 @@ class DbObjectSimpleSpec extends Specification {
             dbo2.a must beEqualTo("a") and(dbo2.b must beEqualTo("b")) and (dbo2.b must not equalTo("c"))
         }
 
+        def changeProperty = {
+            dbo.b = "d"
+            dbo.save()
+            db.getVertex(dbo.getId).toCC[SimpleDbo].get.b must beEqualTo("d")
+        }
+        
+        def useGetId = {
+            val v = db.getVertex(dbo.getId)
+            v.getId must beEqualTo(dbo.getId)
+        }
     }
 
 }

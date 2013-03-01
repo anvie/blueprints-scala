@@ -14,10 +14,6 @@ import com.ansvia.graph.BlueprintsWrapper.DbObject
 
 object ObjectConverter {
 
-//    class Persistent extends scala.annotation.Annotation
-
-//    import BlueprintsWrapper._
-
     /**
      * this name will be used to store the class name of
      * the serialized case class that will be verified
@@ -32,11 +28,14 @@ object ObjectConverter {
     def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
-            case (name, value) => pc.setProperty(name, value)
+            case (name, value) => 
+                // set only if different with current (eg: new changes)
+                if (pc.getProperty(name) != value)
+                    pc.setProperty(name, value)
+                //else
+                //    println("ignored (not different): " + name + " <-> " + value)
         }
         pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
-
-
 
         // save non case class accessor
 

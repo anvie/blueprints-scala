@@ -461,7 +461,11 @@ object BlueprintsWrapper {
                 case ccDbo:DbObject =>
                     val kv = ccDbo.__save__()
                     for ( (k, v) <- kv ){
-                        elm.set(k, v)
+                        
+                        // only set if different/new
+                        if(elm.getOrElse(k,null) != v)
+                            elm.set(k, v)
+                            
                     }
                 case _ =>
             }
@@ -544,6 +548,12 @@ object BlueprintsWrapper {
             this.vertex = v
 
             v.toCC[this.type].get
+        }
+        
+        def getId = {
+            if (!isSaved)
+                throw NotBoundException("object %s not saved yet".format(this))
+            vertex.getId
         }
     }
 }
