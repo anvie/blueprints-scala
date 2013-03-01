@@ -550,10 +550,16 @@ object BlueprintsWrapper {
             v.toCC[this.type].get
         }
         
-        def getId = {
+    }
+
+    trait IDGetter[IDType] {
+        def isSaved:Boolean
+        def getVertex:Vertex
+
+        def getId:IDType = {
             if (!isSaved)
                 throw NotBoundException("object %s not saved yet".format(this))
-            vertex.getId
+            getVertex.getId.asInstanceOf[IDType]
         }
     }
 }
