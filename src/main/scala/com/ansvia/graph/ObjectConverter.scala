@@ -65,12 +65,17 @@ object ObjectConverter {
         }
 
     private def _toCCPossible[T: Manifest](pc: Element): Option[Class[_]] = {
-        val cpn = pc.getProperty(CLASS_PROPERTY_NAME).toString
-        val c = Class.forName(cpn)
-        if (manifest[T].erasure.isAssignableFrom(c))
-            Some(c)
-        else
+        val pv = pc.getProperty(CLASS_PROPERTY_NAME)
+        if(pv != null){
+            val cpn = pv.toString
+            val c = Class.forName(cpn)
+            if (manifest[T].erasure.isAssignableFrom(c))
+                Some(c)
+            else
+                None
+        }else{
             None
+        }
     }
 
     /**
