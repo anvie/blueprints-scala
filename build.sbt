@@ -12,7 +12,7 @@ scalacOptions := Seq("-unchecked", "-deprecation")
 
 resolvers ++= Seq(
     "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
-	"Ansvia repo" at "http://scala.repo.ansvia.com/releases/"
+        "Ansvia repo" at "http://scala.repo.ansvia.com/releases/"
     )
 
 libraryDependencies ++= Seq(
@@ -61,5 +61,10 @@ pomExtra := (
         <id>robin</id>
         <name>Robin Syihab</name>
         <url>http://mindtalk.com/u/robin</url>
+      </developer>
+      <developer>
+        <id>vikraman</id>
+        <name>Vikraman Choudhury</name>
+        <url>http://vh4x0r.wordpress.com</url>
       </developer>
     </developers>)
