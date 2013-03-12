@@ -150,6 +150,73 @@ transact {
 }
 ```
 
+Want more attributes that not fit for case class constructor parameter?
+
+Use `@Persistent` annotation:
+
+```scala
+
+case class City(name:String){
+
+    @Persistent var province = "Jakarta" // this attribute will be saved
+    @Persistent var country = "Indonesia" // this attribute will be saved
+
+    val code = 123 // this not
+
+}
+
+```
+
+Support inheritance as well:
+
+```scala
+
+abstract class City(name:String) {
+    @Persistent var province = ""
+}
+
+trait Street {
+    @Persistent var street = ""
+}
+
+trait Code {
+    @Persistent var postalCode = 0
+}
+
+
+case class Jakarta extends City("Jakarta") with Street with Code with DbObject
+
+// usage
+
+val address = Jakarta()
+address.province = "Jakarta Barat"  // this will be saved
+address.street = "KS. Tubun"        // this will be saved
+address.postalCode = 12345          // this will be saved
+address.save()
+
+// getting back
+
+db.getVertex(address.getVertex.getId).toCC[Jakarta] map { adr =>
+    println(adr.province) // will printed `Jakarta Barat`
+    println(adr.postalCode) // will printed `12345`
+}
+
+// instantiante to parent class
+// this is valid
+
+db.getVertex(address.getVertex.getId).toCC[City] map { adr =>
+    println(adr.province) // will printed `Jakarta Barat`
+}
+
+// this also valid
+
+db.getVertex(address.getVertex.getId).toCC[Street] map { adr =>
+    println(adr.street) // will printed `KS. Tubun`
+}
+
+```
+
+
 How it work? All you needs is to adding dependency (see install), import it, and summon Graph db instance with implicit:
 
 ```scala
