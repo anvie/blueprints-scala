@@ -18,7 +18,7 @@ object BlueprintsWrapper {
 
     sealed trait Wrapper
 
-    case class ScalasticPropertyAccessor[A <: Element : Manifest](var obj:A) {
+    case class ScalasticPropertyAccessor[A <: Element : ClassTag](var obj:A) {
 
         /**
          * Syntactic sugar property getter.
@@ -98,14 +98,17 @@ object BlueprintsWrapper {
          * @return
          */
         def reload()(implicit db:Graph) = {
-            obj =
-            manifest[A].erasure.toString match {
-                case "interface com.tinkerpop.blueprints.Vertex" => 
+            _reloadInner(db)
+            this
+        }
+
+        private def _reloadInner(db:Graph)(implicit tag:ClassTag[A]) = {
+            tag.runtimeClass.toString match {
+                case "interface com.tinkerpop.blueprints.Vertex" =>
                     db.getVertex(obj.asInstanceOf[Vertex].getId).asInstanceOf[A]
-                case "interface com.tinkerpop.blueprints.Edge" => 
+                case "interface com.tinkerpop.blueprints.Edge" =>
                     db.getEdge(obj.asInstanceOf[Edge].getId).asInstanceOf[A]
             }
-            this
         }
 
         /**

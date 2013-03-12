@@ -174,13 +174,7 @@ Add resolvers:
 
 Add dependency:
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.0.6"
-
-For Snapshot:
-
-	"Ansvia snapshot repo" at "http://scala.repo.ansvia.com/snapshots/"
-
-	"com.ansvia.graph" %% "blueprints-scala" % "0.0.7-20130218-SNAPSHOT"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.0"
 
 
 ***[] Robin Sy.***
