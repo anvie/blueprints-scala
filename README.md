@@ -201,7 +201,7 @@ db.getVertex(address.getVertex.getId).toCC[Jakarta] map { adr =>
     println(adr.postalCode) // will printed `12345`
 }
 
-// instantiante to parent class
+// instantiate to parent class
 // this is valid
 
 db.getVertex(address.getVertex.getId).toCC[City] map { adr =>
