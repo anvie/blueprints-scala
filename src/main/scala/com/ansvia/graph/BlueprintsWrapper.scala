@@ -68,9 +68,6 @@ object BlueprintsWrapper {
             obj.getProperty(key) match {
                 case v:T => v
                 case x => {
-//                    if (x != null){
-//                        println("x: " + x.getClass.getName)
-//                    }
                     default
                 }
             }
@@ -103,8 +100,10 @@ object BlueprintsWrapper {
         def reload()(implicit db:Graph) = {
             obj =
             manifest[A].erasure.toString match {
-                case "interface com.tinkerpop.blueprints.Vertex" => db.getVertex(obj.asInstanceOf[Vertex].getId).asInstanceOf[A]
-                case "interface com.tinkerpop.blueprints.Edge" => db.getEdge(obj.asInstanceOf[Edge].getId).asInstanceOf[A]
+                case "interface com.tinkerpop.blueprints.Vertex" => 
+                    db.getVertex(obj.asInstanceOf[Vertex].getId).asInstanceOf[A]
+                case "interface com.tinkerpop.blueprints.Edge" => 
+                    db.getEdge(obj.asInstanceOf[Edge].getId).asInstanceOf[A]
             }
             this
         }
@@ -121,18 +120,7 @@ object BlueprintsWrapper {
 
     implicit def vertexToPropertyAccessor(elm:Vertex) = ScalasticPropertyAccessor(elm)
     implicit def edgeToPropertyAccessor(elm:Edge) = ScalasticPropertyAccessor(elm)
-
-//
-//    case class DbObjectSaver(elm:DbObject, db:Graph){
-//        /**
-//         * Save this object to database.
-//         */
-//        def save() = {
-//            db.save(elm)
-//        }
-//    }
-//
-//    implicit def elmToObjectSaver(elm:DbObject)(implicit db:Graph) = DbObjectSaver(elm, db)
+    implicit def elementToPropertyAccessor(elm:Element) = ScalasticPropertyAccessor(elm)
 
     /**
      * Edge wrapper on arrow chain.
@@ -272,8 +260,7 @@ object BlueprintsWrapper {
          * @return
          */
         def pipe = {
-            val pipe = new GremlinPipeline[Vertex, AnyRef]()
-            pipe.start(vertex)
+            (new GremlinPipeline[Vertex, AnyRef]()).start(vertex)
         }
 
     }
@@ -476,7 +463,11 @@ object BlueprintsWrapper {
                 case ccDbo:DbObject =>
                     val kv = ccDbo.__save__()
                     for ( (k, v) <- kv ){
-                        elm.set(k, v)
+                        
+                        // only set if different/new
+                        if(elm.getOrElse(k,null) != v)
+                            elm.set(k, v)
+                            
                     }
                 case _ =>
             }
@@ -551,12 +542,26 @@ object BlueprintsWrapper {
             if (!isSaved)
                 throw NotBoundException("object %s not saved yet".format(this))
 
-            val vertex = db.getVertex(this.vertex.getId)
+            val v = db.getVertex(this.vertex.getId)
 
-            if (vertex == null)
+            if (v == null)
                 throw NotBoundException("object %s not bound to any vertex".format(this))
 
-            vertex.toCC[this.type].get
+            this.vertex = v
+
+            v.toCC[this.type].get
+        }
+        
+    }
+
+    trait IDGetter[IDType] {
+        def isSaved:Boolean
+        def getVertex:Vertex
+
+        def getId:IDType = {
+            if (!isSaved)
+                throw NotBoundException("object %s not saved yet".format(this))
+            getVertex.getId.asInstanceOf[IDType]
         }
     }
 }
