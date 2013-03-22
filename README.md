@@ -239,5 +239,10 @@ Add dependency:
 
 	"com.ansvia.graph" % "blueprints-scala" % "0.0.6"
 
+License
+---------
+
+[Apache 2](http://www.apache.org/licenses/LICENSE-2.0.html)
+
 
 ***[] Robin Sy.***
