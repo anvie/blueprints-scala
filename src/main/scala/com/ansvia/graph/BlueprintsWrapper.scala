@@ -471,6 +471,13 @@ object BlueprintsWrapper {
             }
             elm
         }
+        def delete[T:Manifest](cc:T):Unit = {
+            cc match {
+                case dbo:DbObject if dbo.isSaved =>
+                    db.removeVertex(dbo.getVertex)
+                case _ =>
+            }
+        }
     }
 
     trait DbObject {
@@ -483,6 +490,14 @@ object BlueprintsWrapper {
         def save()(implicit db:Graph) = {
             vertex = db.save(this)
             vertex
+        }
+
+        /**
+         * Delete this object from database.
+         */
+        def delete()(implicit db:Graph) = {
+            db.delete(this)
+            vertex = null
         }
 
         /**

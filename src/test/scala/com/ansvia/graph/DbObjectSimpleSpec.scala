@@ -20,6 +20,7 @@ class DbObjectSimpleSpec extends Specification {
             "able to reload" ! dboTrees.reload ^
             "change property and save" ! dboTrees.changeProperty ^
             "use getId via IDGetter" ! dboTrees.useGetId ^
+            "able to delete" ! dboTrees.delete ^
         end
 
     object dboTrees {
@@ -47,6 +48,11 @@ class DbObjectSimpleSpec extends Specification {
         def useGetId = {
             val v = db.getVertex(dbo.getVertex.getId)
             v.getId must beEqualTo(dbo.getId)
+        }
+
+        def delete = {
+            dbo.delete()
+            dbo.isSaved must beEqualTo(false)
         }
     }
 
