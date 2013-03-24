@@ -11,7 +11,7 @@ import org.specs2.specification.Step
  * User: robin
  * Date: 12/31/12
  * Time: 5:21 AM
- * 
+ *
  */
 class ObjectConverterSpec extends Specification {
 
@@ -42,7 +42,6 @@ class ObjectConverterSpec extends Specification {
             "able to get raw vertex from case class" ! dboic.getRawVertexFromCC ^
             "make relation DbObject to DbObject #1" ! dboic.makeRelDbo2Dbo ^
             "make relation DbObject to DbObject #2" ! dboic.makeRelDbo2Dbo2 ^
-            "unsaved DbObject return false in isSaved" ! dboic.unsavedDboRetFalse ^
             "saved DbObject return true in isSaved" ! dboic.savedDboRetTrue ^
             "class contain lazy or val should not raising invocation error" ! dboic.ccContainLazyNotError ^
             "access upper variable #1" ! dboic.accessUpperVar1 ^
@@ -132,8 +131,7 @@ class ObjectConverterSpec extends Specification {
         def getRawVertexFromCC = v4ob.getVertex must beEqualTo(v4)
         def makeRelDbo2Dbo = v4ob.getVertex.pipe.inFirst("hit").isDefined must beTrue
         def makeRelDbo2Dbo2 = v4ob.getVertex.pipe.inFirst("hit").get.toCC[Motor].get.mark must beEqualTo("Honda")
-        def unsavedDboRetFalse = v4o.isSaved must beFalse
-        def savedDboRetTrue = v4ob.isSaved must beTrue
+        def savedDboRetTrue = (v4o.isSaved && v4ob.isSaved) must beTrue
         def ccContainLazyNotError = ContainLazy(1).save() must not equalTo(null)
         def accessUpperVar1 = nemo.name must beEqualTo("nemo")
         def accessUpperVar2 = nemo.color must beEqualTo("yellow")
@@ -151,6 +149,3 @@ class ObjectConverterSpec extends Specification {
 
 
 }
-
-
-

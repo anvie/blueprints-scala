@@ -481,7 +481,8 @@ object BlueprintsWrapper {
          * Save this object to database.
          */
         def save()(implicit db:Graph) = {
-            db.save(this)
+            vertex = db.save(this)
+            vertex
         }
 
         /**
@@ -563,4 +564,3 @@ object BlueprintsWrapper {
         }
     }
 }
-
