@@ -24,11 +24,13 @@ libraryDependencies ++= Seq(
     )
 
 publishTo <<= version { (v:String) =>
-      val ansviaRepo = "http://scala.repo.ansvia.com/nexus"
+      //val repoUrl = "http://scala.repo.ansvia.com/nexus"
+      val repoUrl = "https://oss.sonatype.org"
       if(v.trim.endsWith("SNAPSHOT") || """.+\-\d{8}+$""".r.pattern.matcher(v.trim).matches())
-          Some("snapshots" at ansviaRepo + "/content/repositories/snapshots")
+          Some("snapshots" at repoUrl + "/content/repositories/snapshots")
       else
-          Some("releases" at ansviaRepo + "/content/repositories/releases")
+          Some("releases" at repoUrl + "/service/local/staging/deploy/maven2")
+          //Some("releases" at repoUrl + "/content/repositories/releases")
   }
 
 version <<= version { (v:String) =>
@@ -41,14 +43,18 @@ version <<= version { (v:String) =>
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
+//credentials += Credentials(Path.userHome / ".sbt" / "0.11.2" / "sonatype.sbt")
+
 publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
 crossPaths := true
 
+publishMavenStyle := true
+
 pomExtra := (
-    <url>http://ansvia.com</url>
+    <url>http://www.ansvia.com</url>
     <licenses>
       <license>
         <name>Apache 2.0</name>
@@ -56,6 +62,10 @@ pomExtra := (
         <distribution>repo</distribution>
       </license>
     </licenses>
+    <scm>
+      <url>git@github.com:anvie/blueprints-scala.git</url>
+      <connection>scm:git:git@github.com:anvie/blueprints-scala.git</connection>
+    </scm>
     <developers>
       <developer>
         <id>robin</id>
