@@ -237,7 +237,7 @@ Add resolvers:
 
 Add dependency:
 
-	"com.ansvia.graph" % "blueprints-scala" % "0.0.6"
+	"com.ansvia.graph" % "blueprints-scala" % "0.0.7"
 
 License
 ---------
