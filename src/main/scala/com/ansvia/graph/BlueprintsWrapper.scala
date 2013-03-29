@@ -482,7 +482,7 @@ object BlueprintsWrapper {
 
     trait DbObject {
 
-        private var vertex:Vertex = null
+        protected var vertex:Vertex = null
 
         /**
          * Save this object to database.
@@ -495,7 +495,7 @@ object BlueprintsWrapper {
         /**
          * Delete this object from database.
          */
-        def delete()(implicit db:Graph) = {
+        def delete()(implicit db:Graph){
             db.delete(this)
             vertex = null
         }
@@ -578,4 +578,51 @@ object BlueprintsWrapper {
             getVertex.getId.asInstanceOf[IDType]
         }
     }
+
+    trait IdDbObject[IDType] extends DbObject with IDGetter[IDType] {
+
+        private var id:IDType = _
+
+        /**
+         * this method called when loading data from database.
+         * override this for custom load routine
+         * @param vertex vertex object.
+         */
+        override def __load__(vertex: Vertex) {
+            super.__load__(vertex)
+            id = vertex.getId.asInstanceOf[IDType]
+        }
+
+        def isSaved:Boolean
+        def getVertex:Vertex
+
+        override def getId:IDType = {
+            if (id != null)
+                id
+            else{
+                if (!isSaved)
+                    throw NotBoundException("object %s not saved yet".format(this))
+                getVertex.getId.asInstanceOf[IDType]
+            }
+        }
+
+        /**
+         * Reload object from db.
+         * @param db implicit Graph db object.
+         * @return this object with updated vertex.
+         */
+        override def reload()(implicit db: Graph) = {
+            if (id != null){
+                vertex = db.getVertex(id)
+
+                if (vertex == null)
+                    throw NotBoundException("object %s not bound to any vertex".format(this))
+
+            }else{
+                throw NotBoundException("id return null, object %s not saved yet?".format(this))
+            }
+            vertex.toCC[this.type].get
+        }
+    }
+
 }

@@ -247,12 +247,17 @@ object CaseClassSigParser {
         with mutable.SynchronizedMap[Class[_], Array[Class[_]]]
 
     private def isExcluded(clazz: Class[_]) = {
-        clazz == classOf[java.lang.Object] ||
+        if (clazz == null)
+            true
+        else{
+            clazz == classOf[java.lang.Object] ||
             clazz == classOf[scala.ScalaObject] ||
             clazz == classOf[scala.Product] ||
             clazz == classOf[scala.Serializable] ||
             clazz == classOf[DbObject] ||
-            clazz == null
+            clazz.getName == "com.ansvia.graph.BlueprintsWrapper$IDGetter" ||
+            clazz.getName == "com.ansvia.graph.BlueprintsWrapper$IdDbObject"
+        }
     }
 
 //    @tailrec
@@ -319,7 +324,7 @@ object CaseClassSigParser {
 
         while(!done){
 
-//            println("curClazz: " + curClazz.getSimpleName)
+//            println("curClazz: " + curClazz.getName)
 
             val rv =
                 findSym(curClazz).children
@@ -353,7 +358,8 @@ object CaseClassSigParser {
             symbols ++= rv
 
             curClazz = curClazz.getSuperclass
-            done = curClazz == classOf[java.lang.Object] || curClazz == null
+            done = curClazz == null ||
+                curClazz == classOf[java.lang.Object]
 
             if (done && traitIterator.hasNext){
 

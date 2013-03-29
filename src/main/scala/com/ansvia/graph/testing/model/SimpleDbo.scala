@@ -1,6 +1,6 @@
 package com.ansvia.graph.testing.model
 
-import com.ansvia.graph.BlueprintsWrapper.DbObject
+import com.ansvia.graph.BlueprintsWrapper.{IdDbObject, DbObject}
 import com.ansvia.graph.IDGetter
 
 /**
@@ -8,6 +8,8 @@ import com.ansvia.graph.IDGetter
  * Date: 2/17/13
  * Time: 9:54 PM
  *
+ * For test purpose.
  */
 private[graph] case class SimpleDbo(a:String,var b:String) extends DbObject with IDGetter[String]
+private[graph] case class IdSimpleDbo(a:String,var b:String) extends IdDbObject[String]
 
