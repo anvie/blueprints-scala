@@ -70,6 +70,11 @@ object CaseClassDeserializer {
                 // use null if the property does not exist
                 case null =>
                     values += null
+
+                case x:java.lang.Integer if paramType.c == classOf[java.lang.Long] =>
+
+                    values += x
+
                 // if the value is directly assignable: use it
                 case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
                     values += x
@@ -125,6 +130,11 @@ object CaseClassDeserializer {
                 // use null if the property does not exist
                 case null =>
                     // skip null
+
+                case x:java.lang.Integer if paramType.c == classOf[java.lang.Long] =>
+
+                    methods.get(paramNameSet).map(_.invoke(summoned, x))
+
                 // if the value is directly assignable: use it
                 case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
                     methods.get(paramNameSet).map(_.invoke(summoned, x))
