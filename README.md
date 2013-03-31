@@ -231,13 +231,13 @@ Done, now you can using Scalastic sweet syntactic sugar code.
 Install
 --------
 
-Add resolvers:
-
-	"Ansvia Releases Repo" at "http://scala.repo.ansvia.com/releases/"
-
 Add dependency:
 
 	"com.ansvia.graph" % "blueprints-scala" % "0.0.7"
+
+For snapshots:
+
+	"com.ansvia.graph" % "blueprints-scala" % "0.0.8-20130331-SNAPSHOT"
 
 License
 ---------

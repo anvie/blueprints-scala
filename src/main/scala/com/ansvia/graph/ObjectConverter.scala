@@ -26,6 +26,7 @@ object ObjectConverter {
      * for null values not property will be set
      */
     def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
+        assert(cc != null, "duno how to serialize null object :(")
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
             case (name, value) => 
@@ -94,6 +95,7 @@ object ObjectConverter {
      * do not fit to the case class properties
      */
     def deSerialize[T: Manifest](pc: Element): T = {
+        assert(pc != null, "duno how to deserialize null object :(")
         toCC[T](pc) match {
             case Some(t) => t
             case _ => throw new IllegalArgumentException("given Case Class: " +
