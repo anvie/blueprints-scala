@@ -4,7 +4,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.0.8-SNAPSHOT"
+version := "0.0.8"
 
 scalaVersion := "2.9.1"
 
@@ -42,8 +42,6 @@ version <<= version { (v:String) =>
 }
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-
-//credentials += Credentials(Path.userHome / ".sbt" / "0.11.2" / "sonatype.sbt")
 
 publishArtifact in Test := false
 
