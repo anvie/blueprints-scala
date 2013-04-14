@@ -20,6 +20,7 @@ class DbObjectSimpleSpec extends Specification {
             "able to reload" ! dboTrees.reload ^
             "change property and save" ! dboTrees.changeProperty ^
             "use getId via IDGetter" ! dboTrees.useGetId ^
+            "use getId from IdDbObject" ! dboTrees.useGetIdDbObject ^
             "able to delete" ! dboTrees.delete ^
         end
 
@@ -28,6 +29,9 @@ class DbObjectSimpleSpec extends Specification {
 
         val dboDraft = SimpleDbo("a", "b")
         val dbo = dboDraft.save().toCC[SimpleDbo].get
+
+        val dbo2Draft = IdSimpleDbo("b", "c")
+        val dbo2 = dbo2Draft.save().toCC[IdSimpleDbo].get
 
         def close(){
             db.shutdown()
@@ -49,7 +53,12 @@ class DbObjectSimpleSpec extends Specification {
             val v = db.getVertex(dbo.getVertex.getId)
             v.getId must beEqualTo(dbo.getId)
         }
-        
+
+        def useGetIdDbObject = {
+            val d = db.getVertex(dbo2.getVertex.getId).toCC[IdSimpleDbo].get
+            d.getId must beEqualTo(dbo2.getId)
+        }
+
         def delete = {
             dbo.delete()
             dbo.isSaved must beEqualTo(false)
