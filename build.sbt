@@ -41,7 +41,7 @@ version <<= version { (v:String) =>
         v
 }
 
-credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+credentials += Credentials(Path.userHome / ".ivy2" / ".credentials-sonatype")
 
 publishArtifact in Test := false
 
