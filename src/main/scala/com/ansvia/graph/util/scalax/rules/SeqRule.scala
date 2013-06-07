@@ -2,6 +2,9 @@ package com.ansvia.graph.util
 package scalax
 package rules
 
+import scala.language.reflectiveCalls
+import scala.language.postfixOps
+
 /**
  * A workaround for the difficulties of dealing with
  * a contravariant 'In' parameter type...
@@ -92,5 +95,3 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
     in => rep(0, in)
   }
 }
-
-

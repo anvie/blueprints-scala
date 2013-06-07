@@ -5,6 +5,8 @@ package scalasig
 
 import ClassFileParser.{ConstValueIndex, Annotation}
 import reflect.internal.pickling.ByteCodecs
+import scala.language.postfixOps
+import scala.language.implicitConversions
 
 object ScalaSigParser {
 
@@ -372,4 +374,3 @@ case class AnnotInfo(refs: Seq[Int])
  *
  *   len is remaining length after `len'.
  */
-

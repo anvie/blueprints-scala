@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.{TransactionalGraph, Vertex, Direction}
 import java.lang.Iterable
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import org.specs2.execute.Skipped
+import scala.language.reflectiveCalls
 
 /**
  * Copyright (C) 2011-2012 Ansvia Inc.

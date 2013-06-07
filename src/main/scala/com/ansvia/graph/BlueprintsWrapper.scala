@@ -11,6 +11,8 @@ import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import scala.Some
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
+import scala.language.implicitConversions
+import scala.language.reflectiveCalls
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
