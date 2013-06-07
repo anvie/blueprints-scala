@@ -389,13 +389,13 @@ object BlueprintsWrapper {
 
             val x = wrappedFunc
 
-            db.stopTransaction(TransactionalGraph.Conclusion.SUCCESS)
+            db.commit
 
             x
 
         }catch{
             case e:Exception =>
-                db.stopTransaction(TransactionalGraph.Conclusion.FAILURE)
+                db.rollback
                 throw e
         }
     }
