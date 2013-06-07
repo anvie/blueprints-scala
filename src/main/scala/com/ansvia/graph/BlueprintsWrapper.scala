@@ -1,4 +1,3 @@
-
 package com.ansvia.graph
 
 import com.tinkerpop.blueprints._
@@ -43,7 +42,7 @@ object BlueprintsWrapper {
          * @return
          */
         def get[T](key:String)(implicit tag: TypeTag[T]):Option[T] = {
-            obj.getProperty(key) match {
+            obj.getProperty[AnyRef](key) match {
                 case v:T => Some(v)
                 case x => None
             }
@@ -65,7 +64,7 @@ object BlueprintsWrapper {
          * @return
          */
         def getOrElse[T](key:String, default:T)(implicit tag: TypeTag[T]):T = {
-            obj.getProperty(key) match {
+            obj.getProperty[AnyRef](key) match {
                 case v:T => v
                 case x => {
                     default
@@ -420,11 +419,11 @@ object BlueprintsWrapper {
                 case ccDbo:DbObject =>
                     val kv = ccDbo.__save__()
                     for ( (k, v) <- kv ){
-                        
+
                         // only set if different/new
                         if(elm.getOrElse(k,null) != v)
                             elm.set(k, v)
-                            
+
                     }
                 case _ =>
             }
@@ -524,7 +523,7 @@ object BlueprintsWrapper {
 
             v.toCC[this.type].get
         }
-        
+
     }
 
     trait IDGetter[IDType] {
