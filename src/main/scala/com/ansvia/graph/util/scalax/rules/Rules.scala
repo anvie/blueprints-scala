@@ -2,6 +2,9 @@ package com.ansvia.graph.util
 package scalax
 package rules
 
+import scala.language.postfixOps
+import scala.language.implicitConversions
+
 trait Name {
   def name: String
 
@@ -146,4 +149,3 @@ trait StateRules {
 trait RulesWithState extends Rules with StateRules {
   val factory = this
 }
-

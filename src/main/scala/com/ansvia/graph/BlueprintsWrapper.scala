@@ -1,4 +1,3 @@
-
 package com.ansvia.graph
 
 import com.tinkerpop.blueprints._
@@ -12,6 +11,8 @@ import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import scala.Some
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
+import scala.language.implicitConversions
+import scala.language.reflectiveCalls
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
@@ -43,7 +44,7 @@ object BlueprintsWrapper {
          * @return
          */
         def get[T](key:String)(implicit tag: TypeTag[T]):Option[T] = {
-            obj.getProperty(key) match {
+            obj.getProperty[AnyRef](key) match {
                 case v:T => Some(v)
                 case x => None
             }
@@ -65,7 +66,7 @@ object BlueprintsWrapper {
          * @return
          */
         def getOrElse[T](key:String, default:T)(implicit tag: TypeTag[T]):T = {
-            obj.getProperty(key) match {
+            obj.getProperty[AnyRef](key) match {
                 case v:T => v
                 case x => {
                     default
@@ -390,13 +391,13 @@ object BlueprintsWrapper {
 
             val x = wrappedFunc
 
-            db.stopTransaction(TransactionalGraph.Conclusion.SUCCESS)
+            db.commit
 
             x
 
         }catch{
             case e:Exception =>
-                db.stopTransaction(TransactionalGraph.Conclusion.FAILURE)
+                db.rollback
                 throw e
         }
     }
@@ -420,11 +421,11 @@ object BlueprintsWrapper {
                 case ccDbo:DbObject =>
                     val kv = ccDbo.__save__()
                     for ( (k, v) <- kv ){
-                        
+
                         // only set if different/new
                         if(elm.getOrElse(k,null) != v)
                             elm.set(k, v)
-                            
+
                     }
                 case _ =>
             }
@@ -524,7 +525,7 @@ object BlueprintsWrapper {
 
             v.toCC[this.type].get
         }
-        
+
     }
 
     trait IDGetter[IDType] {

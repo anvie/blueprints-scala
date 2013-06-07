@@ -5,7 +5,7 @@ package com.ansvia.graph
  * User: robin
  * Date: 12/31/12
  * Time: 5:21 AM
- * 
+ *
  */
 import collection.JavaConversions._
 import com.tinkerpop.blueprints.{Vertex, Element}
@@ -29,7 +29,7 @@ object ObjectConverter {
     def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
-            case (name, value) => 
+            case (name, value) =>
                 // set only if different with current (eg: new changes)
                 if (pc.getProperty(name) != value)
                     pc.setProperty(name, value)
@@ -53,7 +53,7 @@ object ObjectConverter {
         _toCCPossible(pc) match {
             case Some(serializedClass) =>
 
-                val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
+                val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
 
                 val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
@@ -67,19 +67,19 @@ object ObjectConverter {
         }
 
     private def _toCCPossible[T](pc: Element)(implicit tag: ClassTag[T]): Option[Class[_]] = {
-        
-        val pv = pc.getProperty(CLASS_PROPERTY_NAME)
+
+        val pv = pc.getProperty[String](CLASS_PROPERTY_NAME)
         if( pv != null ){
             val cpn = pv.toString
             val c = Class.forName(cpn)
             if (tag.runtimeClass.isAssignableFrom(c))
                 Some(c)
             else
-                None    
+                None
         } else
             None
-        
-        
+
+
     }
 
     /**
@@ -105,4 +105,3 @@ object ObjectConverter {
         }
     }
 }
-
