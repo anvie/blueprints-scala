@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.blueprints.Vertex
 import com.ansvia.graph.BlueprintsWrapper._
 import org.specs2.specification.Step
+import scala.language.reflectiveCalls
 
 /**
  * Copyright (C) 2011-2012 Ansvia Inc.

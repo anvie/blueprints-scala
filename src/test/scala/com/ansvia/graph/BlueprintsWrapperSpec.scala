@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.{TransactionalGraph, Vertex, Direction}
 import java.lang.Iterable
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import org.specs2.execute.Skipped
+import scala.language.reflectiveCalls
 
 /**
  * Copyright (C) 2011-2012 Ansvia Inc.
@@ -65,7 +66,7 @@ class BlueprintsWrapperSpec extends Specification {
     "Blueprints vertex wrapper" should {
         "create edge out" in {
             val father = vertices("hercules").getVertices(Direction.OUT,"father").iterator().next()
-            father.getProperty("name") must beEqualTo("jupiter")
+            father.getProperty[String]("name") must beEqualTo("jupiter")
         }
         "handle defined field" in {
             vertices("hercules").get[String]("kind").isDefined must beTrue
@@ -182,7 +183,7 @@ class BlueprintsWrapperSpec extends Specification {
         "using sorting method" in {
             val orderedMonsters = hercules.pipe.out("battled").wrap.sort { (v1, v2) =>
                 v1.get[String]("name").get.compareTo(v2.get[String]("name").get)
-            }.iterator().map(_.getProperty("name")).toArray
+            }.iterator().map(_.getProperty[String]("name")).toArray
             orderedMonsters(0) must beEqualTo("cerberus")
             orderedMonsters(1) must beEqualTo("hydra")
             orderedMonsters(2) must beEqualTo("nemean")
@@ -202,5 +203,3 @@ class BlueprintsWrapperSpec extends Specification {
 
 
 }
-
-

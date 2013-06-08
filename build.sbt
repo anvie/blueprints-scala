@@ -4,11 +4,11 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.1.1-SNAPSHOT"
+version := "0.1.2-SNAPSHOT"
 
 scalaVersion := "2.10.0"
 
-scalacOptions := Seq("-unchecked", "-deprecation")
+scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
 
 resolvers ++= Seq(
     "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
@@ -16,12 +16,12 @@ resolvers ++= Seq(
     )
 
 libraryDependencies ++= Seq(
-    "com.tinkerpop.blueprints" % "blueprints-core" % "2.2.0",
-    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.2.0",
-    "com.tinkerpop.gremlin" % "gremlin-java" % "2.2.0",
+    "com.tinkerpop.blueprints" % "blueprints-core" % "2.3.0",
+    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.3.0",
+    "com.tinkerpop.gremlin" % "gremlin-java" % "2.3.0",
     "org.scala-lang" % "scala-reflect" % "2.10.0",
-    "org.specs2" % "specs2_2.10" % "1.13" % "test",
-    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.2.0" % "test"
+    "org.specs2" % "specs2_2.10" % "1.14" % "test",
+    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.3.0" % "test"
     )
 
 publishTo <<= version { (v:String) =>

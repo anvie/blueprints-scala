@@ -8,6 +8,7 @@ import collection.mutable
 import com.ansvia.graph.annotation.Persistent
 import annotation.tailrec
 import scala.reflect.ClassTag
+import scala.language.existentials
 
 /**
  * helper class to store Class object
@@ -426,4 +427,3 @@ object CaseClassSigParser {
         case name => Class.forName(name)
     }
 }
-

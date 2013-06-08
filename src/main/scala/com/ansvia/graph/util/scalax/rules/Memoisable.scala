@@ -3,6 +3,7 @@ package scalax
 package rules
 
 import scala.collection.mutable.HashMap
+import scala.language.reflectiveCalls
 
 trait MemoisableRules extends Rules {
   def memo[In <: Memoisable, Out, A, X](key: AnyRef)
@@ -49,7 +50,3 @@ trait DefaultMemoisable extends Memoisable {
     if (DefaultMemoisable.debug) println(key + " -> " + t + " (" + out + ")")
   }
 }
-
-
-
-
