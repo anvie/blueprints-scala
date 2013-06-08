@@ -25,11 +25,11 @@ libraryDependencies ++= Seq(
     )
 
 publishTo <<= version { (v:String) =>
-      val ansviaRepo = "http://scala.repo.ansvia.com/nexus"
+      val nexus = "https://oss.sonatype.org"
       if(v.trim.endsWith("SNAPSHOT") || """.+\-\d{8}+$""".r.pattern.matcher(v.trim).matches())
-          Some("snapshots" at ansviaRepo + "/content/repositories/snapshots")
+          Some("snapshots" at nexus + "/content/repositories/snapshots")
       else
-          Some("releases" at ansviaRepo + "/content/repositories/releases")
+	  Some("releases"  at nexus + "/service/local/staging/deploy/maven2")
   }
 
 version <<= version { (v:String) =>
