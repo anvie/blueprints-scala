@@ -11,11 +11,12 @@ scalaVersion := "2.9.1"
 scalacOptions := Seq("-unchecked", "-deprecation")
 
 resolvers ++= Seq(
-    "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
+        "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
         "Ansvia repo" at "http://scala.repo.ansvia.com/releases/"
     )
 
 libraryDependencies ++= Seq(
+    "com.ansvia" % "ansvia-commons" % "0.0.7",
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.2.0",
     "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.2.0",
     "com.tinkerpop.gremlin" % "gremlin-java" % "2.2.0",

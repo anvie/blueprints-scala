@@ -11,8 +11,9 @@ import collection.JavaConversions._
 import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
+import com.ansvia.commons.logging.Slf4jLogger
 
-object ObjectConverter {
+object ObjectConverter extends Slf4jLogger {
 
     /**
      * this name will be used to store the class name of
@@ -54,13 +55,21 @@ object ObjectConverter {
 
                 val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
 
-                val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
+                try {
+                    val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
-                if (o.isInstanceOf[DbObject]){
-                    o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    if (o.isInstanceOf[DbObject]){
+                        o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    }
+
+                    Some(o)
+                }catch{
+                    case e:IllegalArgumentException =>
+                        error("Cannot deserialize record from db, broken record? \n" +
+                            "for class: " + serializedClass.getName + "\n" +
+                            "kv: " + kv.toMap)
+                        None
                 }
-
-                Some(o)
 
             case _ => None
         }
