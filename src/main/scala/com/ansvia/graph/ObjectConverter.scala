@@ -32,7 +32,7 @@ object ObjectConverter extends Slf4jLogger {
 
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
-            case (name, value) =>
+            case (name, value) => 
 
                 try {
                     if (pc.getProperty(name) != value)
