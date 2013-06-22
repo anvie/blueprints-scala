@@ -7,6 +7,7 @@ import com.ansvia.graph.BlueprintsWrapper.DbObject
 import collection.mutable
 import com.ansvia.graph.annotation.Persistent
 import annotation.tailrec
+import com.ansvia.commons.logging.Slf4jLogger
 
 /**
  * helper class to store Class object
@@ -16,7 +17,7 @@ case class JavaType(c: Class[_])
 /**
  * Case Class deserializing object
  */
-object CaseClassDeserializer {
+object CaseClassDeserializer extends Slf4jLogger {
 
     /**
      * Method Map cache for method serialize
@@ -90,7 +91,15 @@ object CaseClassDeserializer {
         val paramsCount = constructor.getParameterTypes.length
         val ccParams = values.slice(0, paramsCount)
 
-        val summoned = constructor.newInstance(ccParams.toArray: _*).asInstanceOf[AnyRef]
+        val summoned = try {
+            constructor.newInstance(ccParams.toArray: _*).asInstanceOf[AnyRef]
+        }catch{
+            case e:IllegalArgumentException =>
+                error("cannot spawn object: " + e.getMessage + "\n" +
+                    "paramsCount: " + paramsCount + "\n" +
+                    "ccParams: " + ccParams.toList)
+                throw e
+        }
 
         val methods = {
 
