@@ -28,14 +28,20 @@ object ObjectConverter extends Slf4jLogger {
      */
     def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
         assert(cc != null, "duno how to serialize null object :(")
+
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
             case (name, value) => 
-                // set only if different with current (eg: new changes)
-                if (pc.getProperty(name) != value)
-                    pc.setProperty(name, value)
-                //else
-                //    println("ignored (not different): " + name + " <-> " + value)
+
+                try {
+                    if (pc.getProperty(name) != value)
+                        pc.setProperty(name, value)
+                }catch{
+                    case e:IllegalArgumentException =>
+                        error("cannot set property %s <= %s\nerror: %s".format(name, value, e.getMessage))
+                        throw e
+                }
+
         }
         pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
 
@@ -67,7 +73,8 @@ object ObjectConverter extends Slf4jLogger {
                     case e:IllegalArgumentException =>
                         error("Cannot deserialize record from db, broken record? \n" +
                             "for class: " + serializedClass.getName + "\n" +
-                            "kv: " + kv.toMap)
+                            "kv: " + kv.toMap + "\n" +
+                            "error: " + e.getMessage)
                         None
                 }
 
