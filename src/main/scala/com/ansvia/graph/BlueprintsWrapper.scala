@@ -4,9 +4,8 @@ import com.tinkerpop.blueprints._
 import java.lang.Iterable
 import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.gremlin.java.GremlinPipeline
-import scala.Some
 import com.tinkerpop.pipes.util.FastNoSuchElementException
-import com.ansvia.graph.Exc.{BlueprintsScalaException, NotBoundException}
+import com.ansvia.graph.Exc.NotBoundException
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import scala.Some
 import scala.reflect.ClassTag
