@@ -5,16 +5,13 @@ import com.tinkerpop.blueprints._
 import java.lang.Iterable
 import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.gremlin.java.GremlinPipeline
-import scala.Some
 import com.tinkerpop.pipes.util.FastNoSuchElementException
-import com.ansvia.graph.Exc.{BlueprintsScalaException, NotBoundException}
+import com.ansvia.graph.Exc.NotBoundException
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import scala.Some
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
-
-
 
     case class ScalasticPropertyAccessor[A <: Element : Manifest](var obj:A) {
 
@@ -380,15 +377,10 @@ object BlueprintsWrapper {
      * @return
      */
     def transact[T](wrappedFunc: => T)(implicit db:TransactionalGraph):T = {
-//        val dbx = db.startTransaction()
         try {
-
-            val x = wrappedFunc
-
+            val rv = wrappedFunc
             db.stopTransaction(TransactionalGraph.Conclusion.SUCCESS)
-
-            x
-
+            rv
         }catch{
             case e:Exception =>
                 db.stopTransaction(TransactionalGraph.Conclusion.FAILURE)
