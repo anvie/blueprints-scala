@@ -12,8 +12,9 @@ import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import reflect.ClassTag
+import com.ansvia.commons.logging.Slf4jLogger
 
-object ObjectConverter {
+object ObjectConverter extends Slf4jLogger {
 
     /**
      * this name will be used to store the class name of
@@ -27,17 +28,23 @@ object ObjectConverter {
      * for null values not property will be set
      */
     def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
+        assert(cc != null, "duno how to serialize null object :(")
+
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
             case (name, value) =>
-                // set only if different with current (eg: new changes)
-                if (pc.getProperty(name) != value)
-                    pc.setProperty(name, value)
-                //else
-                //    println("ignored (not different): " + name + " <-> " + value)
+
+                try {
+                    if (pc.getProperty(name) != value)
+                        pc.setProperty(name, value)
+                }catch{
+                    case e:IllegalArgumentException =>
+                        error("cannot set property %s <= %s\nerror: %s".format(name, value, e.getMessage))
+                        throw e
+                }
+
         }
         pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
-
 
         // save non case class accessor
 
@@ -55,13 +62,22 @@ object ObjectConverter {
 
                 val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
 
-                val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
+                try {
+                    val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
-                if (o.isInstanceOf[DbObject]){
-                    o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    if (o.isInstanceOf[DbObject]){
+                        o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    }
+
+                    Some(o)
+                }catch{
+                    case e:IllegalArgumentException =>
+                        error("Cannot deserialize record from db, broken record? \n" +
+                            "for class: " + serializedClass.getName + "\n" +
+                            "kv: " + kv.toMap + "\n" +
+                            "error: " + e.getMessage)
+                        None
                 }
-
-                Some(o)
 
             case _ => None
         }
@@ -98,6 +114,7 @@ object ObjectConverter {
      * do not fit to the case class properties
      */
     def deSerialize[T](pc: Element)(implicit tag: ClassTag[T]): T = {
+        assert(pc != null, "duno how to deserialize null object :(")
         toCC[T](pc) match {
             case Some(t) => t
             case _ => throw new IllegalArgumentException("given Case Class: " +

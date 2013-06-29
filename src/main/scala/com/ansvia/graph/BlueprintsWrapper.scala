@@ -386,18 +386,13 @@ object BlueprintsWrapper {
      * @return
      */
     def transact[T](wrappedFunc: => T)(implicit db:TransactionalGraph):T = {
-//        val dbx = db.startTransaction()
         try {
-
-            val x = wrappedFunc
-
-            db.commit
-
-            x
-
+            val rv = wrappedFunc
+            db.commit()
+            rv
         }catch{
             case e:Exception =>
-                db.rollback
+                db.rollback()
                 throw e
         }
     }
