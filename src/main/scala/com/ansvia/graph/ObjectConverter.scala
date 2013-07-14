@@ -13,6 +13,7 @@ import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import reflect.ClassTag
 import com.ansvia.commons.logging.Slf4jLogger
+import scala.collection.mutable
 
 object ObjectConverter extends Slf4jLogger {
 
@@ -60,9 +61,10 @@ object ObjectConverter extends Slf4jLogger {
         _toCCPossible(pc) match {
             case Some(serializedClass) =>
 
-                val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
-
+                var kv:mutable.Set[(String, AnyRef)] = null
                 try {
+                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
+
                     val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
                     if (o.isInstanceOf[DbObject]){
@@ -74,8 +76,26 @@ object ObjectConverter extends Slf4jLogger {
                     case e:IllegalArgumentException =>
                         error("Cannot deserialize record from db, broken record? \n" +
                             "for class: " + serializedClass.getName + "\n" +
-                            "kv: " + kv.toMap + "\n" +
+                            {
+                                if (kv != null)
+                                    "kv: " + kv.toMap + "\n"
+                                else
+                                    ""
+                            } +
                             "error: " + e.getMessage)
+                        e.printStackTrace()
+                        None
+                    case e:IndexOutOfBoundsException =>
+                        error("Cannot deserialize record from db, broken record? \n" +
+                            "for class: " + serializedClass.getName + "\n" +
+                            {
+                                if (kv != null)
+                                    "kv: " + kv.toMap + "\n"
+                                else
+                                    ""
+                            } +
+                            "error: " + e.getMessage)
+                        e.printStackTrace()
                         None
                 }
 
