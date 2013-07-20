@@ -1,12 +1,11 @@
 package com.ansvia.graph
 
 import com.tinkerpop.blueprints.{Edge, Graph, Vertex}
-import com.ansvia.graph.BlueprintsWrapper.{DbObject, VertexWrapper}
+import com.ansvia.graph.BlueprintsWrapper.VertexWrapper
 
 
 /**
- * Edge wrapper on arrow chain.
- * This wrapper automatic used via VertexWrapper.
+ * Edge wrapper to support arrow operator.
  * @param vertex vertex
  * @param label label
  * @param db database
@@ -44,8 +43,8 @@ private[graph] case class EdgeWrapper(var vertex:Vertex, var label:String, db:Gr
         p
     }
 
-    def -->(o:DbObject):VertexWrapper = {
-        this.-->(o.getVertex)
+    def -->(o:AbstractDbObject):VertexWrapper = {
+        this --> o.getVertex
     }
 
     def <():Edge = this.lastEdge
