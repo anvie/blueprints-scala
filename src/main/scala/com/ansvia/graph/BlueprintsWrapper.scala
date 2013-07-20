@@ -38,7 +38,7 @@ object BlueprintsWrapper {
          * @return
          */
         def get[T](key:String):Option[T] = {
-            obj.getProperty(key) match {
+            obj.getProperty[AnyRef](key) match {
                 case v:T => Some(v)
                 case x => None
             }
@@ -60,7 +60,7 @@ object BlueprintsWrapper {
          * @return
          */
         def getOrElse[T](key:String, default:T):T = {
-            obj.getProperty(key) match {
+            obj.getProperty[AnyRef](key) match {
                 case v:T => v
                 case x => {
                     default
@@ -84,7 +84,7 @@ object BlueprintsWrapper {
          * @return
          */
         def has(key:String):Boolean = {
-            obj.getProperty(key) != null
+            obj.getProperty[AnyRef](key) != null
         }
 
         /**
@@ -160,6 +160,10 @@ object BlueprintsWrapper {
             next
         }
 
+        /**
+         * Get edge.
+         * @return
+         */
         def <():Edge = {
             if (this.prev.isDefined)
                 this.prev.get <()
@@ -215,26 +219,27 @@ object BlueprintsWrapper {
     }
 
 
-    case class EdgeWrapperRight(vertex:Vertex, edge:Edge, label:String, db:Graph) extends Wrapper {
-        def -->(v2:Vertex) = {
-            db.addEdge(null, vertex, v2, label)
-        }
-    }
-
-    case class EdgeWrapperLeft(edge:Edge, db:Graph) extends Wrapper {
-        def -->(label:String):EdgeWrapperRight = {
-            val v = edge.getVertex(Direction.OUT)
-            EdgeWrapperRight(v, edge, label, db)
-        }
-
-        def <--(label:String):VertexWrapper = {
-            val vertex = edge.getVertex(Direction.IN)
-            VertexWrapper(vertex, label, db)
-        }
-    }
+//    case class EdgeWrapperRight(vertex:Vertex, edge:Edge, label:String, db:Graph) extends Wrapper {
+//        def -->(v2:Vertex) = {
+//            db.addEdge(null, vertex, v2, label)
+//        }
+//    }
+//
+//    case class EdgeWrapperLeft(edge:Edge, db:Graph) extends Wrapper {
+//        def -->(label:String):EdgeWrapperRight = {
+//            val v = edge.getVertex(Direction.OUT)
+//            EdgeWrapperRight(v, edge, label, db)
+//        }
+//
+//        def <--(label:String):VertexWrapper = {
+//            val vertex = edge.getVertex(Direction.IN)
+//            VertexWrapper(vertex, label, db)
+//        }
+//    }
 
     implicit def vertexWrapper(vertex:Vertex)(implicit db:Graph) = VertexWrapper(vertex, null, db)
-    implicit def edgeWrapper(edge:Edge)(implicit db:Graph) = EdgeWrapperLeft(edge, db)
+//    implicit def edgeWrapper(edge:Edge)(implicit db:Graph) = EdgeWrapperLeft(edge, db)
+
     implicit def edgeFormatter(edge:Edge) = new {
         def prettyPrint(key:String) = {
             val in = edge.getVertex(Direction.IN)
@@ -263,7 +268,7 @@ object BlueprintsWrapper {
 
 
     /**
-     * Gremlin pipe wrapper.
+     * Gremlin pipe wrapper for vertex.
      * @param innerPipe raw gremlin pipe.
      */
     case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
@@ -336,6 +341,12 @@ object BlueprintsWrapper {
         }
     }
 
+    /**
+     * Gremlin pipe wrapper for edge.
+     * @param innerPipe
+     * @tparam Vertex
+     * @tparam Edge
+     */
     case class GremlinPipeWrapperEdge[Vertex, Edge](innerPipe:GremlinPipeline[Vertex, Edge]){
         def wrap = GremlinPipeWrapperEdge[Vertex, Edge](innerPipe)
 
@@ -379,11 +390,11 @@ object BlueprintsWrapper {
     def transact[T](wrappedFunc: => T)(implicit db:TransactionalGraph):T = {
         try {
             val rv = wrappedFunc
-            db.stopTransaction(TransactionalGraph.Conclusion.SUCCESS)
+            db.commit()
             rv
         }catch{
             case e:Exception =>
-                db.stopTransaction(TransactionalGraph.Conclusion.FAILURE)
+                db.rollback()
                 throw e
         }
     }

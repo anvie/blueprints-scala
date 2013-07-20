@@ -22,11 +22,11 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
     "com.ansvia" % "ansvia-commons" % "0.0.7",
-    "com.tinkerpop.blueprints" % "blueprints-core" % "2.2.0",
-    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.2.0",
-    "com.tinkerpop.gremlin" % "gremlin-java" % "2.2.0",
+    "com.tinkerpop.blueprints" % "blueprints-core" % "2.3.0",
+    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.3.0",
+    "com.tinkerpop.gremlin" % "gremlin-java" % "2.3.0",
     "org.specs2" %%  "specs2" % "1.9" % "test",
-    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.0.0" % "test"
+    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.3.0" % "test"
     )
 
 publishTo <<= version { (v:String) =>
@@ -41,7 +41,7 @@ publishTo <<= version { (v:String) =>
 
 version <<= version { (v:String) =>
     if (v.trim.endsWith("-SNAPSHOT")){
-        val dateFormatter = new SimpleDateFormat("yyyyMMdd")
+        val dateFormatter = new SimpleDateFormat("yyyyMMddHHmm")
         v.trim.split("-").apply(0) + "-" + dateFormatter.format(new java.util.Date()) + "-SNAPSHOT"
     }else
         v

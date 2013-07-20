@@ -62,7 +62,7 @@ object ObjectConverter extends Slf4jLogger {
 
                 var kv:mutable.Set[(String, AnyRef)] = null
                 try {
-                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
+                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
 
                     val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
@@ -100,7 +100,7 @@ object ObjectConverter extends Slf4jLogger {
         }
 
     private def _toCCPossible[T: Manifest](pc: Element): Option[Class[_]] = {
-        val pv = pc.getProperty(CLASS_PROPERTY_NAME)
+        val pv = pc.getProperty[AnyRef](CLASS_PROPERTY_NAME)
         if(pv != null){
             val cpn = pv.toString
             val c = Class.forName(cpn)
