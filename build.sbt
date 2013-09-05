@@ -41,7 +41,7 @@ publishTo <<= version { (v:String) =>
 
 version <<= version { (v:String) =>
     if (v.trim.endsWith("-SNAPSHOT")){
-        val dateFormatter = new SimpleDateFormat("yyyyMMddHHmm")
+        val dateFormatter = new SimpleDateFormat("yyyyMMdd")
         v.trim.split("-").apply(0) + "-" + dateFormatter.format(new java.util.Date()) + "-SNAPSHOT"
     }else
         v

@@ -9,5 +9,6 @@ trait AbstractDbObject {
     def isSaved:Boolean
     def reload()(implicit db: Graph):this.type
     def -->(label:String)(implicit db:Graph):EdgeWrapper
-
+    def __load__(vertex:Vertex)
+    def __save__():Map[String, Any]
 }
