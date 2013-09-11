@@ -7,7 +7,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.0.11-SNAPSHOT"
+version := "0.0.11"
 
 scalaVersion := "2.9.1"
 
