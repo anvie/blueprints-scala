@@ -233,7 +233,7 @@ Install
 
 Add dependency:
 
-	"com.ansvia.graph" % "blueprints-scala" % "0.0.10"
+	"com.ansvia.graph" % "blueprints-scala" % "0.0.11"
 
 
 License
