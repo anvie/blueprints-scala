@@ -82,6 +82,7 @@ object ObjectConverter extends Slf4jLogger {
                                     ""
                             } +
                             "error: " + e.getMessage)
+                        e.printStackTrace()
                         None
                     case e:IndexOutOfBoundsException =>
                         error("Cannot deserialize record from db, broken record? \n" +
@@ -93,6 +94,7 @@ object ObjectConverter extends Slf4jLogger {
                                     ""
                             } +
                             "error: " + e.getMessage)
+                        e.printStackTrace()
                         None
                 }
 
