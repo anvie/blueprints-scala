@@ -1,4 +1,4 @@
-Tinkerpop Blueprints Scala [![Build Status](https://travis-ci.org/anvie/blueprints-scala.png?branch=master)](https://travis-ci.org/anvie/blueprints-scala)
+Tinkerpop Blueprints Scala [![Build Status](https://travis-ci.org/anvie/blueprints-scala.png?branch=master)](https://travis-ci.org/anvie/blueprints-scala) [![Build Status](https://drone.io/github.com/anvie/blueprints-scala/status.png)](https://drone.io/github.com/anvie/blueprints-scala/latest)
 ===================================
 
 Scala wrapper for tinkerpop blueprints, this library provide more scalastic code when working with graph database
@@ -9,9 +9,6 @@ Usage
 
 For installation see install section.
 More working and complete examples can be found on specs test.
-This example data based on graph of the gods https://github.com/thinkaurelius/titan/wiki/Getting-Started
-
-![](https://github.com/thinkaurelius/titan/raw/master/doc/images/graph-of-the-gods.png)
 
 
 Creating new vertex:
