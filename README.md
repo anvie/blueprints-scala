@@ -11,11 +11,7 @@ For installation see install section.
 
 For Scala 2.9 see https://github.com/anvie/blueprints-scala/tree/scala-2.9
 
-More working and complete examples can be found on specs test.
-This example data based on graph of the gods https://github.com/thinkaurelius/titan/wiki/Getting-Started
-
-![](https://github.com/thinkaurelius/titan/raw/master/doc/images/graph-of-the-gods.png)
-
+More working and complete examples can be found in specs test.
 
 Creating new vertex:
 
