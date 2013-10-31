@@ -525,7 +525,11 @@ object BlueprintsWrapper {
         
     }
 
-    trait IDGetter[IDType] {
+    trait AbstractIDGetter[IDType] {
+        def getId:IDType
+    }
+
+    trait IDGetter[IDType] extends AbstractIDGetter[IDType] {
         def isSaved:Boolean
         def getVertex:Vertex
 
@@ -538,7 +542,7 @@ object BlueprintsWrapper {
 
     trait IdDbObject[IDType] extends DbObject with IDGetter[IDType] {
 
-        private var id:IDType = _
+        protected var id:IDType = _
 
         /**
          * this method called when loading data from database.
