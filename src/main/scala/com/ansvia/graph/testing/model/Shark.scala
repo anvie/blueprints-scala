@@ -38,7 +38,7 @@ private[graph] case class Shark(kind:String) extends SeaFish("blue") with Eatabl
      * by default this is just return empty map.
      * @return
      */
-    override def __save__() = {
-        Map("protected" -> animalProtected)
+    override def __save__(vertex:Vertex) = {
+        vertex.setProperty("protected", animalProtected)
     }
 }
