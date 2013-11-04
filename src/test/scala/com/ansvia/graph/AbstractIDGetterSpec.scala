@@ -3,7 +3,6 @@ package com.ansvia.graph
 import org.specs2.mutable.Specification
 import com.ansvia.graph.testing.model.ModelUsingAbstractIDGetter
 import org.specs2.specification.Scope
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 
 /**
