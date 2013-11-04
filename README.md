@@ -243,7 +243,7 @@ SNAPSHOT releases:
 
 	"Sonatype repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.3-20130629-SNAPSHOT"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.5-20131104-SNAPSHOT"
 
 License
 ---------
