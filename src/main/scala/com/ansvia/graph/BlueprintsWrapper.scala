@@ -529,10 +529,6 @@ object BlueprintsWrapper {
         
     }
 
-    trait AbstractIDGetter[IDType] {
-        def getId:IDType
-    }
-
     trait IDGetter[IDType] extends AbstractIDGetter[IDType] {
         def isSaved:Boolean
         def getVertex:Vertex
