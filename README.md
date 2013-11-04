@@ -237,7 +237,7 @@ Add resolvers:
 
 Add dependency:
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.0"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.4"
 
 SNAPSHOT releases:
 
