@@ -413,14 +413,15 @@ object BlueprintsWrapper {
 
             cc match {
                 case ccDbo:DbObject =>
-                    val kv = ccDbo.__save__()
-                    for ( (k, v) <- kv ){
-
-                        // only set if different/new
-                        if(elm.getOrElse(k,null) != v)
-                            elm.set(k, v)
-
-                    }
+                    ccDbo.__save__(elm)
+//                    val kv = ccDbo.__save__()
+//                    for ( (k, v) <- kv ){
+//
+//                        // only set if different/new
+//                        if(elm.getOrElse(k,null) != v)
+//                            elm.set(k, v)
+//
+//                    }
                 case _ =>
             }
             elm
@@ -434,6 +435,9 @@ object BlueprintsWrapper {
         }
     }
 
+    /**
+     * All model should inherit this trait.
+     */
     trait DbObject extends AbstractDbObject {
 
         protected var vertex:Vertex = null
@@ -470,9 +474,7 @@ object BlueprintsWrapper {
          * by default this is just return empty map.
          * @return Map[String, Any]
          */
-        def __save__():Map[String, Any] = {
-            Map.empty[String, Any]
-        }
+        def __save__(vertex:Vertex){}
 
         /**
          * get bounded vertex.
@@ -519,10 +521,9 @@ object BlueprintsWrapper {
 
             v.toCC[this.type].get
         }
-
     }
 
-    trait IDGetter[IDType] {
+    trait IDGetter[IDType] extends AbstractIDGetter[IDType] {
         def isSaved:Boolean
         def getVertex:Vertex
 
