@@ -237,13 +237,15 @@ Add resolvers:
 
 Add dependency:
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.4"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.5"
 
+<!---
 SNAPSHOT releases:
 
 	"Sonatype repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 	"com.ansvia.graph" %% "blueprints-scala" % "0.1.5-20131114-SNAPSHOT"
+-->
 
 License
 ---------
