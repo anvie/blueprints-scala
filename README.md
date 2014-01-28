@@ -231,9 +231,9 @@ Done, now you can using Scalastic sweet syntactic sugar code.
 Install
 --------
 
-Add resolvers:
+<!-- Add resolvers: -->
 
-	"Ansvia Releases Repo" at "http://scala.repo.ansvia.com/releases/"
+<!--	"Ansvia Releases Repo" at "http://scala.repo.ansvia.com/releases/" -->
 
 Add dependency:
 
