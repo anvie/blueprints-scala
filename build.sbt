@@ -7,7 +7,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.0.12"
+version := "0.1.0-SNAPSHOT"
 
 scalaVersion := "2.9.2"
 
@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.3.0",
     "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.3.0",
     "com.tinkerpop.gremlin" % "gremlin-java" % "2.3.0",
-    "org.specs2" %%  "specs2" % "1.9" % "test",
+    "org.specs2" %%  "specs2" % "1.12.3" % "test",
     "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.3.0" % "test"
     )
 

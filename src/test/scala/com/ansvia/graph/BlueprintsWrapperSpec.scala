@@ -1,11 +1,9 @@
 package com.ansvia.graph
 
 import org.specs2.mutable.Specification
-import com.tinkerpop.blueprints.impls.tg.{TinkerGraphFactory, TinkerGraph}
-import com.tinkerpop.blueprints.{TransactionalGraph, Vertex, Direction}
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+import com.tinkerpop.blueprints.{Vertex, Direction}
 import java.lang.Iterable
-import com.tinkerpop.gremlin.java.GremlinPipeline
-import org.specs2.execute.Skipped
 
 /**
  * Copyright (C) 2011-2012 Ansvia Inc.
@@ -18,7 +16,6 @@ class BlueprintsWrapperSpec extends Specification {
 
     import BlueprintsWrapper._
     import scala.collection.JavaConversions._
-    import scala.collection.JavaConverters._
 
     // for test case we using simple in-memory tinkergraph db
     // in reality you can use any graph db that support

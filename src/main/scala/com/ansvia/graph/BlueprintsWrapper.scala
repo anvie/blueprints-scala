@@ -271,28 +271,32 @@ object BlueprintsWrapper {
      * Gremlin pipe wrapper for vertex.
      * @param innerPipe raw gremlin pipe.
      */
+    @deprecated()
     case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
+
+        @deprecated()
         def wrap = GremlinPipeWrapperVertex(innerPipe)
 
-        /**
-         * Filter vertex out.
-         * Example:
-         *
-         * vertex.pipe.out("friend").wrap.filter { v =>
-         *      v.get[String]("name").get != "andrie"
-         * }
-         *
-         * @param gpf
-         * @return
-         */
-        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
-            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
-                def compute(v: Vertex):java.lang.Boolean = {
-                    gpf.apply(v)
-                }
-            })
-            rv
-        }
+//        /**
+//         * Filter vertex out.
+//         * Example:
+//         *
+//         * vertex.pipe.out("friend").wrap.filter { v =>
+//         *      v.get[String]("name").get != "andrie"
+//         * }
+//         *
+//         * @param gpf
+//         * @return
+//         */
+//        @deprecated()
+//        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
+//            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
+//                def compute(v: Vertex):java.lang.Boolean = {
+//                    gpf.apply(v)
+//                }
+//            })
+//            rv
+//        }
 
         /**
          * Order vertices.
@@ -305,6 +309,7 @@ object BlueprintsWrapper {
          * @param gpf
          * @return
          */
+        @deprecated()
         def sort(gpf: (Vertex, Vertex) => Int):GremlinPipeline[Vertex, Vertex] = {
             val rv = innerPipe.order(new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
                 def compute(argument: BPPair[Vertex, Vertex]):java.lang.Integer = {
@@ -319,6 +324,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
+        @deprecated()
         def inFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.in(label).next())
@@ -332,6 +338,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
+        @deprecated()
         def outFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.out(label).next())
