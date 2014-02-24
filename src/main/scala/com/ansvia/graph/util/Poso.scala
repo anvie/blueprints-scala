@@ -7,7 +7,7 @@ import com.ansvia.graph.BlueprintsWrapper.DbObject
 import collection.mutable
 import com.ansvia.graph.annotation.Persistent
 import annotation.tailrec
-import com.ansvia.commons.logging.Slf4jLogger
+import com.ansvia.graph.Log
 
 /**
  * helper class to store Class object
@@ -17,7 +17,7 @@ case class JavaType(c: Class[_])
 /**
  * Case Class deserializing object
  */
-object CaseClassDeserializer extends Slf4jLogger {
+object CaseClassDeserializer extends Log {
 
     /**
      * Method Map cache for method serialize

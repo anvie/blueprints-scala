@@ -11,10 +11,9 @@ import collection.JavaConversions._
 import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
-import com.ansvia.commons.logging.Slf4jLogger
 import scala.collection.mutable
 
-object ObjectConverter extends Slf4jLogger {
+object ObjectConverter extends Log {
 
     /**
      * this name will be used to store the class name of
