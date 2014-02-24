@@ -4,7 +4,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.1.5"
+version := "0.1.6-SNAPSHOT"
 
 scalaVersion := "2.10.0"
 
@@ -16,7 +16,7 @@ resolvers ++= Seq(
     )
 
 libraryDependencies ++= Seq(
-    "com.ansvia" % "ansvia-commons" % "0.0.7",
+    "org.slf4j" % "slf4j-api" % "1.7.6",
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.3.0",
     "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.3.0",
     "com.tinkerpop.gremlin" % "gremlin-java" % "2.3.0",

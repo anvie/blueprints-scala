@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Vertex
 
 package object gremlin {
 
+    import scala.language.implicitConversions
 
     implicit def tupleToPair[A,B](pair:(A, B)) = new BPPair[A,B](pair._1, pair._2)
 
