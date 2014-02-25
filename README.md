@@ -257,3 +257,5 @@ License
 ***[] Robin Sy.***
 
 [![Donation](https://pledgie.com/campaigns/23969.png)](https://pledgie.com/campaigns/23969)
+
+[Support me via Gittip](https://www.gittip.com/anvie/)
