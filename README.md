@@ -230,7 +230,7 @@ Install
 
 Add dependency:
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.0.12"
+    "com.ansvia.graph" %% "blueprints-scala" % "0.0.12"
 
 for snapshot:
 
@@ -242,5 +242,7 @@ License
 
 [Apache 2](http://www.apache.org/licenses/LICENSE-2.0.html)
 
+[Support me via Gittip](https://www.gittip.com/anvie/)
 
 ***[] Robin Syihab***
+
