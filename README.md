@@ -238,15 +238,15 @@ Install
 
 Add dependency:
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.5"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.6"
 
-
+<!--
 SNAPSHOT releases:
 
 	"Sonatype repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 	"com.ansvia.graph" %% "blueprints-scala" % "0.1.6-20140224-SNAPSHOT"
-
+-->
 
 License
 ---------
