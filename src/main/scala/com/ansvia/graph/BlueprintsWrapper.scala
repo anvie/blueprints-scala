@@ -486,7 +486,9 @@ object BlueprintsWrapper {
          * by default this is just return empty map.
          * @return Map[String, Any]
          */
-        def __save__(vertex:Vertex){}
+        def __save__(vertex:Vertex){
+            this.vertex = vertex
+        }
 
         /**
          * get bounded vertex.
