@@ -31,8 +31,8 @@ object CaseClassDeserializer extends Log {
     private val symbolsCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
         with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
-    private val dataCache = new mutable.HashMap[Class[_], Map[String, AnyRef]]()
-        with mutable.SynchronizedMap[Class[_], Map[String, AnyRef]]
+//    private val dataCache = new mutable.HashMap[Class[_], Map[String, AnyRef]]()
+//        with mutable.SynchronizedMap[Class[_], Map[String, AnyRef]]
 
 //    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
 //        with mutable.SynchronizedMap[Class[_], Array[String]]

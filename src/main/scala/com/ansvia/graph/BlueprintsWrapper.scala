@@ -219,26 +219,7 @@ object BlueprintsWrapper {
     }
 
 
-//    case class EdgeWrapperRight(vertex:Vertex, edge:Edge, label:String, db:Graph) extends Wrapper {
-//        def -->(v2:Vertex) = {
-//            db.addEdge(null, vertex, v2, label)
-//        }
-//    }
-//
-//    case class EdgeWrapperLeft(edge:Edge, db:Graph) extends Wrapper {
-//        def -->(label:String):EdgeWrapperRight = {
-//            val v = edge.getVertex(Direction.OUT)
-//            EdgeWrapperRight(v, edge, label, db)
-//        }
-//
-//        def <--(label:String):VertexWrapper = {
-//            val vertex = edge.getVertex(Direction.IN)
-//            VertexWrapper(vertex, label, db)
-//        }
-//    }
-
     implicit def vertexWrapper(vertex:Vertex)(implicit db:Graph) = VertexWrapper(vertex, null, db)
-//    implicit def edgeWrapper(edge:Edge)(implicit db:Graph) = EdgeWrapperLeft(edge, db)
 
     implicit def edgeFormatter(edge:Edge) = new {
         def prettyPrint(key:String) = {
@@ -304,7 +285,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
-        @deprecated("using com.ansvia.graph.gremlin._ instead", "15 march 2014")
+        @deprecated("will be removed", "15 march 2014")
         def inFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.in(label).next())
@@ -318,7 +299,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
-        @deprecated("using com.ansvia.graph.gremlin._ instead", "15 march 2014")
+        @deprecated("will be removed", "15 march 2014")
         def outFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.out(label).next())

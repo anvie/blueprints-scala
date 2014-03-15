@@ -102,23 +102,18 @@ object ObjectConverter extends Log {
             case _ => None
         }
 
-    private val _toCCPossibleCache = new mutable.HashMap[Class[_], Option[Class[_]]]()
-        with mutable.SynchronizedMap[Class[_], Option[Class[_]]]
-
     private def _toCCPossible[T: Manifest](pc: Element): Option[Class[_]] = {
-        _toCCPossibleCache.getOrElseUpdate(manifest[T].erasure, {
-            val pv = pc.getProperty[AnyRef](CLASS_PROPERTY_NAME)
-            if(pv != null){
-                val cpn = pv.toString
-                val c = Class.forName(cpn)
-                if (manifest[T].erasure.isAssignableFrom(c))
-                    Some(c)
-                else
-                    None
-            }else{
+        val pv = pc.getProperty[AnyRef](CLASS_PROPERTY_NAME)
+        if(pv != null){
+            val cpn = pv.toString
+            val c = Class.forName(cpn)
+            if (manifest[T].erasure.isAssignableFrom(c))
+                Some(c)
+            else
                 None
-            }
-        })
+        }else{
+            None
+        }
     }
 
     /**
