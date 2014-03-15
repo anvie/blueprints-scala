@@ -28,6 +28,12 @@ object CaseClassDeserializer extends Log {
     private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
         with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
+    private val symbolsCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+
+    private val dataCache = new mutable.HashMap[Class[_], Map[String, AnyRef]]()
+        with mutable.SynchronizedMap[Class[_], Map[String, AnyRef]]
+
 //    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
 //        with mutable.SynchronizedMap[Class[_], Array[String]]
 
@@ -159,16 +165,18 @@ object CaseClassDeserializer extends Log {
         summoned
     }
 
+
     /**
      * creates a map from case class parameter
      * @param o AnyRef case class instance
      */
     def serialize(o: AnyRef): Map[String, AnyRef] = {
 
-        val methods = {
+        var curClazz:Class[_] = o.getClass
+
+        val methods = symbolsCache.getOrElseUpdate(curClazz, {
 
             var symbols = Map.empty[String, reflect.Method]
-            var curClazz:Class[_] = o.getClass
             var done = false
 
             while(!done){
@@ -189,11 +197,11 @@ object CaseClassDeserializer extends Log {
             }
 
             symbols
-        }
+        })
 
         val params: Seq[(String, JavaType)] = sigParserCache.getOrElseUpdate(o.getClass, CaseClassSigParser.parse(o.getClass))
         val l = for {
-            (paramName, jt) <- params;
+            (paramName, _) <- params;
             value = methods.get(paramName).get.invoke(o)
         } yield {
             (paramName, value)

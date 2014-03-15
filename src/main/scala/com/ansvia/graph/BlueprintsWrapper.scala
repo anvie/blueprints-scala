@@ -271,32 +271,12 @@ object BlueprintsWrapper {
      * Gremlin pipe wrapper for vertex.
      * @param innerPipe raw gremlin pipe.
      */
-    @deprecated()
+    @deprecated("using com.ansvia.graph.gremlin._ instead", "15 march 2014")
     case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
 
-        @deprecated()
+        @deprecated("using com.ansvia.graph.gremlin._ instead", "15 march 2014")
         def wrap = GremlinPipeWrapperVertex(innerPipe)
 
-//        /**
-//         * Filter vertex out.
-//         * Example:
-//         *
-//         * vertex.pipe.out("friend").wrap.filter { v =>
-//         *      v.get[String]("name").get != "andrie"
-//         * }
-//         *
-//         * @param gpf
-//         * @return
-//         */
-//        @deprecated()
-//        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
-//            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
-//                def compute(v: Vertex):java.lang.Boolean = {
-//                    gpf.apply(v)
-//                }
-//            })
-//            rv
-//        }
 
         /**
          * Order vertices.
@@ -309,7 +289,7 @@ object BlueprintsWrapper {
          * @param gpf
          * @return
          */
-        @deprecated()
+        @deprecated("using com.ansvia.graph.gremlin._ instead", "15 march 2014")
         def sort(gpf: (Vertex, Vertex) => Int):GremlinPipeline[Vertex, Vertex] = {
             val rv = innerPipe.order(new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
                 def compute(argument: BPPair[Vertex, Vertex]):java.lang.Integer = {
@@ -324,7 +304,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
-        @deprecated()
+        @deprecated("using com.ansvia.graph.gremlin._ instead", "15 march 2014")
         def inFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.in(label).next())
@@ -338,7 +318,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
-        @deprecated()
+        @deprecated("using com.ansvia.graph.gremlin._ instead", "15 march 2014")
         def outFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.out(label).next())

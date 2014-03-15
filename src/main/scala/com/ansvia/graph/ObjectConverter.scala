@@ -61,12 +61,14 @@ object ObjectConverter extends Log {
 
                 var kv:mutable.Set[(String, AnyRef)] = null
                 try {
-                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
+                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield k -> v
 
                     val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
-                    if (o.isInstanceOf[DbObject]){
-                        o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    o match {
+                        case dbObject: DbObject =>
+                            dbObject.__load__(pc.asInstanceOf[Vertex])
+                        case _ =>
                     }
 
                     Some(o)
@@ -100,18 +102,23 @@ object ObjectConverter extends Log {
             case _ => None
         }
 
+    private val _toCCPossibleCache = new mutable.HashMap[Class[_], Option[Class[_]]]()
+        with mutable.SynchronizedMap[Class[_], Option[Class[_]]]
+
     private def _toCCPossible[T: Manifest](pc: Element): Option[Class[_]] = {
-        val pv = pc.getProperty[AnyRef](CLASS_PROPERTY_NAME)
-        if(pv != null){
-            val cpn = pv.toString
-            val c = Class.forName(cpn)
-            if (manifest[T].erasure.isAssignableFrom(c))
-                Some(c)
-            else
+        _toCCPossibleCache.getOrElseUpdate(manifest[T].erasure, {
+            val pv = pc.getProperty[AnyRef](CLASS_PROPERTY_NAME)
+            if(pv != null){
+                val cpn = pv.toString
+                val c = Class.forName(cpn)
+                if (manifest[T].erasure.isAssignableFrom(c))
+                    Some(c)
+                else
+                    None
+            }else{
                 None
-        }else{
-            None
-        }
+            }
+        })
     }
 
     /**
@@ -130,7 +137,7 @@ object ObjectConverter extends Log {
      * do not fit to the case class properties
      */
     def deSerialize[T: Manifest](pc: Element): T = {
-        assert(pc != null, "duno how to deserialize null object :(")
+        assert(pc != null, "dunno how to deserialize null object :(")
         toCC[T](pc) match {
             case Some(t) => t
             case _ => throw new IllegalArgumentException("given Case Class: " +

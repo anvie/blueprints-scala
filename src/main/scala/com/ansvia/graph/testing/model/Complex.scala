@@ -19,7 +19,19 @@ private[graph] trait C {
     @Persistent var c:Int = 0
 }
 
-private[graph] abstract class A extends DbObject with B with C {
+private[graph] trait D {
+    @Persistent var d:Int = 0
+}
+
+private[graph] trait E extends C {
+    @Persistent var e:Int = 0
+}
+
+private[graph] trait F extends E with D {
+    @Persistent var F:Int = 0
+}
+
+private[graph] abstract class A extends DbObject with B with C with F {
     @Persistent var a:Int = 0
 }
 
