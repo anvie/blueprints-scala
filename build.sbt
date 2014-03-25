@@ -10,6 +10,10 @@ scalaVersion := "2.10.0"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
 
+ScctPlugin.instrumentSettings
+
+com.github.theon.coveralls.CoverallsPlugin.coverallsSettings
+
 resolvers ++= Seq(
     "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
     "Ansvia repo" at "http://scala.repo.ansvia.com/releases/"
