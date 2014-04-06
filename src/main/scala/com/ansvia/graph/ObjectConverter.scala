@@ -12,6 +12,7 @@ import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import scala.collection.mutable
+import com.ansvia.graph.Exc.BlueprintsScalaException
 
 object ObjectConverter extends Log {
 
@@ -26,8 +27,16 @@ object ObjectConverter extends Log {
      * serializes a given case class into a Node instance
      * for null values not property will be set
      */
-    def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
+    def serialize[T <: Element](cc: AnyRef, pc: Element, newElement:Boolean): T = {
         assert(cc != null, "duno how to serialize null object :(")
+
+        if (newElement){
+            val clz = pc.getProperty[String](CLASS_PROPERTY_NAME)
+            if (clz != null)
+                throw new BlueprintsScalaException("element `" + pc + "` treated as new but already has meta class `" + clz + "` " +
+                    "requested to set `" + cc.getClass.getName + "`, we raised this error to prevent data overwrite")
+            pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
+        }
 
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
@@ -43,7 +52,6 @@ object ObjectConverter extends Log {
                 }
 
         }
-        pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
 
         // save non case class accessor
 
@@ -103,6 +111,7 @@ object ObjectConverter extends Log {
         }
 
     private def _toCCPossible[T: Manifest](pc: Element): Option[Class[_]] = {
+        assert(pc != null, "element is null")
         val pv = pc.getProperty[AnyRef](CLASS_PROPERTY_NAME)
         if(pv != null){
             val cpn = pv.toString

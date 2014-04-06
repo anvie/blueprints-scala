@@ -2,8 +2,7 @@ package com.ansvia.graph
 
 import org.specs2.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.blueprints.{Element, Vertex}
-import com.ansvia.graph.BlueprintsWrapper._
+import com.tinkerpop.blueprints.Vertex
 import org.specs2.specification.Step
 import scala.collection.mutable.ArrayBuffer
 
@@ -70,7 +69,7 @@ class ObjectConverterPerfSpec extends Specification {
 
             timing("serialize simple"){
                 for (cc <- ccsSimple){
-                    rvAnimal += ObjectConverter.serialize[Vertex](cc, cc.getVertex)
+                    rvAnimal += ObjectConverter.serialize[Vertex](cc, cc.getVertex, false)
 //                    println(x)
                 }
             }
@@ -84,7 +83,7 @@ class ObjectConverterPerfSpec extends Specification {
 
             timing("serialize complex"){
                 for (cc <- ccsComplex){
-                    rvComplex += ObjectConverter.serialize[Vertex](cc, cc.getVertex)
+                    rvComplex += ObjectConverter.serialize[Vertex](cc, cc.getVertex, false)
                 }
             }
             rvComplex.length must_== 5000

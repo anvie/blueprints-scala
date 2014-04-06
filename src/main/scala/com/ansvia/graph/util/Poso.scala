@@ -184,7 +184,7 @@ object CaseClassDeserializer extends Log {
                 val rv: Map[String, reflect.Method] =
                     methodCache.getOrElseUpdate(curClazz,
                         curClazz.getDeclaredMethods
-                            .filter{ z =>
+                            .filter { z =>
                                 z.getParameterTypes.isEmpty
                             }.map {
                                 m => m.getName -> m

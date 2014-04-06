@@ -370,18 +370,18 @@ object BlueprintsWrapper {
     implicit def dbWrapper(db:Graph) = new {
 
         def save[T:Manifest](cc:T):Vertex = {
-            val o = {
+            val (o, _new) = {
                 cc match {
                     case dbo:DbObject if dbo.isSaved =>
-                        db.getVertex(dbo.getVertex.getId)
+                        (db.getVertex(dbo.getVertex.getId), false)
                     case dbo:DbObject if !dbo.isSaved =>
-                        db.addVertex(null)
+                        (db.addVertex(null), true)
                     case _ =>
-                        db.addVertex(null)
+                        (db.addVertex(null), true)
                 }
             }
 
-            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o)
+            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o, _new)
 
             cc match {
                 case ccDbo:DbObject =>
