@@ -31,12 +31,6 @@ object CaseClassDeserializer extends Log {
     private val symbolsCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
         with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
-//    private val dataCache = new mutable.HashMap[Class[_], Map[String, AnyRef]]()
-//        with mutable.SynchronizedMap[Class[_], Map[String, AnyRef]]
-
-//    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
-//        with mutable.SynchronizedMap[Class[_], Array[String]]
-
     /**
      * signature parser cache
      */
@@ -81,16 +75,31 @@ object CaseClassDeserializer extends Log {
 
                     values += x
 
+                case x:java.lang.Long if paramType.c == classOf[java.lang.Integer] =>
+
+                    values += x.toInt.asInstanceOf[AnyRef]
+
                 // if the value is directly assignable: use it
                 case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
                     values += x
+
                 case x: Array[_] =>
                     values += x
+
                 // otherwise try to create an instance using der String Constructor
                 case x: AnyRef =>
                     val paramCtor = paramType.c.getConstructor(classOf[String])
-                    val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
-                    values += value
+                    try {
+                        val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
+                        values += value
+                    }
+                    catch {
+                        case e:IllegalArgumentException =>
+                            error("cannot instantiate `" + x + "` type " + x.getClass.getName +
+                                " for field `" + paramName + "`, using constructor `" + paramCtor + "`")
+                            error(e.getMessage)
+                            throw e
+                    }
             }
         }
 
@@ -149,16 +158,32 @@ object CaseClassDeserializer extends Log {
 
                     methods.get(paramNameSet).map(_.invoke(summoned, x))
 
+                case x:java.lang.Long if paramType.c == classOf[java.lang.Integer] =>
+
+                    values += x.toInt.asInstanceOf[AnyRef]
+
+
                 // if the value is directly assignable: use it
                 case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
                     methods.get(paramNameSet).map(_.invoke(summoned, x))
+
                 case x: Array[_] =>
                     methods.get(paramNameSet).map(_.invoke(summoned, x))
+
                 // otherwise try to create an instance using der String Constructor
                 case x: AnyRef =>
                     val paramCtor = paramType.c.getConstructor(classOf[String])
-                    val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
-                    methods.get(paramNameSet).map(_.invoke(summoned, value))
+                    try {
+                        val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
+                        values += value
+                    }
+                    catch {
+                        case e:IllegalArgumentException =>
+                            error("cannot instantiate `" + x + "` type " + x.getClass.getName +
+                                " for field `" + paramName + "`, using constructor `" + paramCtor + "`")
+                            error(e.getMessage)
+                            throw e
+                    }
             }
         }
 
@@ -267,8 +292,6 @@ object CaseClassSigParser {
 
     private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
         with mutable.SynchronizedMap[Class[_], Array[String]]
-//    private val traitItCache = new mutable.HashMap[Class[_], Seq[Class[_]]]()
-//        with mutable.SynchronizedMap[Class[_], Seq[Class[_]]]
 
     private val classesTreeCache = new mutable.HashMap[Class[_], Array[Class[_]]]()
         with mutable.SynchronizedMap[Class[_], Array[Class[_]]]
@@ -351,8 +374,6 @@ object CaseClassSigParser {
 
         while(!done){
 
-//            println("curClazz: " + curClazz.getName)
-
             val rv =
                 findSym(curClazz).children
                 .filter{ c =>
@@ -361,9 +382,6 @@ object CaseClassSigParser {
                     }else if (c.isAccessor && !c.isPrivate && !c.isLazy && !c.isProtected){
 
                         val pv = persistedVarCache.get(mainClazz).get
-
-//                        if (pv.length > 0)
-//                            println(curClazz.getSimpleName + ": " + pv.reduceOption(_ + ", " + _).getOrElse("") + " contains " + c.name + "?")
 
                         pv.contains(c.name)
 
