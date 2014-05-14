@@ -2,7 +2,7 @@ package com.ansvia.graph
 
 import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
-import com.tinkerpop.blueprints.Vertex
+import com.tinkerpop.blueprints.{Element, Vertex}
 
 package object gremlin {
 
@@ -26,11 +26,12 @@ package object gremlin {
         }
     }
 
-    implicit def gremlinPipeOrderFuncWrapper(func:(Vertex, Vertex) => Int) = {
-        new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
-            def compute(arg: BPPair[Vertex, Vertex]):java.lang.Integer =
+    implicit def gremlinPipeOrderFuncWrapper[T <: Element](func:(T, T) => Int) = {
+        new PipeFunction[BPPair[T, T], java.lang.Integer] {
+            def compute(arg: BPPair[T, T]):java.lang.Integer =
                 func.apply(arg.getA, arg.getB)
         }
     }
+
 }
 
