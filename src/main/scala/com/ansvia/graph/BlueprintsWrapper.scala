@@ -528,12 +528,13 @@ object BlueprintsWrapper {
         def getVertex:Vertex
 
         override def getId:IDType = {
-            if (id != null)
+            if (id != null){
                 id
-            else{
+            }else{
                 if (!isSaved)
                     throw NotBoundException("object %s not saved yet".format(this))
-                getVertex.getId.asInstanceOf[IDType]
+                id = getVertex.getId.asInstanceOf[IDType]
+                id
             }
         }
 
