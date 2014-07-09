@@ -4,7 +4,6 @@ import org.specs2.mutable.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import org.specs2.specification.Scope
 import com.tinkerpop.blueprints.Vertex
-import com.tinkerpop.pipes.PipeFunction
 
 /**
  * Author: robin
@@ -48,7 +47,7 @@ class GremlinWrapperSpec extends Specification {
         "wrap transform" in new Ctx {
             v1.pipe.out(follow).transform { (v:Vertex) =>
                 v.getOrElse("name","")
-            }.iterator().toList must_== List(name2, name3)
+            }.iterator().toList must contain(name2, name3)
         }
         "wrap side effect" in new Ctx {
             v1.pipe.out(follow).sideEffect { (v:Vertex) =>
