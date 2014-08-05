@@ -218,7 +218,6 @@ object BlueprintsWrapper {
 
     }
 
-
     implicit def vertexWrapper(vertex:Vertex)(implicit db:Graph) = VertexWrapper(vertex, null, db)
 
     implicit def edgeFormatter(edge:Edge) = new {

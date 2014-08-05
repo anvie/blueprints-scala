@@ -230,13 +230,14 @@ Install
 
 Add dependency:
 
-    "com.ansvia.graph" %% "blueprints-scala" % "0.1.7"
+    "com.ansvia.graph" %% "blueprints-scala" % "0.1.17"
 
 
+<!--
 for snapshot:
 
     "com.ansvia.graph" %% "blueprints-scala" % "0.1.16-20140709-SNAPSHOT"
-
+-->
 
 License
 ---------
