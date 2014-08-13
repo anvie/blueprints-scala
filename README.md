@@ -253,7 +253,6 @@ SNAPSHOT releases:
 	"com.ansvia.graph" %% "blueprints-scala" % "0.1.16-20140709-SNAPSHOT"
 -->
 
--->
 
 License
 ---------
