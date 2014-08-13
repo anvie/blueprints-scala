@@ -1,5 +1,7 @@
 import java.text.SimpleDateFormat
 
+import SonatypeKeys._
+
 organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
@@ -25,6 +27,10 @@ libraryDependencies ++= Seq(
     "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.3.0" % "test"
     )
 
+sonatypeSettings
+
+profileName := "com.ansvia"
+
 publishTo <<= version { (v:String) =>
       val nexus = "https://oss.sonatype.org"
       if(v.trim.endsWith("SNAPSHOT") || """.+\-\d{8}+$""".r.pattern.matcher(v.trim).matches())
@@ -43,6 +49,7 @@ version <<= version { (v:String) =>
 
 credentials += Credentials {
     val sonatype = Path.userHome / ".ivy2" / ".credentials-sonatype"
+    println("using credential: " + sonatype)
     if (new File(sonatype.toString).exists())
         sonatype
     else

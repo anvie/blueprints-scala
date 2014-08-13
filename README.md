@@ -240,8 +240,7 @@ Add dependency to your build.sbt:
 
 	"com.ansvia.graph" %% "blueprints-scala" % "0.1.17"
 
-If you get an error when you compile, similar to `sbt.ResolveException: unresolved dependency: com.ansvia.graph#blueprints-scala_2.11;0.1.6: not found` then your Scala version differs from that of the latest version. 
-If you are using Scala 2.10, 2.11, 2.12 add the following dependency instead. :
+If you get an error when you compile, similar to `sbt.ResolveException: unresolved dependency: com.ansvia.graph#blueprints-scala_2.11;0.1.6: not found` then your Scala version differs from that of the latest version, this will fix the issue:
 
 	"com.ansvia.graph" % "blueprints-scala_2.10" % "0.1.17"
 
