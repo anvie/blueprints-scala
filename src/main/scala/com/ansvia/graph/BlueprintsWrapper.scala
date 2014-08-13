@@ -447,7 +447,7 @@ object BlueprintsWrapper {
         /**
          * Save this object to database.
          */
-        def save()(implicit db:Graph) = {
+        def save()(implicit db:Graph):Vertex = {
             vertex = db.save(this)
             vertex
         }
@@ -565,6 +565,15 @@ object BlueprintsWrapper {
                 getVertex.getId.asInstanceOf[IDType]
             }
         }
+        
+        /**
+         * Save this object to database.
+         */
+        override def save()(implicit db: Graph): Vertex = {
+            val v = super.save()(db)
+            id = v.getId.asInstanceOf[IDType]
+            v
+        }
 
         /**
          * Reload object from db.
@@ -572,6 +581,9 @@ object BlueprintsWrapper {
          * @return this object with updated vertex.
          */
         override def reload()(implicit db: Graph) = {
+            if (isSaved)
+                id = vertex.getId.asInstanceOf[IDType]
+                            
             if (id != null){
                 vertex = db.getVertex(id)
 
