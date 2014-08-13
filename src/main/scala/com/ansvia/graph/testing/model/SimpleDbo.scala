@@ -11,5 +11,7 @@ import com.ansvia.graph.IDGetter
  * For test purpose.
  */
 private[graph] case class SimpleDbo(a:String,var b:String) extends DbObject with IDGetter[String]
+private[graph] case class SimpleDboLong(a:String,var b:String) extends DbObject with IDGetter[Long]
 private[graph] case class IdSimpleDbo(a:String,var b:String) extends IdDbObject[String]
+private[graph] case class IdSimpleDboLong(a:String,var b:String) extends IdDbObject[Long]
 

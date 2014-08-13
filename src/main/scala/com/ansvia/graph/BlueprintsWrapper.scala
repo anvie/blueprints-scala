@@ -4,9 +4,8 @@ import com.tinkerpop.blueprints._
 import java.lang.Iterable
 import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.gremlin.java.GremlinPipeline
-import scala.Some
 import com.tinkerpop.pipes.util.FastNoSuchElementException
-import com.ansvia.graph.Exc.{BlueprintsScalaException, NotBoundException}
+import com.ansvia.graph.Exc.NotBoundException
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import scala.Some
 import scala.reflect.ClassTag
@@ -275,28 +274,32 @@ object BlueprintsWrapper {
      * Gremlin pipe wrapper.
      * @param innerPipe raw gremlin pipe.
      */
+    @deprecated()
     case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
+
+        @deprecated()
         def wrap = GremlinPipeWrapperVertex(innerPipe)
 
-        /**
-         * Filter vertex out.
-         * Example:
-         *
-         * vertex.pipe.out("friend").wrap.filter { v =>
-         *      v.get[String]("name").get != "andrie"
-         * }
-         *
-         * @param gpf
-         * @return
-         */
-        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
-            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
-                def compute(v: Vertex):java.lang.Boolean = {
-                    gpf.apply(v)
-                }
-            })
-            rv
-        }
+//        /**
+//         * Filter vertex out.
+//         * Example:
+//         *
+//         * vertex.pipe.out("friend").wrap.filter { v =>
+//         *      v.get[String]("name").get != "andrie"
+//         * }
+//         *
+//         * @param gpf
+//         * @return
+//         */
+//        @deprecated()
+//        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
+//            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
+//                def compute(v: Vertex):java.lang.Boolean = {
+//                    gpf.apply(v)
+//                }
+//            })
+//            rv
+//        }
 
         /**
          * Order vertices.
@@ -309,6 +312,7 @@ object BlueprintsWrapper {
          * @param gpf
          * @return
          */
+        @deprecated()
         def sort(gpf: (Vertex, Vertex) => Int):GremlinPipeline[Vertex, Vertex] = {
             val rv = innerPipe.order(new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
                 def compute(argument: BPPair[Vertex, Vertex]):java.lang.Integer = {
@@ -323,6 +327,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
+        @deprecated()
         def inFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.in(label).next())
@@ -336,6 +341,7 @@ object BlueprintsWrapper {
          * @param label edge label.
          * @return
          */
+        @deprecated()
         def outFirst(label:String):Option[Vertex] = {
             try {
                 Some(innerPipe.out(label).next())
@@ -386,18 +392,13 @@ object BlueprintsWrapper {
      * @return
      */
     def transact[T](wrappedFunc: => T)(implicit db:TransactionalGraph):T = {
-//        val dbx = db.startTransaction()
         try {
-
-            val x = wrappedFunc
-
-            db.commit
-
-            x
-
+            val rv = wrappedFunc
+            db.commit()
+            rv
         }catch{
             case e:Exception =>
-                db.rollback
+                db.rollback()
                 throw e
         }
     }
@@ -419,14 +420,15 @@ object BlueprintsWrapper {
 
             cc match {
                 case ccDbo:DbObject =>
-                    val kv = ccDbo.__save__()
-                    for ( (k, v) <- kv ){
-
-                        // only set if different/new
-                        if(elm.getOrElse(k,null) != v)
-                            elm.set(k, v)
-
-                    }
+                    ccDbo.__save__(elm)
+//                    val kv = ccDbo.__save__()
+//                    for ( (k, v) <- kv ){
+//
+//                        // only set if different/new
+//                        if(elm.getOrElse(k,null) != v)
+//                            elm.set(k, v)
+//
+//                    }
                 case _ =>
             }
             elm
@@ -440,6 +442,9 @@ object BlueprintsWrapper {
         }
     }
 
+    /**
+     * All model should inherit this trait.
+     */
     trait DbObject extends AbstractDbObject {
 
         protected var vertex:Vertex = null
@@ -476,9 +481,7 @@ object BlueprintsWrapper {
          * by default this is just return empty map.
          * @return Map[String, Any]
          */
-        def __save__():Map[String, Any] = {
-            Map.empty[String, Any]
-        }
+        def __save__(vertex:Vertex){}
 
         /**
          * get bounded vertex.
@@ -525,10 +528,9 @@ object BlueprintsWrapper {
 
             v.toCC[this.type].get
         }
-
     }
 
-    trait IDGetter[IDType] {
+    trait IDGetter[IDType] extends AbstractIDGetter[IDType] {
         def isSaved:Boolean
         def getVertex:Vertex
 
@@ -557,15 +559,16 @@ object BlueprintsWrapper {
         def getVertex:Vertex
 
         override def getId:IDType = {
-            if (id != null)
+            if (id != null){
                 id
-            else{
+            }else{
                 if (!isSaved)
                     throw NotBoundException("object %s not saved yet".format(this))
-                getVertex.getId.asInstanceOf[IDType]
+                id = getVertex.getId.asInstanceOf[IDType]
+                id
             }
         }
-        
+
         /**
          * Save this object to database.
          */
@@ -583,7 +586,7 @@ object BlueprintsWrapper {
         override def reload()(implicit db: Graph) = {
             if (isSaved)
                 id = vertex.getId.asInstanceOf[IDType]
-                            
+
             if (id != null){
                 vertex = db.getVertex(id)
 

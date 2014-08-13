@@ -38,7 +38,7 @@ private[graph] case class Shark(kind:String, color: String = "blue") extends Col
      * by default this is just return empty map.
      * @return
      */
-    override def __save__() = {
-        Map("protected" -> animalProtected)
+    override def __save__(v:Vertex) = {
+        v.setProperty("protected", animalProtected)
     }
 }

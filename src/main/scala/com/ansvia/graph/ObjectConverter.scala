@@ -12,8 +12,9 @@ import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import reflect.ClassTag
+import scala.collection.mutable
 
-object ObjectConverter {
+object ObjectConverter extends Log {
 
     /**
      * this name will be used to store the class name of
@@ -27,17 +28,23 @@ object ObjectConverter {
      * for null values not property will be set
      */
     def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
+        assert(cc != null, "duno how to serialize null object :(")
+
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
-            case (name, value) =>
-                // set only if different with current (eg: new changes)
-                if (pc.getProperty(name) != value)
-                    pc.setProperty(name, value)
-                //else
-                //    println("ignored (not different): " + name + " <-> " + value)
+            case (name, value) => 
+
+                try {
+                    if (pc.getProperty(name) != value)
+                        pc.setProperty(name, value)
+                }catch{
+                    case e:IllegalArgumentException =>
+                        error("cannot set property %s <= %s\nerror: %s".format(name, value, e.getMessage))
+                        throw e
+                }
+
         }
         pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
-
 
         // save non case class accessor
 
@@ -53,15 +60,43 @@ object ObjectConverter {
         _toCCPossible(pc) match {
             case Some(serializedClass) =>
 
-                val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
+                var kv:mutable.Set[(String, AnyRef)] = null
+                try {
+                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
 
-                val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
+                    val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
-                if (o.isInstanceOf[DbObject]){
-                    o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    if (o.isInstanceOf[DbObject]){
+                        o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    }
+
+                    Some(o)
+                }catch{
+                    case e:IllegalArgumentException =>
+                        error("Cannot deserialize record from db, broken record? \n" +
+                            "for class: " + serializedClass.getName + "\n" +
+                            {
+                                if (kv != null)
+                                    "kv: " + kv.toMap + "\n"
+                                else
+                                    ""
+                            } +
+                            "error: " + e.getMessage)
+                        e.printStackTrace()
+                        None
+                    case e:IndexOutOfBoundsException =>
+                        error("Cannot deserialize record from db, broken record? \n" +
+                            "for class: " + serializedClass.getName + "\n" +
+                            {
+                                if (kv != null)
+                                    "kv: " + kv.toMap + "\n"
+                                else
+                                    ""
+                            } +
+                            "error: " + e.getMessage)
+                        e.printStackTrace()
+                        None
                 }
-
-                Some(o)
 
             case _ => None
         }
@@ -98,6 +133,7 @@ object ObjectConverter {
      * do not fit to the case class properties
      */
     def deSerialize[T](pc: Element)(implicit tag: ClassTag[T]): T = {
+        assert(pc != null, "duno how to deserialize null object :(")
         toCC[T](pc) match {
             case Some(t) => t
             case _ => throw new IllegalArgumentException("given Case Class: " +

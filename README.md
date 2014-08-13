@@ -1,6 +1,7 @@
 Tinkerpop Blueprints Scala [![Build Status](https://travis-ci.org/anvie/blueprints-scala.png?branch=master)](https://travis-ci.org/anvie/blueprints-scala)
 ===================================
 
+
 Scala wrapper for tinkerpop blueprints, this library provide more scalastic code when working with graph database
 supported by blueprints.
 
@@ -11,11 +12,7 @@ For installation see install section.
 
 For Scala 2.9 see https://github.com/anvie/blueprints-scala/tree/scala-2.9
 
-More working and complete examples can be found on specs test.
-This example data based on graph of the gods https://github.com/thinkaurelius/titan/wiki/Getting-Started
-
-![](https://github.com/thinkaurelius/titan/raw/master/doc/images/graph-of-the-gods.png)
-
+More working and complete examples can be found in specs test.
 
 Creating new vertex:
 
@@ -235,20 +232,24 @@ Done, now you can using Scalastic sweet syntactic sugar code.
 Install
 --------
 
-Add resolvers:
+<!-- Add resolvers: -->
 
-	"Ansvia Releases Repo" at "http://scala.repo.ansvia.com/releases/"
+<!--	"Ansvia Releases Repo" at "http://scala.repo.ansvia.com/releases/" -->
 
-Add dependency:
+Add dependency to your build.sbt:
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.3"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.6"
 
+If you get an error when you compile, similar to `sbt.ResolveException: unresolved dependency: com.ansvia.graph#blueprints-scala_2.11;0.1.6: not found` then your scala version differs from that of the latest version.  Add the following dependency instead.  This specifically uses the version built for Scala 2.9.2 and at the time of writing is the latest version:
+
+	"com.ansvia.graph" % "blueprints-scala_2.9.2" % "0.1.6"
 <!--
 SNAPSHOT releases:
 
 	"Sonatype repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.2-20130608-SNAPSHOT"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.16-20140709-SNAPSHOT"
+-->
 
 -->
 
@@ -259,3 +260,7 @@ License
 
 
 ***[] Robin Sy.***
+
+[![Donation](https://pledgie.com/campaigns/23969.png)](https://pledgie.com/campaigns/23969)
+
+[Support me via Gittip](https://www.gittip.com/anvie/)

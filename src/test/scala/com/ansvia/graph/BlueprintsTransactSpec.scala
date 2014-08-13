@@ -1,6 +1,6 @@
 package com.ansvia.graph
 
-import org.specs2.mutable.Specification
+import org.specs2.mutable.{After, Specification}
 import com.tinkerpop.blueprints.Edge
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph
 
@@ -19,8 +19,8 @@ class BlueprintsTransactSpec extends Specification {
     sequential
 
     // since tinkergraph doesn't support transactional
-    // we using neo4j db for transactional support
-    implicit val db = new Neo4jGraph("/tmp/neo4jdb-test")
+    // we using neo4j db for transactional testing
+    implicit val db = new Neo4jGraph("/tmp/neo4jdb-test-transact")
 
     val data = Map(
         "hercules" -> "demigod",
@@ -93,9 +93,11 @@ class BlueprintsTransactSpec extends Specification {
         "create edge and set inside transact return expected data" in {
             edge4.get[Int]("timestamp") must beEqualTo(Some(1))
         }
+
     }
 
-//    override def after(){
-//        db.shutdown()
-//    }
+    step {
+        db.shutdown()
+    }
+
 }

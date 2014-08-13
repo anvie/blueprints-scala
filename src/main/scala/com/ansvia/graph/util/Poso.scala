@@ -9,6 +9,7 @@ import com.ansvia.graph.annotation.Persistent
 import annotation.tailrec
 import scala.reflect.ClassTag
 import scala.language.existentials
+import com.ansvia.graph.Log
 
 /**
  * helper class to store Class object
@@ -18,7 +19,7 @@ case class JavaType(c: Class[_])
 /**
  * Case Class deserializing object
  */
-object CaseClassDeserializer {
+object CaseClassDeserializer extends Log {
 
     /**
      * Method Map cache for method serialize
@@ -28,9 +29,6 @@ object CaseClassDeserializer {
 
     private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
         with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
-
-//    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
-//        with mutable.SynchronizedMap[Class[_], Array[String]]
 
     /**
      * signature parser cache
@@ -92,7 +90,15 @@ object CaseClassDeserializer {
         val paramsCount = constructor.getParameterTypes.length
         val ccParams = values.slice(0, paramsCount)
 
-        val summoned = constructor.newInstance(ccParams.toArray: _*).asInstanceOf[AnyRef]
+        val summoned = try {
+            constructor.newInstance(ccParams.toArray: _*).asInstanceOf[AnyRef]
+        }catch{
+            case e:IllegalArgumentException =>
+                error("cannot spawn object: " + e.getMessage + "\n" +
+                    "paramsCount: " + paramsCount + "\n" +
+                    "ccParams: " + ccParams.toList)
+                throw e
+        }
 
         val methods = {
 
@@ -427,3 +433,4 @@ object CaseClassSigParser {
         case name => Class.forName(name)
     }
 }
+
