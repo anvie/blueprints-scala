@@ -5,4 +5,4 @@ target
 sbt/
 atlassian-ide-plugin.xml
 .history
-project/plugins.sbt
+
