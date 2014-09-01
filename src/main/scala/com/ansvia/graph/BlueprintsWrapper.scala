@@ -269,121 +269,121 @@ object BlueprintsWrapper {
         }
     }
 
-
-    /**
-     * Gremlin pipe wrapper.
-     * @param innerPipe raw gremlin pipe.
-     */
-    @deprecated()
-    case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
-
-        @deprecated()
-        def wrap = GremlinPipeWrapperVertex(innerPipe)
-
+//
+//    /**
+//     * Gremlin pipe wrapper.
+//     * @param innerPipe raw gremlin pipe.
+//     */
+//    @deprecated()
+//    case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
+//
+//        @deprecated()
+//        def wrap = GremlinPipeWrapperVertex(innerPipe)
+//
+////        /**
+////         * Filter vertex out.
+////         * Example:
+////         *
+////         * vertex.pipe.out("friend").wrap.filter { v =>
+////         *      v.get[String]("name").get != "andrie"
+////         * }
+////         *
+////         * @param gpf
+////         * @return
+////         */
+////        @deprecated()
+////        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
+////            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
+////                def compute(v: Vertex):java.lang.Boolean = {
+////                    gpf.apply(v)
+////                }
+////            })
+////            rv
+////        }
+//
 //        /**
-//         * Filter vertex out.
+//         * Order vertices.
 //         * Example:
 //         *
-//         * vertex.pipe.out("friend").wrap.filter { v =>
-//         *      v.get[String]("name").get != "andrie"
+//         * vertex.pipe.out("friend").wrap.order{ (a,b) =>
+//         *      a.getProperty("name").compare(b.getProperty("name"))
 //         * }
 //         *
 //         * @param gpf
 //         * @return
 //         */
 //        @deprecated()
-//        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
-//            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
-//                def compute(v: Vertex):java.lang.Boolean = {
-//                    gpf.apply(v)
+//        def sort(gpf: (Vertex, Vertex) => Int):GremlinPipeline[Vertex, Vertex] = {
+//            val rv = innerPipe.order(new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
+//                def compute(argument: BPPair[Vertex, Vertex]):java.lang.Integer = {
+//                    gpf.apply(argument.getA, argument.getB)
 //                }
 //            })
 //            rv
 //        }
-
-        /**
-         * Order vertices.
-         * Example:
-         *
-         * vertex.pipe.out("friend").wrap.order{ (a,b) =>
-         *      a.getProperty("name").compare(b.getProperty("name"))
-         * }
-         *
-         * @param gpf
-         * @return
-         */
-        @deprecated()
-        def sort(gpf: (Vertex, Vertex) => Int):GremlinPipeline[Vertex, Vertex] = {
-            val rv = innerPipe.order(new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
-                def compute(argument: BPPair[Vertex, Vertex]):java.lang.Integer = {
-                    gpf.apply(argument.getA, argument.getB)
-                }
-            })
-            rv
-        }
-
-        /**
-         * Get first in direction for label vertex.
-         * @param label edge label.
-         * @return
-         */
-        @deprecated()
-        def inFirst(label:String):Option[Vertex] = {
-            try {
-                Some(innerPipe.in(label).next())
-            }catch{
-                case e:FastNoSuchElementException => None
-            }
-        }
-
-        /**
-         * Get first head out direction for label vertex.
-         * @param label edge label.
-         * @return
-         */
-        @deprecated()
-        def outFirst(label:String):Option[Vertex] = {
-            try {
-                Some(innerPipe.out(label).next())
-            }catch{
-                case e:FastNoSuchElementException => None
-            }
-        }
-    }
-
-    case class GremlinPipeWrapperEdge[Vertex, Edge](innerPipe:GremlinPipeline[Vertex, Edge]){
-        def wrap = GremlinPipeWrapperEdge[Vertex, Edge](innerPipe)
-
-        /**
-         * Filter edge out.
-         * @param gpf
-         * @return
-         */
-        def filter(gpf: Edge => Boolean):GremlinPipeline[Vertex, Edge] = {
-            val rv = innerPipe.filter(new PipeFunction[Edge,java.lang.Boolean] {
-                def compute(e: Edge):java.lang.Boolean = {
-                    gpf.apply(e)
-                }
-            })
-            rv
-        }
-
-        /**
-         * Order edges.
-         * @param gpf
-         * @return
-         */
-        def sort(gpf: (Edge, Edge) => Int):GremlinPipeline[Vertex, Edge] = {
-            val rv = innerPipe.order(new PipeFunction[BPPair[Edge, Edge], java.lang.Integer] {
-                def compute(argument: BPPair[Edge, Edge]):java.lang.Integer = {
-                    gpf.apply(argument.getA, argument.getB)
-                }
-            })
-            rv
-        }
-    }
-    implicit def gremlinPipeWrapperVertex(pipe:GremlinPipeline[Vertex, Vertex]) = GremlinPipeWrapperVertex(pipe)
-    implicit def gremlinPipeWrapperEdge(pipe:GremlinPipeline[Vertex, Edge]) = GremlinPipeWrapperEdge(pipe)
+//
+//        /**
+//         * Get first in direction for label vertex.
+//         * @param label edge label.
+//         * @return
+//         */
+//        @deprecated()
+//        def inFirst(label:String):Option[Vertex] = {
+//            try {
+//                Some(innerPipe.in(label).next())
+//            }catch{
+//                case e:FastNoSuchElementException => None
+//            }
+//        }
+//
+//        /**
+//         * Get first head out direction for label vertex.
+//         * @param label edge label.
+//         * @return
+//         */
+//        @deprecated()
+//        def outFirst(label:String):Option[Vertex] = {
+//            try {
+//                Some(innerPipe.out(label).next())
+//            }catch{
+//                case e:FastNoSuchElementException => None
+//            }
+//        }
+//    }
+//
+//    case class GremlinPipeWrapperEdge[Vertex, Edge](innerPipe:GremlinPipeline[Vertex, Edge]){
+//        def wrap = GremlinPipeWrapperEdge[Vertex, Edge](innerPipe)
+//
+//        /**
+//         * Filter edge out.
+//         * @param gpf
+//         * @return
+//         */
+//        def filter(gpf: Edge => Boolean):GremlinPipeline[Vertex, Edge] = {
+//            val rv = innerPipe.filter(new PipeFunction[Edge,java.lang.Boolean] {
+//                def compute(e: Edge):java.lang.Boolean = {
+//                    gpf.apply(e)
+//                }
+//            })
+//            rv
+//        }
+//
+//        /**
+//         * Order edges.
+//         * @param gpf
+//         * @return
+//         */
+//        def sort(gpf: (Edge, Edge) => Int):GremlinPipeline[Vertex, Edge] = {
+//            val rv = innerPipe.order(new PipeFunction[BPPair[Edge, Edge], java.lang.Integer] {
+//                def compute(argument: BPPair[Edge, Edge]):java.lang.Integer = {
+//                    gpf.apply(argument.getA, argument.getB)
+//                }
+//            })
+//            rv
+//        }
+//    }
+//    implicit def gremlinPipeWrapperVertex(pipe:GremlinPipeline[Vertex, Vertex]) = GremlinPipeWrapperVertex(pipe)
+//    implicit def gremlinPipeWrapperEdge(pipe:GremlinPipeline[Vertex, Edge]) = GremlinPipeWrapperEdge(pipe)
 
     /**
      * Working in transactional fashion.

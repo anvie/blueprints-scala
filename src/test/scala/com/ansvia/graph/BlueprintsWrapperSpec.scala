@@ -124,11 +124,11 @@ class BlueprintsWrapperSpec extends Specification {
     edge2.set("time", 2)
     edge3.set("time", 12)
 
-    val multiFilterResult = hercules.pipe.outE("battled").wrap.filter {
-        _.getOrElse[Int]("time", 0).toString.toInt < 12
-    }.wrap.filter {
-        _.getOrElse[Int]("time", 0).toString.toInt > 1
-    }.toList
+//    val multiFilterResult = hercules.pipe.outE("battled").wrap.filter {
+//        _.getOrElse[Int]("time", 0).toString.toInt < 12
+//    }.wrap.filter {
+//        _.getOrElse[Int]("time", 0).toString.toInt > 1
+//    }.toList
 
     "Blueprints Gremlin pipe wrapper" should {
         "do simple query" in {
@@ -150,24 +150,24 @@ class BlueprintsWrapperSpec extends Specification {
         "get count of out edges" in {
             hercules.pipe.outE("battled").count() must beEqualTo(3)
         }
-        "able to using currying filter / gremlin pipe wrapper" in {
-            val vx = hercules.pipe.outE("battled").filter { (edge:Edge) =>
-                edge.getOrElse[Int]("time", 0).toString.toInt > 5
-            }
-            vx.iterator().next().getOrElse[Int]("time", 0) must beEqualTo(12)
-        }
-        "use multi filtering #1" in {
-            multiFilterResult.length must beEqualTo(1)
-        }
-        "use multi filtering #2 must not contains nemean" in {
-            multiFilterResult.contains(edge1) must beFalse
-        }
-        "use multi filtering #3 must contains hydra" in {
-            multiFilterResult.contains(edge2) must beTrue
-        }
-        "use multi filtering #4 must not contains cerberus" in {
-            multiFilterResult.contains(edge3) must beFalse
-        }
+//        "able to using currying filter / gremlin pipe wrapper" in {
+//            val vx = hercules.pipe.outE("battled").filter { (edge:Edge) =>
+//                edge.getOrElse[Int]("time", 0).toString.toInt > 5
+//            }
+//            vx.iterator().next().getOrElse[Int]("time", 0) must beEqualTo(12)
+//        }
+//        "use multi filtering #1" in {
+//            multiFilterResult.length must beEqualTo(1)
+//        }
+//        "use multi filtering #2 must not contains nemean" in {
+//            multiFilterResult.contains(edge1) must beFalse
+//        }
+//        "use multi filtering #3 must contains hydra" in {
+//            multiFilterResult.contains(edge2) must beTrue
+//        }
+//        "use multi filtering #4 must not contains cerberus" in {
+//            multiFilterResult.contains(edge3) must beFalse
+//        }
         // deprecated
 //        "use inFirst" in {
 //            sea.pipe.inFirst("lives").get.getOrElse("name", "") must beEqualTo("neptune")
