@@ -6,7 +6,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.1.17"
+version := "0.1.30-SNAPSHOT"
 
 scalaVersion := "2.10.0"
 
@@ -18,13 +18,14 @@ resolvers ++= Seq(
     )
 
 libraryDependencies ++= Seq(
-    "org.slf4j" % "slf4j-api" % "1.7.6",
-    "com.tinkerpop.blueprints" % "blueprints-core" % "2.3.0",
-    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.3.0",
-    "com.tinkerpop.gremlin" % "gremlin-java" % "2.3.0",
     "org.scala-lang" % "scala-reflect" % "2.10.0",
-    "org.specs2" % "specs2_2.10" % "1.14" % "test",
-    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.3.0" % "test"
+    "org.slf4j" % "slf4j-api" % "1.7.6",
+    "com.tinkerpop.blueprints" % "blueprints-core" % "2.5.0",
+    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.5.0",
+    "com.tinkerpop.gremlin" % "gremlin-java" % "2.5.0",
+    "org.specs2" %% "specs2" % "1.14" % "test",
+    "com.thinkaurelius.titan" % "titan-core" % "0.5.0" % "provided",
+    "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.5.0" % "test"
     )
 
 sonatypeSettings
@@ -49,7 +50,6 @@ version <<= version { (v:String) =>
 
 credentials += Credentials {
     val sonatype = Path.userHome / ".ivy2" / ".credentials-sonatype"
-    println("using credential: " + sonatype)
     if (new File(sonatype.toString).exists())
         sonatype
     else

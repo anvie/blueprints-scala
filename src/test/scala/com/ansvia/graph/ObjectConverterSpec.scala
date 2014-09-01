@@ -4,6 +4,7 @@ import org.specs2.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.blueprints.Vertex
 import com.ansvia.graph.BlueprintsWrapper._
+import scala.collection.JavaConversions._
 import org.specs2.specification.Step
 import scala.language.reflectiveCalls
 
@@ -130,8 +131,8 @@ class ObjectConverterSpec extends Specification {
         def deserializable = v3.toCC[Motor].isDefined must beTrue
         def expectedDataDeserializedObj = v3.toCC[Motor].get.mark must beEqualTo("Honda")
         def getRawVertexFromCC = v4ob.getVertex must beEqualTo(v4)
-        def makeRelDbo2Dbo = v4ob.getVertex.pipe.inFirst("hit").isDefined must beTrue
-        def makeRelDbo2Dbo2 = v4ob.getVertex.pipe.inFirst("hit").get.toCC[Motor].get.mark must beEqualTo("Honda")
+        def makeRelDbo2Dbo = v4ob.getVertex.pipe.in("hit").headOption.isDefined must beTrue
+        def makeRelDbo2Dbo2 = v4ob.getVertex.pipe.in("hit").headOption.get.toCC[Motor].get.mark must beEqualTo("Honda")
         def savedDboRetTrue = (v4o.isSaved && v4ob.isSaved) must beTrue
         def ccContainLazyNotError = ContainLazy(1).save() must not equalTo(null)
         def accessUpperVar1 = nemo.name must beEqualTo("nemo")

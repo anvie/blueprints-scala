@@ -13,6 +13,7 @@ import util.CaseClassDeserializer
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import reflect.ClassTag
 import scala.collection.mutable
+import com.ansvia.graph.Exc.BlueprintsScalaException
 
 object ObjectConverter extends Log {
 
@@ -21,14 +22,22 @@ object ObjectConverter extends Log {
      * the serialized case class that will be verified
      * in deserialization
      */
-    val CLASS_PROPERTY_NAME = "_class_"
+    var CLASS_PROPERTY_NAME = "_class_"
 
     /**
      * serializes a given case class into a Node instance
      * for null values not property will be set
      */
-    def serialize[T <: Element](cc: AnyRef, pc: Element): T = {
+    def serialize[T <: Element](cc: AnyRef, pc: Element, newElement:Boolean): T = {
         assert(cc != null, "duno how to serialize null object :(")
+
+        if (newElement){
+            val clz = pc.getProperty[String](CLASS_PROPERTY_NAME)
+            if (clz != null)
+                throw new BlueprintsScalaException("element `" + pc + "` treated as new but already has meta class `" +
+                    clz + "` requested to set `" + cc.getClass.getName + "`, we raised this error to prevent data overwrite")
+            pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
+        }
 
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
@@ -62,12 +71,14 @@ object ObjectConverter extends Log {
 
                 var kv:mutable.Set[(String, AnyRef)] = null
                 try {
-                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield (k -> v)
+                    kv = for (k <- pc.getPropertyKeys; v = pc.getProperty[AnyRef](k)) yield k -> v
 
                     val o = CaseClassDeserializer.deserialize[T](serializedClass, kv.toMap)
 
-                    if (o.isInstanceOf[DbObject]){
-                        o.asInstanceOf[DbObject].__load__(pc.asInstanceOf[Vertex])
+                    o match {
+                      case dbObject: DbObject =>
+                        dbObject.__load__(pc.asInstanceOf[Vertex])
+                      case _ =>
                     }
 
                     Some(o)
