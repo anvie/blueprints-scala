@@ -366,46 +366,7 @@ object BlueprintsWrapper {
         }
     }
 
-    implicit def dbWrapper(db:Graph) = new {
-
-        def save[T:Manifest](cc:T):Vertex = {
-            val (o, _new) = {
-                cc match {
-                    case dbo:DbObject if dbo.isSaved =>
-                        (db.getVertex(dbo.getVertex.getId), false)
-                    case dbo:DbObject if !dbo.isSaved =>
-                        (db.addVertex(null), true)
-                    case _ =>
-                        (db.addVertex(null), true)
-                }
-            }
-
-            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o, _new)
-
-            cc match {
-                case ccDbo:DbObject =>
-                    ccDbo.__save__(elm)
-//                    val kv = ccDbo.__save__()
-//                    for ( (k, v) <- kv ){
-//
-//                        // only set if different/new
-//                        if(elm.getOrElse(k,null) != v)
-//                            elm.set(k, v)
-//
-//                    }
-                case _ =>
-            }
-            elm
-        }
-
-        def delete[T:Manifest](cc:T):Unit = {
-            cc match {
-                case dbo:DbObject if dbo.isSaved =>
-                    db.removeVertex(dbo.getVertex)
-                case _ =>
-            }
-        }
-    }
+    implicit def dbWrapper(db:Graph) = StdDbWrapper.dbWrapper(db) //new DbWrapper(db)
 
     /**
      * All model should inherit this trait.
@@ -447,6 +408,10 @@ object BlueprintsWrapper {
          * @return Map[String, Any]
          */
         def __save__(vertex:Vertex){
+            this.vertex = vertex
+        }
+
+        private[graph] def setVertex(v:Vertex){
             this.vertex = vertex
         }
 
@@ -495,7 +460,7 @@ object BlueprintsWrapper {
 
             v.toCC[this.type].get
         }
-        
+
     }
 
     trait IDGetter[IDType] extends AbstractIDGetter[IDType] {

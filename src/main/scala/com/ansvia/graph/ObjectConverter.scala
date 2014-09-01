@@ -21,7 +21,7 @@ object ObjectConverter extends Log {
      * the serialized case class that will be verified
      * in deserialization
      */
-    val CLASS_PROPERTY_NAME = "_class_"
+    var CLASS_PROPERTY_NAME = "_class_"
 
     /**
      * serializes a given case class into a Node instance
@@ -33,8 +33,8 @@ object ObjectConverter extends Log {
         if (newElement){
             val clz = pc.getProperty[String](CLASS_PROPERTY_NAME)
             if (clz != null)
-                throw new BlueprintsScalaException("element `" + pc + "` treated as new but already has meta class `" + clz + "` " +
-                    "requested to set `" + cc.getClass.getName + "`, we raised this error to prevent data overwrite")
+                throw new BlueprintsScalaException("element `" + pc + "` treated as new but already has meta class `" +
+                    clz + "` requested to set `" + cc.getClass.getName + "`, we raised this error to prevent data overwrite")
             pc.setProperty(CLASS_PROPERTY_NAME, cc.getClass.getName)
         }
 

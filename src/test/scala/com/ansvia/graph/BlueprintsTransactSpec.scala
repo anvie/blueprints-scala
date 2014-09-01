@@ -1,8 +1,7 @@
 package com.ansvia.graph
 
-import org.specs2.mutable.{After, Specification}
+import org.specs2.mutable.Specification
 import com.tinkerpop.blueprints.Edge
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph
 
 /**
  * Copyright (C) 2011-2012 Ansvia Inc.
@@ -11,16 +10,12 @@ import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph
  * Time: 2:12 AM
  * 
  */
-class BlueprintsTransactSpec extends Specification {
+class BlueprintsTransactSpec extends Specification with TitanBackedDb {
 
 
     import BlueprintsWrapper._
 
     sequential
-
-    // since tinkergraph doesn't support transactional
-    // we using neo4j db for transactional testing
-    implicit val db = new Neo4jGraph("/tmp/neo4jdb-test-transact")
 
     val data = Map(
         "hercules" -> "demigod",

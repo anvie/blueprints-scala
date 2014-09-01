@@ -3,7 +3,6 @@ package com.ansvia.graph
 import org.specs2.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.ansvia.graph.Exc.NotBoundException
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph
 import org.specs2.specification.Step
 
 /**
@@ -89,18 +88,20 @@ class DbObjectSimpleSpec extends Specification {
         }
     }
 
-    object treesTx {
-        implicit val db = new Neo4jGraph("/tmp/neo4jdb-test-simple")
+    object treesTx extends TitanBackedDb {
+//        implicit val db = new Neo4jGraph("/tmp/neo4jdb-test-simple")
 
         val dboDraft = SimpleDboLong("a", "b")
         val dbo = transact {
             dboDraft.save().toCC[SimpleDboLong].get
         }
 
+
         val dbo2Draft = IdSimpleDboLong("b", "c")
         val dbo2 = transact {
             dbo2Draft.save().toCC[IdSimpleDboLong].get
         }
+
 
         def close(){
             db.shutdown()
@@ -115,6 +116,7 @@ class DbObjectSimpleSpec extends Specification {
         def changeProperty = {
             dbo.b = "d"
             dbo.save()
+            db.commit()
             db.getVertex(dbo.getId).toCC[SimpleDboLong].get.b must beEqualTo("d")
         }
 
@@ -135,9 +137,8 @@ class DbObjectSimpleSpec extends Specification {
 
         def getIdAfterSave = {
             val o = SimpleDboLong("d", "f")
-            transact {
-                o.save()
-            }
+            o.save()
+            db.commit()
 
             (o.getId must be not throwAn[NotBoundException]) and
                 (o.getId must be not equalTo(null)) and

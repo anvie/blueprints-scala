@@ -2,7 +2,7 @@ package com.ansvia.graph
 
 import org.specs2.mutable.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.blueprints.{Vertex, Direction}
+import com.tinkerpop.blueprints.{Edge, Vertex, Direction}
 import java.lang.Iterable
 
 /**
@@ -16,6 +16,7 @@ class BlueprintsWrapperSpec extends Specification {
 
     import BlueprintsWrapper._
     import scala.collection.JavaConversions._
+    import com.ansvia.graph.gremlin._
 
     // for test case we using simple in-memory tinkergraph db
     // in reality you can use any graph db that support
@@ -147,7 +148,7 @@ class BlueprintsWrapperSpec extends Specification {
             hercules.pipe.outE("battled").count() must beEqualTo(3)
         }
         "able to using currying filter / gremlin pipe wrapper" in {
-            val vx = hercules.pipe.outE("battled").wrap.filter { edge =>
+            val vx = hercules.pipe.outE("battled").filter { (edge:Edge) =>
                 edge.getOrElse[Int]("time", 0).toString.toInt > 5
             }
             vx.iterator().next().getOrElse[Int]("time", 0) must beEqualTo(12)
@@ -164,20 +165,21 @@ class BlueprintsWrapperSpec extends Specification {
         "use multi filtering #4 must not contains cerberus" in {
             multiFilterResult.contains(edge3) must beFalse
         }
-        "use inFirst" in {
-            sea.pipe.inFirst("lives").get.getOrElse("name", "") must beEqualTo("neptune")
-        }
-        "not throwing any error when inFirst didn't returning any values" in {
-            sea.pipe.inFirst("destroy").isEmpty must beTrue
-        }
-        "use outFirst" in {
-            hercules.pipe.outFirst("battled").get.getOrElse("name", "") must beEqualTo("nemean")
-        }
-        "not throwing any error when outFirst didn't returning any values" in {
-            hercules.pipe.outFirst("destroy").isEmpty must beTrue
-        }
+        // deprecated
+//        "use inFirst" in {
+//            sea.pipe.inFirst("lives").get.getOrElse("name", "") must beEqualTo("neptune")
+//        }
+//        "not throwing any error when inFirst didn't returning any values" in {
+//            sea.pipe.inFirst("destroy").isEmpty must beTrue
+//        }
+//        "use outFirst" in {
+//            hercules.pipe.outFirst("battled").get.getOrElse("name", "") must beEqualTo("nemean")
+//        }
+//        "not throwing any error when outFirst didn't returning any values" in {
+//            hercules.pipe.outFirst("destroy").isEmpty must beTrue
+//        }
         "using sorting method" in {
-            val orderedMonsters = hercules.pipe.out("battled").wrap.sort { (v1, v2) =>
+            val orderedMonsters = hercules.pipe.out("battled").order { (v1:Vertex, v2:Vertex) =>
                 v1.get[String]("name").get.compareTo(v2.get[String]("name").get)
             }.iterator().map(_.getProperty[AnyRef]("name")).toArray
             orderedMonsters(0) must beEqualTo("cerberus")

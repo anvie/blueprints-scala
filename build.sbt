@@ -22,11 +22,12 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
     "org.slf4j" % "slf4j-api" % "1.7.6",
-    "com.tinkerpop.blueprints" % "blueprints-core" % "2.3.0",
-    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.3.0",
-    "com.tinkerpop.gremlin" % "gremlin-java" % "2.3.0",
+    "com.tinkerpop.blueprints" % "blueprints-core" % "2.5.0",
+    "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.5.0",
+    "com.tinkerpop.gremlin" % "gremlin-java" % "2.5.0",
     "org.specs2" %%  "specs2" % "1.12.3" % "test",
-    "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % "2.3.0" % "test"
+    "com.thinkaurelius.titan" % "titan-core" % "0.5.0" % "provided",
+    "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.5.0" % "test"
     )
 
 publishTo <<= version { (v:String) =>
@@ -47,7 +48,13 @@ version <<= version { (v:String) =>
         v
 }
 
-credentials += Credentials(Path.userHome / ".ivy2" / ".credentials-sonatype")
+credentials += Credentials {
+    val sonatype = Path.userHome / ".ivy2" / ".credentials-sonatype"
+    if (new File(sonatype.toString).exists())
+        sonatype
+    else
+        Path.userHome / ".ivy2" / ".credentials"
+}
 
 publishArtifact in Test := false
 
