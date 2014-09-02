@@ -1,6 +1,6 @@
 package com.ansvia.graph
 
-import com.tinkerpop.blueprints.{Graph, Vertex}
+import com.tinkerpop.blueprints.{TransactionalGraph, Graph, Vertex}
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import com.thinkaurelius.titan.core.{VertexLabel, TitanGraph, TitanTransaction}
 
@@ -50,19 +50,33 @@ class TitanDbWrapper(db:TitanGraph) extends DbWrapper(db){
 
 class TitanDbObjectWrapper(dbo:DbObject){
 
-    def saveWithLabel(label:VertexLabel)(implicit db:TitanTransaction):Vertex = {
+    def saveWithLabelTx(label:VertexLabel)(implicit db:TitanTransaction):Vertex = {
         val v = db.addVertexWithLabel(label)
         dbo.setVertex(v)
         v
     }
 
-    def saveWithLabel(label:String)(implicit db:TitanTransaction):Vertex = {
+    def saveWithLabelTx(label:String)(implicit db:TitanTransaction):Vertex = {
+        val lbl = db.getVertexLabel(label)
+        assert(lbl != null, "unknown label: " + label)
+        saveWithLabelTx(lbl)
+    }
+
+    def saveWithLabel(label:VertexLabel)(implicit db:TitanGraph):Vertex = {
+        val v = db.addVertexWithLabel(label)
+        dbo.setVertex(v)
+        v
+    }
+
+    def saveWithLabel(label:String)(implicit db:TitanGraph):Vertex = {
         val lbl = db.getVertexLabel(label)
         assert(lbl != null, "unknown label: " + label)
         saveWithLabel(lbl)
     }
 
+
 }
+
 
 object TitanDbWrapper {
 
