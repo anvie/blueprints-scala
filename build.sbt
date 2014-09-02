@@ -7,7 +7,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.1.21-SNAPSHOT"
+version := "0.1.22-SNAPSHOT"
 
 scalaVersion := "2.9.2"
 
@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
     "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.5.0",
     "com.tinkerpop.gremlin" % "gremlin-java" % "2.5.0",
     "org.specs2" %%  "specs2" % "1.12.3" % "test",
-    "com.thinkaurelius.titan" % "titan-core" % "0.5.0" % "provided",
+    "com.thinkaurelius.titan" % "titan-core" % "0.5.0", // % "provided",
     "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.5.0" % "test"
     )
 
