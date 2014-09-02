@@ -56,6 +56,12 @@ class TitanDbObjectWrapper(dbo:DbObject){
         v
     }
 
+    def saveWithLabel(label:String)(implicit db:TitanTransaction):Vertex = {
+        val lbl = db.getVertexLabel(label)
+        assert(lbl != null, "unknown label: " + label)
+        saveWithLabel(lbl)
+    }
+
 }
 
 object TitanDbWrapper {

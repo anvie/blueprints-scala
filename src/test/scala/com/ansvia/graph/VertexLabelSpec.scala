@@ -27,6 +27,7 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
 
         var humanV:Vertex = _
         var animalV:Vertex = _
+        var animal2V:Vertex = _
 
         titanDb.transact { implicit trx =>
             val HUMAN = trx.makeVertexLabel("human").make()
@@ -34,6 +35,9 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
 
             humanV = SimpleDbo("unyil", "").saveWithLabel(HUMAN)
             animalV = Animal("cat").saveWithLabel(ANIMAL)
+
+            // using string
+            animal2V = Animal("lion").saveWithLabel("animal")
         }
     }
 
@@ -41,8 +45,10 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
         "be able to create vertex with label" in new Ctx {
             val _humanV:TitanVertex = titanDb.getVertex(humanV.getId).asInstanceOf[TitanVertex]
             val _animalV:TitanVertex = titanDb.getVertex(animalV.getId).asInstanceOf[TitanVertex]
+            val _animal2V:TitanVertex = titanDb.getVertex(animal2V.getId).asInstanceOf[TitanVertex]
             _humanV.getLabel must_== "human"
             _animalV.getLabel must_== "animal"
+            _animal2V.getLabel must_== "animal"
         }
     }
 }
