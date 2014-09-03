@@ -1,9 +1,8 @@
 package com.ansvia.graph
 
-import com.tinkerpop.blueprints.{TransactionalGraph, Graph, Vertex}
+import com.tinkerpop.blueprints.Vertex
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import com.thinkaurelius.titan.core.{VertexLabel, TitanGraph, TitanTransaction}
-import com.tinkerpop.blueprints.util.wrappers.id.IdGraph
 
 
 /**
@@ -22,8 +21,6 @@ object TitanDbWrapper {
                 cc match {
                     case dbo:DbObject if dbo.isSaved =>
                         (db.getVertex(dbo.getVertex.getId), false)
-                    //                case dbo:DbObject if !dbo.isSaved =>
-                    //                    (db.addVertex(null), true)
                     case _ =>
                         (db.addVertex(label), true)
                 }
@@ -53,10 +50,36 @@ object TitanDbWrapper {
         }
     }
 
+    class TitanTransactionDbWrapper(db:TitanTransaction) extends DbWrapper(db){
+        def saveWithLabel[T: Manifest](cc:T, label:VertexLabel):Vertex = {
+            val (o, _new) = {
+                cc match {
+                    case dbo:DbObject if dbo.isSaved =>
+                        (db.getVertex(dbo.getVertex.getId), false)
+                    case _ =>
+                        (db.addVertex(label), true)
+                }
+            }
+
+            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o, _new)
+
+            cc match {
+                case ccDbo:DbObject =>
+                    ccDbo.__save__(elm)
+                case _ =>
+            }
+            elm
+        }
+
+    }
+
     class TitanDbObjectWrapper(dbo:DbObject){
 
+        implicit private def transactionWrapper(trx:TitanTransaction) = new TitanTransactionDbWrapper(trx)
+
+
         def saveWithLabelTx(label:VertexLabel)(implicit db:TitanTransaction):Vertex = {
-            val v = db.addVertexWithLabel(label)
+            val v = db.saveWithLabel(dbo, label)
             dbo.setVertex(v)
             v
         }
@@ -68,7 +91,7 @@ object TitanDbWrapper {
         }
 
         def saveWithLabel(label:VertexLabel)(implicit db:TitanGraph):Vertex = {
-            val v = db.addVertexWithLabel(label)
+            val v = db.saveWithLabel(dbo, label)
             dbo.setVertex(v)
             v
         }
@@ -91,6 +114,7 @@ object TitanDbWrapper {
 
 object IdGraphTitanDbWrapper {
 
+    import TitanDbWrapper._
 
     class IdGraphTitanDbObjectWrapper(dbo:DbObject){
 
@@ -109,7 +133,7 @@ object IdGraphTitanDbWrapper {
 
 
         def saveWithLabel(label:VertexLabel)(implicit db:IdGraph[TitanGraph]):IdVertex = {
-            val v:Vertex = db.getBaseGraph.addVertexWithLabel(label)
+            val v:Vertex = db.getBaseGraph.saveWithLabel(dbo, label)
 
             val id = db.getVertexIdFactory.createId()
 
@@ -118,7 +142,6 @@ object IdGraphTitanDbWrapper {
             dbo.setVertex(v)
 
             new IdVertex(v, db)
-            //            v
         }
 
     }

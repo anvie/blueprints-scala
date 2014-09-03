@@ -47,9 +47,11 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
     class Ctx3 extends Scope {
         private val titanDb = db.asInstanceOf[TitanGraph]
         val mgmt = titanDb.getManagementSystem
-        val __id = mgmt.makePropertyKey(IdGraph.ID).dataType(classOf[java.lang.String]).make()
-        mgmt.buildIndex("IDGraphId", classOf[Vertex]).addKey(__id).unique().buildCompositeIndex()
-        mgmt.commit()
+        if (!mgmt.containsRelationType(IdGraph.ID)){
+            val __id = mgmt.makePropertyKey(IdGraph.ID).dataType(classOf[java.lang.String]).make()
+            mgmt.buildIndex("IDGraphId", classOf[Vertex]).addKey(__id).unique().buildCompositeIndex()
+            mgmt.commit()
+        }
         implicit val idGraphTitanDb = new IdGraph(titanDb, true, false)
     }
 
@@ -90,6 +92,17 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
 
             v2 must_!= null
             v2.getLabel must_== ANIMAL
+        }
+        "be able to using DbObject" in new Ctx3 {
+            import IdGraphTitanDbWrapper._
+            import com.ansvia.graph.BlueprintsWrapper._
+
+            val v = Animal("bear").saveWithLabel(ANIMAL)
+
+            idGraphTitanDb.commit()
+
+            v.toCC[Animal] must_!= None
+            v.toCC[Animal].get.name must_== "bear"
         }
     }
 }
