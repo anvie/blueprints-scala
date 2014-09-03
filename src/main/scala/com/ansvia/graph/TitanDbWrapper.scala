@@ -3,6 +3,7 @@ package com.ansvia.graph
 import com.tinkerpop.blueprints.Vertex
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import com.thinkaurelius.titan.core.{VertexLabel, TitanGraph, TitanTransaction}
+import com.tinkerpop.blueprints.util.wrappers.id.IdGraph
 
 
 /**
@@ -146,6 +147,7 @@ object IdGraphTitanDbWrapper {
 
     }
 
+    implicit def idTitanDbWrapper(db:IdGraph[TitanGraph]):TitanDbWrapper = new TitanDbWrapper(db.getBaseGraph)
     implicit def idGraphTitanDbObjectWrapper(dbo:DbObject):IdGraphTitanDbObjectWrapper =
         new IdGraphTitanDbObjectWrapper(dbo)
 }
