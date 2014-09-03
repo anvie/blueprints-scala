@@ -4,6 +4,8 @@ import com.tinkerpop.blueprints.Vertex
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import com.thinkaurelius.titan.core.{VertexLabel, TitanGraph, TitanTransaction}
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph
+import com.thinkaurelius.titan.core.schema.EdgeLabelMaker
+import com.thinkaurelius.titan.graphdb.types.StandardEdgeLabelMaker
 
 
 /**
@@ -13,7 +15,7 @@ import com.tinkerpop.blueprints.util.wrappers.id.IdGraph
  *
  */
 
-object TitanDbWrapper {
+object TitanDbWrapper extends Helpers {
 
 
     class TitanDbWrapper(db:TitanGraph) extends DbWrapper(db){
@@ -113,7 +115,8 @@ object TitanDbWrapper {
 }
 
 
-object IdGraphTitanDbWrapper {
+
+object IdGraphTitanDbWrapper extends Helpers {
 
     import TitanDbWrapper._
 
@@ -150,5 +153,10 @@ object IdGraphTitanDbWrapper {
     implicit def idTitanDbWrapper(db:IdGraph[TitanGraph]):TitanDbWrapper = new TitanDbWrapper(db.getBaseGraph)
     implicit def idGraphTitanDbObjectWrapper(dbo:DbObject):IdGraphTitanDbObjectWrapper =
         new IdGraphTitanDbObjectWrapper(dbo)
+}
+
+
+private[graph] trait Helpers {
+    implicit def edgeLabelMakerWrapper(elm:EdgeLabelMaker) = elm.asInstanceOf[StandardEdgeLabelMaker]
 }
 
