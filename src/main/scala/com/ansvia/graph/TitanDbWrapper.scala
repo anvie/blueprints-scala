@@ -76,7 +76,7 @@ object TitanDbWrapper extends Helpers {
 
         def saveWithLabelTx(label:String)(implicit db:TitanTransaction):Vertex = {
             val lbl = db.getVertexLabel(label)
-            assert(lbl != null, "unknown label: " + label)
+            assert(lbl != null, "unknown vertex label: " + label)
             saveWithLabelTx(lbl)
         }
 
@@ -96,7 +96,7 @@ object TitanDbWrapper extends Helpers {
 
         def saveWithLabel(label:String)(implicit db:TitanGraph):Vertex = {
             val lbl = db.getVertexLabel(label)
-            assert(lbl != null, "unknown label: " + label)
+            assert(lbl != null, "unknown vertex label: " + label)
             saveWithLabel(lbl)
         }
 
@@ -125,7 +125,7 @@ object IdGraphTitanDbWrapper extends Helpers {
         def saveWithLabel(label:String)(implicit db:IdGraph[TitanGraph]):IdVertex = {
             val lbl = db.getBaseGraph.getVertexLabel(label)
 
-            assert(lbl != null, "unknown label: " + label)
+            assert(lbl != null, "unknown vertex label: " + label)
 
             saveWithLabel(lbl)
         }
@@ -152,6 +152,34 @@ object IdGraphTitanDbWrapper extends Helpers {
             rv
         }
 
+        def saveWithLabelTx(label:VertexLabel, trx:TitanTransaction)(implicit db:IdGraph[TitanGraph]):IdVertex = {
+            val trxw = new TitanTransactionDbWrapper(trx)
+
+            val v:Vertex = trxw.saveWithLabel(dbo, label)
+
+            val id = db.getVertexIdFactory.createId()
+
+            v.setProperty(IdGraph.ID, id)
+
+            val rv = new IdVertex(v, db)
+
+            dbo.setVertex(rv)
+
+            dbo match {
+                case iddbo:IdDbObject[_] =>
+                    iddbo.setId(id.asInstanceOf[iddbo.idType])
+                case _ =>
+            }
+
+            rv
+        }
+
+        def saveWithLabelTx(label:String, trx:TitanTransaction)(implicit db:IdGraph[TitanGraph]):IdVertex = {
+            val lbl = trx.getVertexLabel(label)
+            assert(lbl != null, "unknown vertex label: " + label)
+            saveWithLabelTx(lbl, trx)
+        }
+
     }
 
     implicit def idTitanDbWrapper(db:IdGraph[TitanGraph]):TitanDbWrapper = new TitanDbWrapper(db.getBaseGraph)
@@ -163,14 +191,14 @@ object IdGraphTitanDbWrapper extends Helpers {
 private[graph] trait Helpers {
 
 
-    class TitanTransactionDbWrapper(db:TitanTransaction) extends DbWrapper(db){
+    class TitanTransactionDbWrapper(trx:TitanTransaction) extends DbWrapper(trx){
         def saveWithLabel[T: Manifest](cc:T, label:VertexLabel):Vertex = {
             val (o, _new) = {
                 cc match {
                     case dbo:DbObject if dbo.isSaved =>
-                        (db.getVertex(dbo.getVertex.getId), false)
+                        (trx.getVertex(dbo.getVertex.getId), false)
                     case _ =>
-                        (db.addVertex(label), true)
+                        (trx.addVertex(label), true)
                 }
             }
 
@@ -187,6 +215,7 @@ private[graph] trait Helpers {
     }
 
     implicit def edgeLabelMakerWrapper(elm:EdgeLabelMaker) = elm.asInstanceOf[StandardEdgeLabelMaker]
+    implicit def titanTransactionWrapper(trx:TitanTransaction) = new TitanTransactionDbWrapper(trx)
 
 
 }

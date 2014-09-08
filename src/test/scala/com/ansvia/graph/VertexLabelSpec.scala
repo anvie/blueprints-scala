@@ -123,5 +123,30 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
             tiger.getVertex must_== v
             tiger.name must_== "tiger"
         }
+        "save with label via transaction" in new Ctx3 {
+            import IdGraphTitanDbWrapper._
+            import com.ansvia.graph.BlueprintsWrapper._
+
+            val id =
+            idGraphTitanDb.transact { trx =>
+                val tiger = Animal("tiger")
+
+                val v = tiger.saveWithLabelTx(ANIMAL, trx)
+
+                v.getId
+            }
+
+            idGraphTitanDb.commit()
+
+            val v = idGraphTitanDb.getVertex(id)
+
+            v must_!= null
+
+            val tiger = v.toCC[Animal].get
+
+            tiger.getVertex must_== v
+            tiger.name must_== "tiger"
+
+        }
     }
 }
