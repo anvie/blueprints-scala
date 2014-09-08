@@ -52,7 +52,10 @@ object TitanDbWrapper extends Helpers {
                 trx.commit()
                 rv
             }catch{
+                case e:IllegalArgumentException =>
+                    throw e
                 case e:Exception =>
+                    e.printStackTrace()
                     trx.rollback()
                     throw e
             }
