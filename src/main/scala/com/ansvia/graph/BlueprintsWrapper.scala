@@ -9,6 +9,7 @@ import com.tinkerpop.pipes.util.FastNoSuchElementException
 import com.ansvia.graph.Exc.NotBoundException
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import scala.Some
+import com.tinkerpop.blueprints.util.wrappers.id.{IdVertex, IdGraph}
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
@@ -451,7 +452,25 @@ object BlueprintsWrapper {
             if (!isSaved)
                 throw NotBoundException("object %s not saved yet".format(this))
 
-            val v = db.getVertex(this.vertex.getId)
+            val id =
+            if (isSaved){
+                vertex match {
+                    case iv:IdVertex =>
+
+                        db match {
+                            case ig:IdGraph[_] =>
+                                iv.getId
+                            case _ =>
+                                iv.getBaseVertex.getId
+                        }
+
+                    case _ =>
+                        vertex.getId
+                }
+            }else
+                vertex.getId
+
+            val v = db.getVertex(id)
 
             if (v == null)
                 throw NotBoundException("object %s not bound to any vertex".format(this))
@@ -524,8 +543,21 @@ object BlueprintsWrapper {
          * @return this object with updated vertex.
          */
         override def reload()(implicit db: Graph) = {
-            if (isSaved)
-                id = vertex.getId.asInstanceOf[IDType]
+            if (isSaved){
+                vertex match {
+                    case iv:IdVertex =>
+
+                        db match {
+                            case ig:IdGraph[_] =>
+                                id = iv.getId.asInstanceOf[IDType]
+                            case _ =>
+                                id = iv.getBaseVertex.getId.asInstanceOf[IDType]
+                        }
+
+                    case _ =>
+                        id = vertex.getId.asInstanceOf[IDType]
+                }
+            }
 
             if (id != null){
                 vertex = db.getVertex(id)
