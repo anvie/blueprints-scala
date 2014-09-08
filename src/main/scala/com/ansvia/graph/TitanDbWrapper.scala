@@ -62,28 +62,6 @@ object TitanDbWrapper extends Helpers {
         }
     }
 
-    class TitanTransactionDbWrapper(db:TitanTransaction) extends DbWrapper(db){
-        def saveWithLabel[T: Manifest](cc:T, label:VertexLabel):Vertex = {
-            val (o, _new) = {
-                cc match {
-                    case dbo:DbObject if dbo.isSaved =>
-                        (db.getVertex(dbo.getVertex.getId), false)
-                    case _ =>
-                        (db.addVertex(label), true)
-                }
-            }
-
-            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o, _new)
-
-            cc match {
-                case ccDbo:DbObject =>
-                    ccDbo.__save__(elm)
-                case _ =>
-            }
-            elm
-        }
-
-    }
 
     class TitanDbObjectWrapper(dbo:DbObject){
 
@@ -183,6 +161,33 @@ object IdGraphTitanDbWrapper extends Helpers {
 
 
 private[graph] trait Helpers {
+
+
+    class TitanTransactionDbWrapper(db:TitanTransaction) extends DbWrapper(db){
+        def saveWithLabel[T: Manifest](cc:T, label:VertexLabel):Vertex = {
+            val (o, _new) = {
+                cc match {
+                    case dbo:DbObject if dbo.isSaved =>
+                        (db.getVertex(dbo.getVertex.getId), false)
+                    case _ =>
+                        (db.addVertex(label), true)
+                }
+            }
+
+            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o, _new)
+
+            cc match {
+                case ccDbo:DbObject =>
+                    ccDbo.__save__(elm)
+                case _ =>
+            }
+            elm
+        }
+
+    }
+
     implicit def edgeLabelMakerWrapper(elm:EdgeLabelMaker) = elm.asInstanceOf[StandardEdgeLabelMaker]
+
+
 }
 
