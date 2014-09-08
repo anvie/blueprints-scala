@@ -1,7 +1,7 @@
 package com.ansvia.graph
 
 import com.tinkerpop.blueprints.Vertex
-import com.ansvia.graph.BlueprintsWrapper.DbObject
+import com.ansvia.graph.BlueprintsWrapper.{IdDbObject, DbObject}
 import com.thinkaurelius.titan.core.{VertexLabel, TitanGraph, TitanTransaction}
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph
 import com.thinkaurelius.titan.core.schema.EdgeLabelMaker
@@ -37,6 +37,12 @@ object TitanDbWrapper extends Helpers {
                 case _ =>
             }
             elm
+        }
+
+        def saveWithLabel[T: Manifest](cc:T, label:String):Vertex = {
+            val lbl = db.getVertexLabel(label)
+            require(lbl != null, "Unknown vertex label: " + label)
+            saveWithLabel(cc, lbl)
         }
 
         def transact[T](f: (TitanTransaction) => T):T = {
@@ -96,6 +102,14 @@ object TitanDbWrapper extends Helpers {
         def saveWithLabel(label:VertexLabel)(implicit db:TitanGraph):Vertex = {
             val v = db.saveWithLabel(dbo, label)
             dbo.setVertex(v)
+
+
+            dbo match {
+                case iddbo:IdDbObject[_] =>
+                    iddbo.setId(v.getId.asInstanceOf[iddbo.idType])
+                case _ =>
+            }
+
             v
         }
 
@@ -145,7 +159,15 @@ object IdGraphTitanDbWrapper extends Helpers {
 
             dbo.setVertex(v)
 
-            new IdVertex(v, db)
+            val rv = new IdVertex(v, db)
+
+            dbo match {
+                case iddbo:IdDbObject[_] =>
+                    iddbo.setId(id.asInstanceOf[iddbo.idType])
+                case _ =>
+            }
+
+            rv
         }
 
     }

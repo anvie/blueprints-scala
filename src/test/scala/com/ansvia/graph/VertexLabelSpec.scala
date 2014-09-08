@@ -104,5 +104,13 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
             v.toCC[Animal] must_!= None
             v.toCC[Animal].get.name must_== "bear"
         }
+        "saved vertex has id immediately" in new Ctx3 {
+            import IdGraphTitanDbWrapper._
+            import com.ansvia.graph.BlueprintsWrapper._
+
+            val v = Animal("tiger").saveWithLabel(ANIMAL)
+
+            v.getId must_!= null
+        }
     }
 }

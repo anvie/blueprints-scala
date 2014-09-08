@@ -476,6 +476,7 @@ object BlueprintsWrapper {
 
     trait IdDbObject[IDType] extends DbObject with IDGetter[IDType] {
 
+        type idType = IDType
         protected var id:IDType = _
 
         /**
@@ -511,6 +512,11 @@ object BlueprintsWrapper {
             id = v.getId.asInstanceOf[IDType]
             v
         }
+
+        private[graph] def setId(id:IDType){
+            this.id = id
+        }
+
 
         /**
          * Reload object from db.
