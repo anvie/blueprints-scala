@@ -157,9 +157,10 @@ object IdGraphTitanDbWrapper extends Helpers {
 
             v.setProperty(IdGraph.ID, id)
 
-            dbo.setVertex(v)
 
             val rv = new IdVertex(v, db)
+
+            dbo.setVertex(rv)
 
             dbo match {
                 case iddbo:IdDbObject[_] =>

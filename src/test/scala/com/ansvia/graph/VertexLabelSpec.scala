@@ -112,5 +112,16 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
 
             v.getId must_!= null
         }
+        "get vertex from dbo after save" in new Ctx3 {
+            import IdGraphTitanDbWrapper._
+            import com.ansvia.graph.BlueprintsWrapper._
+
+            val tiger = Animal("tiger")
+
+            val v = tiger.saveWithLabel(ANIMAL)
+
+            tiger.getVertex must_== v
+            tiger.name must_== "tiger"
+        }
     }
 }

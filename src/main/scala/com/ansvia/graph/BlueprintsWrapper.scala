@@ -412,7 +412,7 @@ object BlueprintsWrapper {
         }
 
         private[graph] def setVertex(v:Vertex){
-            this.vertex = vertex
+            this.vertex = v
         }
 
         /**
