@@ -147,6 +147,11 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
             tiger.getVertex must_== v
             tiger.name must_== "tiger"
 
+            // can reload using transaction
+            idGraphTitanDb.transact { trx =>
+                tiger.reload()(trx) must be not throwAn[Exception]
+            }
+
         }
     }
 }
