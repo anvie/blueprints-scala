@@ -153,5 +153,12 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
             }
 
         }
+        "add vertex with label via IdGraph" in new Ctx3 {
+            import IdGraphTitanDbWrapper._
+
+            val v = idGraphTitanDb.addVertexWithLabel(ANIMAL)
+
+            v.asInstanceOf[TitanVertex].getLabel must_== ANIMAL
+        }
     }
 }
