@@ -158,7 +158,7 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
 
             val v = idGraphTitanDb.addVertexWithLabel(ANIMAL)
 
-            v.asInstanceOf[TitanVertex].getLabel must_== ANIMAL
+            v.asInstanceOf[IdVertex].getBaseVertex.asInstanceOf[TitanVertex].getLabel must_== ANIMAL
         }
     }
 }
