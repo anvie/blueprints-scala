@@ -60,6 +60,7 @@ object TitanDbWrapper extends Helpers {
                     throw e
             }
         }
+
     }
 
 
@@ -180,9 +181,22 @@ object IdGraphTitanDbWrapper extends Helpers {
             saveWithLabelTx(lbl, trx)
         }
 
+
     }
 
-    implicit def idTitanDbWrapper(db:IdGraph[TitanGraph]):TitanDbWrapper = new TitanDbWrapper(db.getBaseGraph)
+    implicit def idTitanDbWrapper(db:IdGraph[TitanGraph]) = new TitanDbWrapper(db.getBaseGraph){
+
+        def addVertexWithLabel(label:VertexLabel):Vertex = {
+            db.getBaseGraph.addVertexWithLabel(label)
+        }
+
+        def addVertexWithLabel(label:String):Vertex = {
+            val lbl = db.getBaseGraph.getVertexLabel(label)
+            assert(lbl != null, "unknown vertex label: " + label)
+            addVertexWithLabel(lbl)
+        }
+
+    }
     implicit def idGraphTitanDbObjectWrapper(dbo:DbObject):IdGraphTitanDbObjectWrapper =
         new IdGraphTitanDbObjectWrapper(dbo)
 }
