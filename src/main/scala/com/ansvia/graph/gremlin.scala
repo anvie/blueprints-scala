@@ -2,11 +2,11 @@ package com.ansvia.graph
 
 import com.tinkerpop.pipes.PipeFunction
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
-import com.tinkerpop.blueprints.{Element, Vertex}
+import com.tinkerpop.blueprints.{Edge, Element, Vertex}
 
 package object gremlin {
 
-    import scala.language.implicitConversions
+//    import scala.language.implicitConversions
 
     implicit def tupleToPair[A,B](pair:(A, B)) = new BPPair[A,B](pair._1, pair._2)
 
@@ -18,13 +18,16 @@ package object gremlin {
         }
     }
 
-    implicit def gremlinPipeFilterFuncWrapper(func:(Vertex) => Boolean) = {
-        new PipeFunction[Vertex,java.lang.Boolean]{
-            def compute(v:Vertex):java.lang.Boolean = {
-                func.apply(v)
+    private def gremlinPipeFilterFuncWrapperT[T <: Element](func:(T) => Boolean) = {
+        new PipeFunction[T,java.lang.Boolean]{
+            def compute(elm:T):java.lang.Boolean = {
+                func.apply(elm)
             }
         }
     }
+
+    implicit def gremlinPipeFilterFuncWrapperVertex = gremlinPipeFilterFuncWrapperT[Vertex] _
+    implicit def gremlinPipeFilterFuncWrapperEdge = gremlinPipeFilterFuncWrapperT[Edge] _
 
     implicit def gremlinPipeOrderFuncWrapper[T <: Element](func:(T, T) => Int) = {
         new PipeFunction[BPPair[T, T], java.lang.Integer] {

@@ -3,7 +3,7 @@ package com.ansvia.graph
 import org.specs2.mutable.Specification
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import org.specs2.specification.Scope
-import com.tinkerpop.blueprints.Vertex
+import com.tinkerpop.blueprints.{Direction, Edge, Vertex}
 
 /**
  * Author: robin
@@ -61,10 +61,15 @@ class GremlinWrapperSpec extends Specification {
                 a.getProperty[java.lang.Integer]("age").compareTo(b.getProperty[java.lang.Integer]("age"))
             }.iterator().toList must contain(v3,v2).inOrder
         }
-        "wrap filter" in new Ctx {
+        "wrap filter vertex" in new Ctx {
             v1.pipe.out(follow).filter { (v:Vertex) =>
                 v.get[String]("name") == Some(name3)
             }.iterator().toList must contain(v3).only
+        }
+        "wrap filter edge" in new Ctx {
+            v1.pipe.outE(follow).filter { (e:Edge) =>
+                e.getVertex(Direction.IN).get[String]("name") == Some(name3)
+            }.inV().iterator().toList must contain(v3).only
         }
     }
 }
