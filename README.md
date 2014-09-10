@@ -244,13 +244,13 @@ If you get an error when you compile, similar to `sbt.ResolveException: unresolv
 
 	"com.ansvia.graph" % "blueprints-scala_2.10" % "0.1.17"
 
-<!--
+
 SNAPSHOT releases:
 
 	"Sonatype repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.16-20140709-SNAPSHOT"
--->
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.37-20140911-SNAPSHOT"
+
 
 
 License
