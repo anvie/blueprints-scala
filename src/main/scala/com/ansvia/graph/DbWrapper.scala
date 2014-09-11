@@ -27,6 +27,7 @@ class DbWrapper(db:Graph) {
 
         cc match {
             case ccDbo:DbObject =>
+                ccDbo.setVertex(elm)
                 ccDbo.__save__(elm)
             //                    val kv = ccDbo.__save__()
             //                    for ( (k, v) <- kv ){
