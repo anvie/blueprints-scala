@@ -66,7 +66,7 @@ object ObjectConverter extends Log {
      * None if not
      */
     def toCC[T: ClassTag](pc: Element): Option[T] =
-        _toCCPossible(pc) match {
+        _toCCPossible[T](pc) match {
             case Some(serializedClass) =>
 
                 var kv:mutable.Set[(String, AnyRef)] = null
@@ -133,7 +133,7 @@ object ObjectConverter extends Log {
      * with T
      */
     def toCCPossible[T: ClassTag](pc: Element): Boolean =
-        _toCCPossible(pc) match {
+        _toCCPossible[T](pc) match {
             case Some(_) => true
             case _ => false
         }

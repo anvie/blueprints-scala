@@ -226,7 +226,6 @@ object IdGraphTitanDbWrapper extends Helpers {
             rawV.setProperty(IdGraph.ID, id)
 
             new _IdVertex(rawV, trx)
-            //            trx.getVertex(id)
         }
 
         def addVertexWithLabel(label:String):Vertex = {
