@@ -618,7 +618,7 @@ object BlueprintsWrapper {
          * @return this object with updated vertex.
          */
         override def reload()(implicit db: Graph) = {
-            if (isSaved){
+            if (id == null && isSaved){
                 vertex match {
                     case iv:IdVertex =>
 
