@@ -573,6 +573,7 @@ object BlueprintsWrapper {
 
         type idType = IDType
         protected var id:IDType = _
+        private val _nullId:IDType = id
 
         /**
          * this method called when loading data from database.
@@ -588,7 +589,7 @@ object BlueprintsWrapper {
         def getVertex:Vertex
 
         override def getId:IDType = {
-            if (id != null){
+            if (id != _nullId){
                 id
             }else{
                 if (!isSaved)
@@ -618,7 +619,7 @@ object BlueprintsWrapper {
          * @return this object with updated vertex.
          */
         override def reload()(implicit db: Graph) = {
-            if (id == null && isSaved){
+            if (id == _nullId && isSaved){
                 vertex match {
                     case iv:IdVertex =>
 
@@ -634,7 +635,7 @@ object BlueprintsWrapper {
                 }
             }
 
-            if (id != null){
+            if (id != _nullId){
                 vertex = db.getVertex(id)
 
                 if (vertex == null)
