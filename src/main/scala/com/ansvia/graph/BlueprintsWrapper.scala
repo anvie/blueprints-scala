@@ -99,7 +99,6 @@ object BlueprintsWrapper {
          */
         def reload()(implicit db:Graph) = {
             _reloadInner(db)
-            this
         }
 
         private def _reloadInner(db:Graph)(implicit tag:ClassTag[A]) = {
