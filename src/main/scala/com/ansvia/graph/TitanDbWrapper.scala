@@ -1,6 +1,6 @@
 package com.ansvia.graph
 
-import com.tinkerpop.blueprints.{KeyIndexableGraph, Vertex}
+import com.tinkerpop.blueprints.{KeyIndexableGraph, Graph, Vertex}
 import com.ansvia.graph.BlueprintsWrapper.{IdDbObject, DbObject}
 import com.thinkaurelius.titan.core.{VertexLabel, TitanGraph, TitanTransaction}
 import com.tinkerpop.blueprints.util.wrappers.id.{IdVertex, IdGraph}
@@ -56,14 +56,14 @@ object TitanDbWrapper extends Helpers {
             }catch{
                 case e:IllegalArgumentException =>
                     throw e
-                case e:Exception =>
-                    e.printStackTrace()
-                    try {
-                        trx.rollback()
-                    }catch{
-                        case e:Throwable =>
-                    }
-                    throw e
+//                case e:Exception =>
+//                    e.printStackTrace()
+//                    try {
+//                        trx.rollback()
+//                    }catch{
+//                        case e:Throwable =>
+//                    }
+//                    throw e
             }
         }
 
@@ -77,14 +77,14 @@ object TitanDbWrapper extends Helpers {
             }catch{
                 case e:IllegalArgumentException =>
                     throw e
-                case e:Exception =>
-                    e.printStackTrace()
-                    try {
-                        trx.rollback()
-                    }catch{
-                        case e:Throwable =>
-                    }
-                    throw e
+//                case e:Exception =>
+//                    e.printStackTrace()
+//                    try {
+//                        trx.rollback()
+//                    }catch{
+//                        case e:Throwable =>
+//                    }
+//                    throw e
             }
         }
 
