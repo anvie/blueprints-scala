@@ -33,14 +33,6 @@ profileName := "com.ansvia"
 
 publishTo := Some("Nexelem Nexus" at "http://nexus.nexelem.com:8081/nexus/content/repositories/snapshots")
 
-version <<= version { (v:String) =>
-    if (v.trim.endsWith("-SNAPSHOT")){
-        val dateFormatter = new SimpleDateFormat("yyyyMMdd")
-        v.trim.split("-").apply(0) + "-" + dateFormatter.format(new java.util.Date()) + "-SNAPSHOT"
-    }else
-        v
-}
-
 credentials += Credentials {
     val sonatype = Path.userHome / ".ivy2" / ".credentials-sonatype"
     if (new File(sonatype.toString).exists())
