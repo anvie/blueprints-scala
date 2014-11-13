@@ -13,8 +13,7 @@ scalaVersion := "2.10.0"
 scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-language:implicitConversions")
 
 resolvers ++= Seq(
-    "typesafe repo" at "http://repo.typesafe.com/typesafe/releases/",
-    "Ansvia repo" at "http://scala.repo.ansvia.com/releases/"
+    "nexelem repo" at "http://nexus.nexelem.com:8081/nexus/content/groups/public"
     )
 
 libraryDependencies ++= Seq(
@@ -32,21 +31,7 @@ sonatypeSettings
 
 profileName := "com.ansvia"
 
-publishTo <<= version { (v:String) =>
-      val nexus = "https://oss.sonatype.org"
-      if(v.trim.endsWith("SNAPSHOT") || """.+\-\d{8}+$""".r.pattern.matcher(v.trim).matches())
-          Some("snapshots" at nexus + "/content/repositories/snapshots")
-      else
-	  Some("releases"  at nexus + "/service/local/staging/deploy/maven2")
-  }
-
-version <<= version { (v:String) =>
-    if (v.trim.endsWith("-SNAPSHOT")){
-        val dateFormatter = new SimpleDateFormat("yyyyMMdd")
-        v.trim.split("-").apply(0) + "-" + dateFormatter.format(new java.util.Date()) + "-SNAPSHOT"
-    }else
-        v
-}
+publishTo := Some("Nexelem Nexus" at "http://nexus.nexelem.com:8081/nexus/content/repositories/snapshots")
 
 credentials += Credentials {
     val sonatype = Path.userHome / ".ivy2" / ".credentials-sonatype"
