@@ -7,15 +7,19 @@ import com.tinkerpop.gremlin.java.GremlinPipeline
 import com.tinkerpop.pipes.util.FastNoSuchElementException
 import com.ansvia.graph.Exc.NotBoundException
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
+import sun.reflect.Reflection
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 import scala.language.implicitConversions
 import scala.language.reflectiveCalls
 import com.tinkerpop.blueprints.util.wrappers.id.{IdVertex, IdGraph}
 
+
+
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
 
+  val defaultClassloader = if(Reflection.getCallerClass!=null) Reflection.getCallerClass.getClassLoader else null
 
 
     case class ScalasticPropertyAccessor[A <: Element : ClassTag](var obj:A) {
@@ -113,11 +117,17 @@ object BlueprintsWrapper {
         /**
          * Deserialize object to case class.
          * @tparam T case class type.
-         * @return
          */
-        def toCC[T: ClassTag]:Option[T] = {
-            ObjectConverter.toCC[T](obj)
-        }
+        def toCC[T: ClassTag]:Option[T] = toCC[T](defaultClassloader)
+
+      /**
+       * Deserialize object to case class.
+       * @tparam T case class type.
+       * @param classLoader explicitly specified classloader if needed.
+       */
+      def toCC[T: ClassTag](classLoader: ClassLoader):Option[T] = {
+        ObjectConverter.toCC[T](obj, classLoader)
+      }
     }
 
     implicit def vertexToPropertyAccessor(elm:Vertex) = ScalasticPropertyAccessor(elm)
@@ -552,7 +562,7 @@ object BlueprintsWrapper {
 
             this.vertex = v
 
-            v.toCC[this.type].get
+            v.toCC[this.type](defaultClassloader).get
         }
 
     }
@@ -643,7 +653,7 @@ object BlueprintsWrapper {
             }else{
                 throw NotBoundException("id return null, object %s not saved yet?".format(this))
             }
-            vertex.toCC[this.type].get
+            vertex.toCC[this.type](defaultClassloader).get
         }
     }
 

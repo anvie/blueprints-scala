@@ -7,6 +7,9 @@ package com.ansvia.graph
  * Time: 5:21 AM
  *
  */
+
+import sun.reflect.Reflection
+
 import collection.JavaConversions._
 import com.tinkerpop.blueprints.{Vertex, Element}
 import util.CaseClassDeserializer
@@ -24,13 +27,14 @@ object ObjectConverter extends Log {
      */
     var CLASS_PROPERTY_NAME = "_class_"
 
+    val defaultClassloader = if(Reflection.getCallerClass!=null) Reflection.getCallerClass.getClassLoader else null
+
     /**
      * serializes a given case class into a Node instance
      * for null values not property will be set
      */
     def serialize[T <: Element](cc: AnyRef, pc: Element, newElement:Boolean): T = {
         assert(cc != null, "duno how to serialize null object :(")
-
         if (newElement){
             val clz = pc.getProperty[String](CLASS_PROPERTY_NAME)
             if (clz != null)
@@ -65,8 +69,8 @@ object ObjectConverter extends Log {
      * Some(T) if possible
      * None if not
      */
-    def toCC[T: ClassTag](pc: Element): Option[T] =
-        _toCCPossible[T](pc) match {
+    def toCC[T: ClassTag](pc: Element, classLoader: ClassLoader = defaultClassloader): Option[T] =
+        _toCCPossible[T](pc, classLoader) match {
             case Some(serializedClass) =>
 
                 var kv:mutable.Set[(String, AnyRef)] = null
@@ -112,12 +116,11 @@ object ObjectConverter extends Log {
             case _ => None
         }
 
-    private def _toCCPossible[T](pc: Element)(implicit tag: ClassTag[T]): Option[Class[_]] = {
-
+    private def _toCCPossible[T](pc: Element, classLoader: ClassLoader)(implicit tag: ClassTag[T]): Option[Class[_]] = {
         val pv = pc.getProperty[String](CLASS_PROPERTY_NAME)
         if( pv != null ){
             val cpn = pv.toString
-            val c = Class.forName(cpn)
+            val c = Class.forName(cpn, true, classLoader)
             if (tag.runtimeClass.isAssignableFrom(c))
                 Some(c)
             else
@@ -132,8 +135,8 @@ object ObjectConverter extends Log {
      * only checks if this property container has been serialized
      * with T
      */
-    def toCCPossible[T: ClassTag](pc: Element): Boolean =
-        _toCCPossible[T](pc) match {
+    def toCCPossible[T: ClassTag](pc: Element, classLoader: ClassLoader = defaultClassloader): Boolean =
+        _toCCPossible[T](pc, classLoader) match {
             case Some(_) => true
             case _ => false
         }
