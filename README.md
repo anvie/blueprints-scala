@@ -238,18 +238,18 @@ Install
 
 Add dependency to your build.sbt:
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.17"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.41"
 
-If you get an error when you compile, similar to `sbt.ResolveException: unresolved dependency: com.ansvia.graph#blueprints-scala_2.11;0.1.6: not found` then your Scala version differs from that of the latest version, this will fix the issue:
+If you get an error when you compile, similar to `sbt.ResolveException: unresolved dependency: com.ansvia.graph#blueprints-scala_x.x;x.x.x: not found` then your Scala version differs from that of the latest version, if you using Scala 2.10 this will fix the issue:
 
-	"com.ansvia.graph" % "blueprints-scala_2.10" % "0.1.17"
+	"com.ansvia.graph" % "blueprints-scala_2.10" % "0.1.41"
 
 
 SNAPSHOT releases:
 
 	"Sonatype repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.37-20140911-SNAPSHOT"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.42-20141117-SNAPSHOT"
 
 
 
