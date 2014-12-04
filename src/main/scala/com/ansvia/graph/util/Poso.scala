@@ -6,7 +6,6 @@ import java.lang.reflect
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import collection.mutable
 import com.ansvia.graph.annotation.Persistent
-import annotation.tailrec
 import scala.reflect.ClassTag
 import scala.language.existentials
 import com.ansvia.graph.Log
@@ -269,7 +268,7 @@ object CaseClassSigParser {
             true
         else{
             clazz == classOf[java.lang.Object] ||
-            clazz == classOf[scala.ScalaObject] ||
+            clazz == classOf[scala.Any] ||
             clazz == classOf[scala.Product] ||
             clazz == classOf[scala.Serializable] ||
             clazz == classOf[DbObject] ||

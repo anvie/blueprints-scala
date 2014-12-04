@@ -64,12 +64,12 @@ class GremlinWrapperSpec extends Specification {
         "wrap filter vertex" in new Ctx {
             v1.pipe.out(follow).filter { (v:Vertex) =>
                 v.get[String]("name") == Some(name3)
-            }.iterator().toList must contain(v3).only
+            }.iterator().toList must beEqualTo(List(v3))
         }
         "wrap filter edge" in new Ctx {
             v1.pipe.outE(follow).filter { (e:Edge) =>
                 e.getVertex(Direction.IN).get[String]("name") == Some(name3)
-            }.inV().iterator().toList must contain(v3).only
+            }.inV().iterator().toList must beEqualTo(List(v3))
         }
     }
 }

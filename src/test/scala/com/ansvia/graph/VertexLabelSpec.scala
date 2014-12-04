@@ -149,7 +149,7 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
 
             // can reload using transaction
             idGraphTitanDb.transact { trx =>
-                tiger.reload()(trx) must be not throwAn[Exception]
+                tiger.reload()(trx) must not be throwAn[Exception]
             }
 
         }
