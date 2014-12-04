@@ -8,6 +8,8 @@ name := "blueprints-scala"
 
 version := "0.1.42-SNAPSHOT"
 
+scalaVersion := "2.11.0"
+
 crossScalaVersions := Seq("2.10.0", "2.11.0")
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-language:implicitConversions")
