@@ -82,8 +82,8 @@ class DbObjectSimpleSpec extends Specification {
             val o = SimpleDbo("d", "f")
             o.save()
 
-            (o.getId must be not throwAn[NotBoundException]) and
-                (o.getId must be not equalTo(null)) and
+            (o.getId must not be throwAn[NotBoundException]) and
+                (o.getId must not be equalTo(null)) and
                 (o.isSaved must beTrue)
         }
     }
@@ -140,8 +140,8 @@ class DbObjectSimpleSpec extends Specification {
             o.save()
             db.commit()
 
-            (o.getId must be not throwAn[NotBoundException]) and
-                (o.getId must be not equalTo(null)) and
+            (o.getId must not be throwAn[NotBoundException]) and
+                (o.getId must not be equalTo(null)) and
                 (o.isSaved must beTrue)
         }
     }
