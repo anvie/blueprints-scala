@@ -1,14 +1,15 @@
 package com.ansvia.graph.util
 
-import scalax.rules.scalasig._
-import collection.mutable.ArrayBuffer
 import java.lang.reflect
+
 import com.ansvia.graph.BlueprintsWrapper.DbObject
-import collection.mutable
-import com.ansvia.graph.annotation.Persistent
-import scala.reflect.ClassTag
-import scala.language.existentials
 import com.ansvia.graph.Log
+import com.ansvia.graph.annotation.Persistent
+import com.ansvia.graph.util.scalax.rules.scalasig._
+
+import scala.collection.mutable.ArrayBuffer
+import scala.language.existentials
+import scala.reflect.ClassTag
 
 /**
  * helper class to store Class object
@@ -23,17 +24,17 @@ object CaseClassDeserializer extends Log {
     /**
      * Method Map cache for method serialize
      */
-    private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
-        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+    private val methodCache = new java.util.concurrent.ConcurrentHashMap[Class[_], Map[String, java.lang.reflect.Method]]() //new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+        //with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
-    private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
-        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+    private val methodSetterCache = new java.util.concurrent.ConcurrentHashMap[Class[_], Map[String, java.lang.reflect.Method]]()  //new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+        //with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
     /**
      * signature parser cache
      */
-    private val sigParserCache = new mutable.HashMap[Class[_], Seq[(String, JavaType)]]()
-        with mutable.SynchronizedMap[Class[_], Seq[(String, JavaType)]]
+    private val sigParserCache = new java.util.concurrent.ConcurrentHashMap[Class[_], Seq[(String, JavaType)]]() //new mutable.HashMap[Class[_], Seq[(String, JavaType)]]()
+//        with mutable.SynchronizedMap[Class[_], Seq[(String, JavaType)]]
 
     /**
      * default behaviour for T == serialized class
@@ -58,7 +59,7 @@ object CaseClassDeserializer extends Log {
         require(javaTypeTarget.c.getConstructors.length == 1, "Case classes must only have one constructor.")
 
         val constructor = javaTypeTarget.c.getConstructors.head
-        val params = sigParserCache.getOrElseUpdate(javaTypeTarget.c, CaseClassSigParser.parse(javaTypeTarget.c))
+        val params = sigParserCache.getOrDefault(javaTypeTarget.c, CaseClassSigParser.parse(javaTypeTarget.c))
 
         val values = new ArrayBuffer[AnyRef]
         for ((paramName, paramType) <- params) {
@@ -108,7 +109,7 @@ object CaseClassDeserializer extends Log {
             while(!done){
 
                 val rv: Map[String, reflect.Method] =
-                    methodSetterCache.getOrElseUpdate(curClazz,
+                    methodSetterCache.getOrDefault(curClazz,
                         curClazz.getDeclaredMethods
                          .filter{ z =>
                             z.getParameterTypes.length == 1
@@ -172,7 +173,7 @@ object CaseClassDeserializer extends Log {
             while(!done){
 
                 val rv: Map[String, reflect.Method] =
-                    methodCache.getOrElseUpdate(curClazz,
+                    methodCache.getOrDefault(curClazz,
                         curClazz.getDeclaredMethods
                             .filter{ z =>
                                 z.getParameterTypes.isEmpty
@@ -189,9 +190,9 @@ object CaseClassDeserializer extends Log {
             symbols
         }
 
-        val params: Seq[(String, JavaType)] = sigParserCache.getOrElseUpdate(o.getClass, CaseClassSigParser.parse(o.getClass))
+        val params: Seq[(String, JavaType)] = sigParserCache.getOrDefault(o.getClass, CaseClassSigParser.parse(o.getClass))
         val l = for {
-            (paramName, jt) <- params;
+            (paramName, jt) <- params
             value = methods.get(paramName).get.invoke(o)
         } yield {
             (paramName, value)
@@ -200,7 +201,7 @@ object CaseClassDeserializer extends Log {
     }
 
     def getParsedParams(k:Class[_]):Option[Seq[(String, JavaType)]] = {
-        Some(sigParserCache.getOrElseUpdate(k.getClass, CaseClassSigParser.parse(k.getClass)))
+        Some(sigParserCache.getOrDefault(k.getClass, CaseClassSigParser.parse(k.getClass)))
     }
 }
 
@@ -255,13 +256,13 @@ object CaseClassSigParser {
         }
     }
 
-    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
-        with mutable.SynchronizedMap[Class[_], Array[String]]
+    private val persistedVarCache = new java.util.concurrent.ConcurrentHashMap[Class[_], Array[String]]() //new mutable.HashMap[Class[_], Array[String]]()
+        //with mutable.SynchronizedMap[Class[_], Array[String]]
 //    private val traitItCache = new mutable.HashMap[Class[_], Seq[Class[_]]]()
 //        with mutable.SynchronizedMap[Class[_], Seq[Class[_]]]
 
-    private val classesTreeCache = new mutable.HashMap[Class[_], Array[Class[_]]]()
-        with mutable.SynchronizedMap[Class[_], Array[Class[_]]]
+    private val classesTreeCache = new java.util.concurrent.ConcurrentHashMap[Class[_], Array[Class[_]]]() //new mutable.HashMap[Class[_], Array[Class[_]]]()
+        //with mutable.SynchronizedMap[Class[_], Array[Class[_]]]
 
     private def isExcluded(clazz: Class[_]) = {
         if (clazz == null)
@@ -280,7 +281,7 @@ object CaseClassSigParser {
 //    @tailrec
     private def crawlClassesTree(clazz:Class[_]):Array[Class[_]] = {
 
-        classesTreeCache.getOrElseUpdate(clazz,
+        classesTreeCache.getOrDefault(clazz,
             {
                 var rv:Array[Class[_]] = clazz.getInterfaces.flatMap { c =>
                     if (c!=null && !isExcluded(c))
@@ -332,7 +333,7 @@ object CaseClassSigParser {
                 }
 
             }
-            persistedVarCache.update(mainClazz, fieldNames)
+            persistedVarCache.put(mainClazz, fieldNames)
         }
 
         curClazz = mainClazz
@@ -350,12 +351,15 @@ object CaseClassSigParser {
                         true
                     }else if (c.isAccessor && !c.isPrivate && !c.isLazy && !c.isProtected){
 
-                        val pv = persistedVarCache.get(mainClazz).get
+                        val pv = persistedVarCache.get(mainClazz)
 
 //                        if (pv.length > 0)
 //                            println(curClazz.getSimpleName + ": " + pv.reduceOption(_ + ", " + _).getOrElse("") + " contains " + c.name + "?")
 
-                        pv.contains(c.name)
+                        if (pv != null)
+                            pv.contains(c.name)
+                        else
+                            false
 
                     }else{
                         false

@@ -1,12 +1,12 @@
 package com.ansvia.graph
 
-import com.tinkerpop.blueprints.{KeyIndexableGraph, Graph, Vertex}
-import com.ansvia.graph.BlueprintsWrapper.{IdDbObject, DbObject}
-import com.thinkaurelius.titan.core.{VertexLabel, TitanGraph, TitanTransaction}
-import com.tinkerpop.blueprints.util.wrappers.id.{IdVertex, IdGraph}
+import com.ansvia.graph.BlueprintsWrapper.{DbObject, IdDbObject}
 import com.thinkaurelius.titan.core.schema.EdgeLabelMaker
+import com.thinkaurelius.titan.core.{TitanGraph, TitanTransaction, VertexLabel}
 import com.thinkaurelius.titan.graphdb.types.StandardEdgeLabelMaker
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph.IdFactory
+import com.tinkerpop.blueprints.util.wrappers.id.{IdGraph, IdVertex}
+import com.tinkerpop.blueprints.{KeyIndexableGraph, Vertex}
 
 
 /**
@@ -56,14 +56,6 @@ object TitanDbWrapper extends Helpers {
             }catch{
                 case e:IllegalArgumentException =>
                     throw e
-//                case e:Exception =>
-//                    e.printStackTrace()
-//                    try {
-//                        trx.rollback()
-//                    }catch{
-//                        case e:Throwable =>
-//                    }
-//                    throw e
             }
         }
 
@@ -77,14 +69,6 @@ object TitanDbWrapper extends Helpers {
             }catch{
                 case e:IllegalArgumentException =>
                     throw e
-//                case e:Exception =>
-//                    e.printStackTrace()
-//                    try {
-//                        trx.rollback()
-//                    }catch{
-//                        case e:Throwable =>
-//                    }
-//                    throw e
             }
         }
 
@@ -98,8 +82,6 @@ object TitanDbWrapper extends Helpers {
 
         def saveWithLabelTx(label:VertexLabel)(implicit db:TitanTransaction):Vertex = {
             db.saveWithLabel(dbo, label)
-//            dbo.setVertex(v)
-//            v
         }
 
         def saveWithLabelTx(label:String)(implicit db:TitanTransaction):Vertex = {
@@ -110,8 +92,6 @@ object TitanDbWrapper extends Helpers {
 
         def saveWithLabel(label:VertexLabel)(implicit db:TitanGraph):Vertex = {
             val v = db.saveWithLabel(dbo, label)
-//            dbo.setVertex(v)
-
 
             dbo match {
                 case iddbo:IdDbObject[_] =>
@@ -141,7 +121,7 @@ object TitanDbWrapper extends Helpers {
 
 object IdGraphTitanDbWrapper extends Helpers {
 
-    import TitanDbWrapper._
+    import com.ansvia.graph.TitanDbWrapper._
 
 
 

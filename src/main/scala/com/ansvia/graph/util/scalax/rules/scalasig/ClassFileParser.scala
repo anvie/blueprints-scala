@@ -76,6 +76,9 @@ class ByteCode(val bytes: Array[Byte], val pos: Int, val length: Int) {
         {f => m2.invoke(io.Codec, f).asInstanceOf[Array[Char]]}
       }
     }
+
+//      {f => io.Codec.fromUTF8(f)}
+
   }
 
   /**

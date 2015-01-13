@@ -3,8 +3,6 @@ package com.ansvia.graph
 /**
  * Copyright (C) 2011-2012 Ansvia Inc.
  * User: robin
- * Date: 12/31/12
- * Time: 5:21 AM
  *
  */
 
