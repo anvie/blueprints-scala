@@ -45,12 +45,10 @@ object ObjectConverter extends Log {
 
         CaseClassDeserializer.serialize(cc).foreach {
             case (name, null) =>
-            case (name, value) => 
-
+            case (name, value) =>
                 try {
-                    if (pc.getProperty(name) != value)
-                        pc.setProperty(name, value)
-                }catch{
+                    assignValue(pc, name, value)
+                } catch{
                     case e:IllegalArgumentException =>
                         error("cannot set property %s <= %s\nerror: %s".format(name, value, e.getMessage))
                         throw e
@@ -115,6 +113,19 @@ object ObjectConverter extends Log {
 
             case _ => None
         }
+    private def assignValue(pc: Element, attributeName: String, value: Any) {
+        value match {
+            case Some(x) =>
+                assignValue(pc, attributeName, x)
+            case None =>
+                pc.removeProperty(attributeName)
+                ()  // forced Unit
+            case _ =>
+                if(pc.getProperty(attributeName) != value) {
+                    pc.setProperty(attributeName, value)
+                }
+        }
+    }
 
     private def _toCCPossible[T](pc: Element, classLoader: ClassLoader)(implicit tag: ClassTag[T]): Option[Class[_]] = {
         val pv = pc.getProperty[String](CLASS_PROPERTY_NAME)

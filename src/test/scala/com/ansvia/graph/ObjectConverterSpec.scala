@@ -146,8 +146,4 @@ class ObjectConverterSpec extends Specification {
         def savedViaSaveMethod = shark.animalProtected must beTrue
 
     }
-
-
-
-
 }

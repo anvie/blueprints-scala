@@ -1,25 +1,24 @@
 package com.ansvia.graph
 
-import com.tinkerpop.blueprints._
 import java.lang.Iterable
-import com.tinkerpop.pipes.PipeFunction
-import com.tinkerpop.gremlin.java.GremlinPipeline
-import com.tinkerpop.pipes.util.FastNoSuchElementException
+
 import com.ansvia.graph.Exc.NotBoundException
+import com.tinkerpop.blueprints._
+import com.tinkerpop.blueprints.util.wrappers.id.{IdGraph, IdVertex}
+import com.tinkerpop.gremlin.java.GremlinPipeline
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
 import sun.reflect.Reflection
-import scala.reflect.ClassTag
+
+import scala.language.{implicitConversions, reflectiveCalls}
+import scala.reflect._
 import scala.reflect.runtime.universe._
-import scala.language.implicitConversions
-import scala.language.reflectiveCalls
-import com.tinkerpop.blueprints.util.wrappers.id.{IdVertex, IdGraph}
 
 
 
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
 
-  val defaultClassloader = if(Reflection.getCallerClass!=null) Reflection.getCallerClass.getClassLoader else null
+    val defaultClassloader = if(Reflection.getCallerClass!=null) Reflection.getCallerClass.getClassLoader else null
 
 
     case class ScalasticPropertyAccessor[A <: Element : ClassTag](var obj:A) {
@@ -46,10 +45,11 @@ object BlueprintsWrapper {
          * @tparam T template to return.
          * @return
          */
-        def get[T](key:String)(implicit tag: TypeTag[T]):Option[T] = {
-            obj.getProperty[AnyRef](key) match {
-                case v:T => Some(v)
-                case x => None
+        def get[T: TypeTag](key:String):Option[T] = {
+          obj.getProperty[AnyRef](key) match {
+              case null => None
+              case None => None
+              case anyOther => Some(anyOther.asInstanceOf[T])
             }
         }
 
@@ -68,14 +68,7 @@ object BlueprintsWrapper {
          * @tparam T return type.
          * @return
          */
-        def getOrElse[T](key:String, default:T)(implicit tag: TypeTag[T]):T = {
-            obj.getProperty[AnyRef](key) match {
-                case v:T => v
-                case x => {
-                    default
-                }
-            }
-        }
+        def getOrElse[T : TypeTag](key:String, default:T): T = get[T](key).getOrElse(default)
 
         /**
          * Syntactic sugar for property setter.

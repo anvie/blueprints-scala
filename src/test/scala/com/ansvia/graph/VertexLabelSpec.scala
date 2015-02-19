@@ -155,6 +155,7 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
         }
         "add vertex with label via IdGraph" in new Ctx3 {
             import IdGraphTitanDbWrapper._
+            import scala.language.reflectiveCalls
 
             val v = idGraphTitanDb.addVertexWithLabel(ANIMAL)
 
