@@ -13,7 +13,7 @@ class DbObjectOptionalSpec extends Specification {
     import com.ansvia.graph.testing.model._
 
     def is = sequential ^
-        "DbObject non tx should" ^
+        "DbObject with optional parameter should" ^
         p ^
             "save NONE property" ! treesNonTx.getOptionalEntityNone ^
             "save SOME property" ! treesNonTx.getOptionalWithValue ^

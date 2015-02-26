@@ -46,10 +46,10 @@ object BlueprintsWrapper {
          * @return
          */
         def get[T: TypeTag](key:String):Option[T] = {
-          obj.getProperty[AnyRef](key) match {
-              case null => None
-              case None => None
-              case anyOther => Some(anyOther.asInstanceOf[T])
+            obj.getProperty[AnyRef](key) match {
+                case null => None
+                case None => None
+                case anyOther => Some(anyOther.asInstanceOf[T])
             }
         }
 
@@ -113,14 +113,14 @@ object BlueprintsWrapper {
          */
         def toCC[T: ClassTag]:Option[T] = toCC[T](defaultClassloader)
 
-      /**
-       * Deserialize object to case class.
-       * @tparam T case class type.
-       * @param classLoader explicitly specified classloader if needed.
-       */
-      def toCC[T: ClassTag](classLoader: ClassLoader):Option[T] = {
-        ObjectConverter.toCC[T](obj, classLoader)
-      }
+        /**
+         * Deserialize object to case class.
+         * @tparam T case class type.
+         * @param classLoader explicitly specified classloader if needed.
+         */
+        def toCC[T: ClassTag](classLoader: ClassLoader):Option[T] = {
+            ObjectConverter.toCC[T](obj, classLoader)
+        }
     }
 
     implicit def vertexToPropertyAccessor(elm:Vertex) = ScalasticPropertyAccessor(elm)
@@ -271,122 +271,6 @@ object BlueprintsWrapper {
         }
     }
 
-//
-//    /**
-//     * Gremlin pipe wrapper.
-//     * @param innerPipe raw gremlin pipe.
-//     */
-//    @deprecated()
-//    case class GremlinPipeWrapperVertex(innerPipe:GremlinPipeline[Vertex, Vertex]){
-//
-//        @deprecated()
-//        def wrap = GremlinPipeWrapperVertex(innerPipe)
-//
-////        /**
-////         * Filter vertex out.
-////         * Example:
-////         *
-////         * vertex.pipe.out("friend").wrap.filter { v =>
-////         *      v.get[String]("name").get != "andrie"
-////         * }
-////         *
-////         * @param gpf
-////         * @return
-////         */
-////        @deprecated()
-////        def filter(gpf: Vertex => Boolean):GremlinPipeline[Vertex, Vertex] = {
-////            val rv = innerPipe.filter(new PipeFunction[Vertex,java.lang.Boolean] {
-////                def compute(v: Vertex):java.lang.Boolean = {
-////                    gpf.apply(v)
-////                }
-////            })
-////            rv
-////        }
-//
-//        /**
-//         * Order vertices.
-//         * Example:
-//         *
-//         * vertex.pipe.out("friend").wrap.order{ (a,b) =>
-//         *      a.getProperty("name").compare(b.getProperty("name"))
-//         * }
-//         *
-//         * @param gpf
-//         * @return
-//         */
-//        @deprecated()
-//        def sort(gpf: (Vertex, Vertex) => Int):GremlinPipeline[Vertex, Vertex] = {
-//            val rv = innerPipe.order(new PipeFunction[BPPair[Vertex, Vertex], java.lang.Integer] {
-//                def compute(argument: BPPair[Vertex, Vertex]):java.lang.Integer = {
-//                    gpf.apply(argument.getA, argument.getB)
-//                }
-//            })
-//            rv
-//        }
-//
-//        /**
-//         * Get first in direction for label vertex.
-//         * @param label edge label.
-//         * @return
-//         */
-//        @deprecated()
-//        def inFirst(label:String):Option[Vertex] = {
-//            try {
-//                Some(innerPipe.in(label).next())
-//            }catch{
-//                case e:FastNoSuchElementException => None
-//            }
-//        }
-//
-//        /**
-//         * Get first head out direction for label vertex.
-//         * @param label edge label.
-//         * @return
-//         */
-//        @deprecated()
-//        def outFirst(label:String):Option[Vertex] = {
-//            try {
-//                Some(innerPipe.out(label).next())
-//            }catch{
-//                case e:FastNoSuchElementException => None
-//            }
-//        }
-//    }
-//
-//    case class GremlinPipeWrapperEdge[Vertex, Edge](innerPipe:GremlinPipeline[Vertex, Edge]){
-//        def wrap = GremlinPipeWrapperEdge[Vertex, Edge](innerPipe)
-//
-//        /**
-//         * Filter edge out.
-//         * @param gpf
-//         * @return
-//         */
-//        def filter(gpf: Edge => Boolean):GremlinPipeline[Vertex, Edge] = {
-//            val rv = innerPipe.filter(new PipeFunction[Edge,java.lang.Boolean] {
-//                def compute(e: Edge):java.lang.Boolean = {
-//                    gpf.apply(e)
-//                }
-//            })
-//            rv
-//        }
-//
-//        /**
-//         * Order edges.
-//         * @param gpf
-//         * @return
-//         */
-//        def sort(gpf: (Edge, Edge) => Int):GremlinPipeline[Vertex, Edge] = {
-//            val rv = innerPipe.order(new PipeFunction[BPPair[Edge, Edge], java.lang.Integer] {
-//                def compute(argument: BPPair[Edge, Edge]):java.lang.Integer = {
-//                    gpf.apply(argument.getA, argument.getB)
-//                }
-//            })
-//            rv
-//        }
-//    }
-//    implicit def gremlinPipeWrapperVertex(pipe:GremlinPipeline[Vertex, Vertex]) = GremlinPipeWrapperVertex(pipe)
-//    implicit def gremlinPipeWrapperEdge(pipe:GremlinPipeline[Vertex, Edge]) = GremlinPipeWrapperEdge(pipe)
-
     /**
      * Working in transactional fashion.
      * @param wrappedFunc function
@@ -405,48 +289,7 @@ object BlueprintsWrapper {
         }
     }
 
-  //
-  //    implicit def dbWrapper(db:Graph) = new {
-  //
-  //        def save[T:Manifest](cc:T):Vertex = {
-  //            val (o, _new) = {
-  //                cc match {
-  //                    case dbo:DbObject if dbo.isSaved =>
-  //                        (db.getVertex(dbo.getVertex.getId), false)
-  //                    case dbo:DbObject if !dbo.isSaved =>
-  //                        (db.addVertex(null), true)
-  //                    case _ =>
-  //                        (db.addVertex(null), true)
-  //                }
-  //            }
-  //
-  //            val elm:Vertex = ObjectConverter.serialize(cc.asInstanceOf[AnyRef], o, _new)
-  //
-  //            cc match {
-  //                case ccDbo:DbObject =>
-  //                    ccDbo.__save__(elm)
-  ////                    val kv = ccDbo.__save__()
-  ////                    for ( (k, v) <- kv ){
-  ////
-  ////                        // only set if different/new
-  ////                        if(elm.getOrElse(k,null) != v)
-  ////                            elm.set(k, v)
-  ////
-  ////                    }
-  //                case _ =>
-  //            }
-  //            elm
-  //        }
-  //
-  //        def delete[T:Manifest](cc:T):Unit = {
-  //            cc match {
-  //                case dbo:DbObject if dbo.isSaved =>
-  //                    db.removeVertex(dbo.getVertex)
-  //                case _ =>
-  //            }
-  //        }
-  //    }
-  implicit def dbWrapper(db:Graph) = StdDbWrapper.dbWrapper(db) //new DbWrapper(db)
+    implicit def dbWrapper(db:Graph) = StdDbWrapper.dbWrapper(db) //new DbWrapper(db)
 
 
     /**
@@ -478,7 +321,7 @@ object BlueprintsWrapper {
          * @param vertex vertex object.
          */
         def __load__(vertex:Vertex){
-           this.vertex = vertex
+            this.vertex = vertex
         }
 
         /**
@@ -531,22 +374,22 @@ object BlueprintsWrapper {
                 throw NotBoundException("object %s not saved yet".format(this))
 
             val id =
-            if (isSaved){
-                vertex match {
-                    case iv:IdVertex =>
+                if (isSaved){
+                    vertex match {
+                        case iv:IdVertex =>
 
-                        db match {
-                            case ig:IdGraph[_] =>
-                                iv.getId
-                            case _ =>
-                                iv.getBaseVertex.getId
-                        }
+                            db match {
+                                case ig:IdGraph[_] =>
+                                    iv.getId
+                                case _ =>
+                                    iv.getBaseVertex.getId
+                            }
 
-                    case _ =>
-                        vertex.getId
-                }
-            }else
-                vertex.getId
+                        case _ =>
+                            vertex.getId
+                    }
+                }else
+                    vertex.getId
 
             val v = db.getVertex(id)
 
