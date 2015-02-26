@@ -12,19 +12,20 @@ class DbObjectOptionalSpec extends Specification {
 
     import com.ansvia.graph.testing.model._
 
-    def is = sequential ^
-        "DbObject with optional parameter should" ^
-        p ^
-            "save NONE property" ! treesNonTx.getOptionalEntityNone ^
-            "save SOME property" ! treesNonTx.getOptionalWithValue ^
-            "reload Option attribute" ! treesNonTx.reload ^
-            "overwrite with None" ! treesNonTx.overwriteWithNone ^
-            Step(treesNonTx.close()) ^
-        end
+    def is = s2"""
+    This is specification to check Option type as the db object attribute.
+
+    DbObject with optional attribute should
+        save NONE property                  ${trees.getOptionalEntityNone}
+        save SOME property                  ${trees.getOptionalWithValue}
+        reload Option attribute             ${trees.reload}
+        overwrite with None                 ${trees.overwriteWithNone}
+                                            ${Step(trees.close())}
+    """
 
 
-    object treesNonTx {
-        import BlueprintsWrapper._
+    object trees {
+        import com.ansvia.graph.BlueprintsWrapper._
 
         implicit val db = TinkerGraphFactory.createTinkerGraph()
 

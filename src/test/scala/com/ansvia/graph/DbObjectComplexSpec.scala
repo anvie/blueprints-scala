@@ -5,8 +5,6 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 
 /**
  * Author: robin
- * Date: 1/16/13
- * Time: 12:58 AM
  * 
  */
 class DbObjectComplexSpec extends Specification {
@@ -14,15 +12,14 @@ class DbObjectComplexSpec extends Specification {
     import com.ansvia.graph.testing.model._
     import BlueprintsWrapper._
 
-    def is = sequential ^
-        "Complex DbObject inheritance should" ^
-        p ^
-            "get level 1 var" ! cdbo.getLevel1Var ^
-            "get level 1b var" ! cdbo.getLevel1bVar ^
-            "get level 2 var" ! cdbo.getLevel2Var ^
-            "get level 2b var" ! cdbo.getLevel2bVar ^
-            "get level 2c var" ! cdbo.getLevel2cVar ^
-    end
+    def is = s2"""$sequential ^
+       "Complex DbObject inheritance should
+            get level 1 var             ${cdbo.getLevel1Var}
+            get level 1b var            ${cdbo.getLevel1bVar}
+            get level 2 var             ${cdbo.getLevel2Var}
+            get level 2b var            ${cdbo.getLevel2bVar}
+            get level 2c var            ${cdbo.getLevel2cVar}
+    """
 
     object cdbo {
         implicit val db = TinkerGraphFactory.createTinkerGraph()
