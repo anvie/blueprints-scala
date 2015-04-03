@@ -3,11 +3,11 @@ package com.ansvia.graph
 import java.lang.Iterable
 
 import com.ansvia.graph.Exc.NotBoundException
+import com.ansvia.graph.util.CallersContext
 import com.tinkerpop.blueprints._
 import com.tinkerpop.blueprints.util.wrappers.id.{IdGraph, IdVertex}
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import com.tinkerpop.pipes.util.structures.{Pair => BPPair}
-import sun.reflect.Reflection
 
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect._
@@ -18,7 +18,7 @@ import scala.reflect.runtime.universe._
 object BlueprintsWrapper {
     import scala.collection.JavaConversions._
 
-    val defaultClassloader = if(Reflection.getCallerClass!=null) Reflection.getCallerClass.getClassLoader else null
+    val defaultClassloader = CallersContext.fetchDefaultClassLoader
 
 
     case class ScalasticPropertyAccessor[A <: Element : ClassTag](var obj:A) {
