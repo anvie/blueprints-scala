@@ -100,7 +100,7 @@ class BlueprintsWrapperSpec extends Specification {
         }
         "using mutual wrapper #2" in {
             val vx: Iterable[Vertex] = vertices("pluto").mutual("brother")
-            vx.iterator().next().get[String]("name").get must beEqualTo("jupiter")
+            vx.iterator().next().get[String]("name").get must beOneOf("jupiter", "neptune")
         }
         "dump iterable vertices" in {
             vertices("hercules").getEdges(Direction.OUT).printDump("name")
