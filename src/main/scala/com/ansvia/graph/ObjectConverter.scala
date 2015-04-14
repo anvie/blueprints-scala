@@ -8,11 +8,9 @@ package com.ansvia.graph
  *
  */
 
-import sun.reflect.Reflection
-
 import collection.JavaConversions._
 import com.tinkerpop.blueprints.{Vertex, Element}
-import util.CaseClassDeserializer
+import com.ansvia.graph.util.{CallersContext, CaseClassDeserializer}
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import reflect.ClassTag
 import scala.collection.mutable
@@ -27,7 +25,7 @@ object ObjectConverter extends Log {
      */
     var CLASS_PROPERTY_NAME = "_class_"
 
-    val defaultClassloader = if(Reflection.getCallerClass!=null) Reflection.getCallerClass.getClassLoader else null
+    val defaultClassloader = CallersContext.fetchDefaultClassLoader
 
     /**
      * serializes a given case class into a Node instance

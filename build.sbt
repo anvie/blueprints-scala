@@ -108,4 +108,9 @@ pomExtra := (
                 <name>Vikraman Choudhury</name>
                 <url>http://vh4x0r.wordpress.com</url>
             </developer>
+            <developer>
+                <id>pdolega</id>
+                <name>Pawel Dolega</name>
+                <url>http://nexelem.com</url>
+            </developer>
         </developers>)
