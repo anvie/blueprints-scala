@@ -252,7 +252,7 @@ For Scala 2.11 currently only SNAPSHOT releases available:
 
 	"Sonatype repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-	"com.ansvia.graph" %% "blueprints-scala" % "0.1.60-20150226-SNAPSHOT"
+	"com.ansvia.graph" %% "blueprints-scala" % "0.1.61-20150416-SNAPSHOT"
 
 
 License
