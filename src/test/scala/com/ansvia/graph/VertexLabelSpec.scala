@@ -1,16 +1,14 @@
 package com.ansvia.graph
 
+import com.ansvia.graph.testing.model.{Animal, SimpleDbo}
+import com.thinkaurelius.titan.core.{TitanGraph, TitanVertex}
+import com.tinkerpop.blueprints.Vertex
+import com.tinkerpop.blueprints.util.wrappers.id.{IdGraph, IdVertex}
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import com.thinkaurelius.titan.core.{TitanVertex, TitanGraph}
-import com.ansvia.graph.testing.model.{SimpleDbo, Animal}
-import com.tinkerpop.blueprints.Vertex
-import com.tinkerpop.blueprints.util.wrappers.id.{IdVertex, IdGraph}
 
 /**
  * Author: robin
- * Date: 9/1/14
- * Time: 3:21 PM
  *
  *
  * Titan only specific label feature test
@@ -106,7 +104,6 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
         }
         "saved vertex has id immediately" in new Ctx3 {
             import IdGraphTitanDbWrapper._
-            import com.ansvia.graph.BlueprintsWrapper._
 
             val v = Animal("tiger").saveWithLabel(ANIMAL)
 
@@ -114,7 +111,6 @@ class VertexLabelSpec extends Specification with TitanBackedDb {
         }
         "get vertex from dbo after save" in new Ctx3 {
             import IdGraphTitanDbWrapper._
-            import com.ansvia.graph.BlueprintsWrapper._
 
             val tiger = Animal("tiger")
 

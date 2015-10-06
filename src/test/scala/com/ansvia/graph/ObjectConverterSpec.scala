@@ -9,10 +9,7 @@ import org.specs2.specification.Step
 import scala.language.reflectiveCalls
 
 /**
- * Copyright (C) 2011-2012 Ansvia Inc.
  * User: robin
- * Date: 12/31/12
- * Time: 5:21 AM
  *
  */
 class ObjectConverterSpec extends Specification {
@@ -20,41 +17,41 @@ class ObjectConverterSpec extends Specification {
     import com.ansvia.graph.testing.model._
 
     def is = sequential ^
-        "Object cenverter should" ^
+        "Object cenverter should\n" ^
         p ^
-            "convert vertex to case class #1" ! oc.vtocc1 ^
-            "convert vertex to case class #2" ! oc.vtocc2 ^
-            "convert vertex to case class #3" ! oc.vtocc3 ^
-            "convert case class to vertex #1" ! oc.cctov1 ^
-            "convert case class to vertex #3" ! oc.cctov2 ^
-            "convert back from vertex to case class #1" ! oc.cbvtocc1 ^
-            "convert back from vertex to case class #2" ! oc.cbvtocc2 ^
-            "convert back from vertex to case class #3" ! oc.cbvtocc3 ^
+            "convert vertex to case class #1\n" ! oc.vtocc1 ^
+            "convert vertex to case class #2\n" ! oc.vtocc2 ^
+            "convert vertex to case class #3\n" ! oc.vtocc3 ^
+            "convert case class to vertex #1\n" ! oc.cctov1 ^
+            "convert case class to vertex #3\n" ! oc.cctov2 ^
+            "convert back from vertex to case class #1\n" ! oc.cbvtocc1 ^
+            "convert back from vertex to case class #2\n" ! oc.cbvtocc2 ^
+            "convert back from vertex to case class #3\n" ! oc.cbvtocc3 ^
             Step(oc.close()) ^
         p ^
         "DbObject inherited class should" ^
-            "work with non param var get parameter" ! dboic.nonParamVarGet ^
-            "work with non param var get inner variable #1" ! dboic.nonParamVarGetInner ^
-            "work with non param var get inner variable #2" ! dboic.nonParamVarGetInner2 ^
-            "save directly using .save()" ! dboic.saveDirectlyUsingSave ^
-            "has expected field" ! dboic.hasExpectedField ^
-            "get back saved field data" ! dboic.getBackSavedFieldData ^
-            "deserializable" ! dboic.deserializable ^
-            "has expected data in deserialized object" ! dboic.expectedDataDeserializedObj ^
-            "able to get raw vertex from case class" ! dboic.getRawVertexFromCC ^
-            "make relation DbObject to DbObject #1" ! dboic.makeRelDbo2Dbo ^
-            "make relation DbObject to DbObject #2" ! dboic.makeRelDbo2Dbo2 ^
-            "saved DbObject return true in isSaved" ! dboic.savedDboRetTrue ^
-            "class contain lazy or val should not raising invocation error" ! dboic.ccContainLazyNotError ^
-            "access upper variable #1" ! dboic.accessUpperVar1 ^
-            "access upper variable #2" ! dboic.accessUpperVar2 ^
-            "access upper-upper variable #1" ! dboic.accessUpperUpperVar1 ^
-            "access upper-upper variable #2" ! dboic.accessUpperUpperVar2 ^
-            "access upper-upper variable #3" ! dboic.accessUpperUpperVar3 ^
-            "access lower variable via loader from upper-upper" ! dboic.accessLowVarViaLoaderFromUpperUpper ^
-            "access trait variable" ! dboic.accessTraitVar ^
-            "not saving non persisted var" ! dboic.noSaveNonPersistedVar ^
-            "saved via __save__()" ! dboic.savedViaSaveMethod ^
+            "work with non param var get parameter\n" ! dboic.nonParamVarGet ^
+            "work with non param var get inner variable #1\n" ! dboic.nonParamVarGetInner ^
+            "work with non param var get inner variable #2\n" ! dboic.nonParamVarGetInner2 ^
+            "save directly using .save()\n" ! dboic.saveDirectlyUsingSave ^
+            "has expected field\n" ! dboic.hasExpectedField ^
+            "get back saved field data\n" ! dboic.getBackSavedFieldData ^
+            "deserializable\n" ! dboic.deserializable ^
+            "has expected data in deserialized object\n" ! dboic.expectedDataDeserializedObj ^
+            "able to get raw vertex from case class\n" ! dboic.getRawVertexFromCC ^
+            "make relation DbObject to DbObject #1\n" ! dboic.makeRelDbo2Dbo ^
+            "make relation DbObject to DbObject #2\n" ! dboic.makeRelDbo2Dbo2 ^
+            "saved DbObject return true in isSaved\n" ! dboic.savedDboRetTrue ^
+            "class contain lazy or val should not raising invocation error\n" ! dboic.ccContainLazyNotError ^
+            "access upper variable #1\n" ! dboic.accessUpperVar1 ^
+            "access upper variable #2\n" ! dboic.accessUpperVar2 ^
+            "access upper-upper variable #1\n" ! dboic.accessUpperUpperVar1 ^
+            "access upper-upper variable #2\n" ! dboic.accessUpperUpperVar2 ^
+            "access upper-upper variable #3\n" ! dboic.accessUpperUpperVar3 ^
+            "access lower variable via loader from upper-upper\n" ! dboic.accessLowVarViaLoaderFromUpperUpper ^
+            "access trait variable\n" ! dboic.accessTraitVar ^
+            "not saving non persisted var\n" ! dboic.noSaveNonPersistedVar ^
+            "saved via __save__()\n" ! dboic.savedViaSaveMethod ^
             Step(dboic.close()) ^
     end
 
@@ -87,7 +84,6 @@ class ObjectConverterSpec extends Specification {
         def cbvtocc1 = vtcc2.isDefined must beTrue
         def cbvtocc2 = vtcc2.get.name must beEqualTo("gondez")
         def cbvtocc3 = vtcc2.get.age must beEqualTo(35)
-
 
     }
 

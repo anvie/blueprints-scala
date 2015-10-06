@@ -1,14 +1,17 @@
 package com.ansvia.graph.util
 
-import scalax.rules.scalasig._
-import collection.mutable.ArrayBuffer
 import java.lang.reflect
+
+import scala.collection.concurrent
 import com.ansvia.graph.BlueprintsWrapper.DbObject
-import collection.mutable
-import com.ansvia.graph.annotation.Persistent
-import scala.reflect.ClassTag
-import scala.language.existentials
 import com.ansvia.graph.Log
+import com.ansvia.graph.annotation.Persistent
+import com.ansvia.graph.util.scalax.rules.scalasig._
+
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
+import scala.language.existentials
+import scala.reflect.ClassTag
 
 /**
  * helper class to store Class object
@@ -23,17 +26,21 @@ object CaseClassDeserializer extends Log {
     /**
      * Method Map cache for method serialize
      */
-    private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
-        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+//    private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+//        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+    private val methodCache = new concurrent.TrieMap[Class[_], Map[String, java.lang.reflect.Method]]()
 
-    private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
-        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+
+//    private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+//        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
+    private val methodSetterCache = new concurrent.TrieMap[Class[_], Map[String, java.lang.reflect.Method]]()
 
     /**
      * signature parser cache
      */
-    private val sigParserCache = new mutable.HashMap[Class[_], Seq[(String, JavaType)]]()
-        with mutable.SynchronizedMap[Class[_], Seq[(String, JavaType)]]
+//    private val sigParserCache = new mutable.HashMap[Class[_], Seq[(String, JavaType)]]()
+//        with mutable.SynchronizedMap[Class[_], Seq[(String, JavaType)]]
+    private val sigParserCache = new concurrent.TrieMap[Class[_], Seq[(String, JavaType)]]()
 
     /**
      * default behaviour for T == serialized class

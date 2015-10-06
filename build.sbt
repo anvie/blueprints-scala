@@ -6,7 +6,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.1.50-SNAPSHOT"
+version := "0.1.51-SNAPSHOT"
 
 scalaVersion := "2.11.0"
 
@@ -25,9 +25,11 @@ libraryDependencies ++= Seq(
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.5.0",
     "com.tinkerpop.gremlin" % "gremlin-groovy" % "2.5.0",
     "com.tinkerpop.gremlin" % "gremlin-java" % "2.5.0",
-    "org.specs2" %% "specs2" % "2.3.13" % "test",
+//    "org.specs2" %% "specs2" % "2.3.13" % "test",
+    "org.specs2" %% "specs2-core" % "3.6.4" % "test",
     "com.thinkaurelius.titan" % "titan-core" % "0.5.0" % "provided",
-    "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.5.0" % "test"
+    "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.5.0" % "test",
+    "com.ansvia" %% "ansvia-perf" % "0.1.10" % "test"
     )
 
 sonatypeSettings
