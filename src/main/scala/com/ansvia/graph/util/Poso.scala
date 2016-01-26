@@ -218,7 +218,7 @@ class MissingExpectedType(clazz: Class[_]) extends Error(
         .format(clazz)
 )
 
-object CaseClassSigParser {
+object CaseClassSigParser extends Log {
     val SCALA_SIG = "ScalaSig"
     val SCALA_SIG_ANNOTATION = "Lscala/reflect/ScalaSignature;"
     val BYTES_VALUE = "bytes"
@@ -348,19 +348,14 @@ object CaseClassSigParser {
 
         while(!done){
 
-//            println("curClazz: " + curClazz.getName)
-
             val rv =
                 findSym(curClazz).children
-                .filter{ c =>
+                .filter { c =>
                     if (c.isCaseAccessor && !c.isPrivate){
                         true
                     }else if (c.isAccessor && !c.isPrivate && !c.isLazy && !c.isProtected){
 
                         val pv = persistedVarCache.get(mainClazz).get
-
-//                        if (pv.length > 0)
-//                            println(curClazz.getSimpleName + ": " + pv.reduceOption(_ + ", " + _).getOrElse("") + " contains " + c.name + "?")
 
                         pv.contains(c.name)
 
@@ -370,15 +365,25 @@ object CaseClassSigParser {
                 }.map(_.asInstanceOf[MethodSymbol])
                 .zipWithIndex
                 .flatMap {
-                    case (ms, idx) => {
+                    case (ms, idx) =>
                         ms.infoType match {
                             case NullaryMethodType(t: TypeRefType) =>
-                                Some(ms.name -> typeRef2JavaType(t))
+                                try {
+                                    Some(ms.name -> typeRef2JavaType(t))
+                                }catch{
+                                    case e:java.lang.ClassNotFoundException =>
+                                        error("Cannot recognize `%s` with type `%s`".format(ms.name, t.symbol.path))
+                                        e.printStackTrace()
+                                        None
+                                    case e:Throwable =>
+                                        e.printStackTrace()
+                                        None
+                                }
                             case _ =>
                                 None
                         }
-                    }
                 }
+
             symbols ++= rv
 
             curClazz = curClazz.getSuperclass
@@ -399,14 +404,7 @@ object CaseClassSigParser {
     }
 
     protected def typeRef2JavaType(ref: TypeRefType): JavaType = {
-        try {
-            JavaType(loadClass(ref.symbol.path))
-        } catch {
-            case e: Throwable => {
-                e.printStackTrace()
-                null
-            }
-        }
+        JavaType(loadClass(ref.symbol.path))
     }
 
     protected def loadClass(path: String) = path match {

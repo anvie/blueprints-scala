@@ -4,8 +4,6 @@ import org.slf4j.LoggerFactory
 
 /**
  * Author: robin
- * Date: 2/24/14
- * Time: 11:27 PM
  *
  */
 private[graph] trait Log {
