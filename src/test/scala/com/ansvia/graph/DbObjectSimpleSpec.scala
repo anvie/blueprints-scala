@@ -1,8 +1,8 @@
 package com.ansvia.graph
 
-import org.specs2.Specification
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.ansvia.graph.Exc.NotBoundException
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+import org.specs2.Specification
 import org.specs2.specification.Step
 
 /**
@@ -13,30 +13,28 @@ import org.specs2.specification.Step
  */
 class DbObjectSimpleSpec extends Specification {
 
+    import com.ansvia.graph.BlueprintsWrapper._
     import com.ansvia.graph.testing.model._
-    import BlueprintsWrapper._
 
-    def is = sequential ^
-        "DbObject non tx should" ^
-        p ^
-            "able to reload" ! treesNonTx.reload ^
-            "change property and save" ! treesNonTx.changeProperty ^
-            "use getId via IDGetter" ! treesNonTx.useGetId ^
-            "use getId from IdDbObject" ! treesNonTx.useGetIdDbObject ^
-            "able to delete" ! treesNonTx.delete ^
-            "get id immediately after save" ! treesNonTx.getIdAfterSave ^
-            Step(treesNonTx.close()) ^
-        p ^
-        "DbObject tx should" ^
-        p ^
-            "able to reload" ! treesTx.reload ^
-            "change property and save" ! treesTx.changeProperty ^
-            "use getId via IDGetter" ! treesTx.useGetId ^
-            "use getId from IdDbObject" ! treesTx.useGetIdDbObject ^
-            "able to delete" ! treesTx.delete ^
-            "get id immediately after save" ! treesNonTx.getIdAfterSave ^
-            Step(treesTx.close()) ^
-        end
+
+    def is =
+        s2""" $sequential
+          This specification is to test basic DbObject functionality.
+
+          DbObject non tx should
+               able to reload              ${treesNonTx.reload}
+               change property and save    ${treesNonTx.changeProperty}
+               use getId via IDGetter      ${treesNonTx.useGetId}
+               able to delete              ${treesNonTx.getIdAfterSave}
+               ${Step(treesNonTx.close())}
+
+          DbObject tx should
+               able to reload              ${treesTx.reload}
+               change property and save    ${treesTx.changeProperty}
+               use getId via IDGetter      ${treesTx.useGetId}
+               able to delete              ${treesTx.getIdAfterSave}
+               ${Step(treesTx.close())}
+        """
 
     object treesNonTx {
         implicit val db = TinkerGraphFactory.createTinkerGraph()
@@ -89,7 +87,6 @@ class DbObjectSimpleSpec extends Specification {
     }
 
     object treesTx extends TitanBackedDb {
-//        implicit val db = new Neo4jGraph("/tmp/neo4jdb-test-simple")
 
         val dboDraft = SimpleDboLong("a", "b")
         val dbo = transact {

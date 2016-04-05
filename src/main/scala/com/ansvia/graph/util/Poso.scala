@@ -1,8 +1,8 @@
 package com.ansvia.graph.util
 
 import java.lang.reflect
+import java.util.concurrent.ConcurrentHashMap
 
-import scala.collection.concurrent
 import com.ansvia.graph.BlueprintsWrapper.DbObject
 import com.ansvia.graph.Log
 import com.ansvia.graph.annotation.Persistent
@@ -12,6 +12,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.language.existentials
 import scala.reflect.ClassTag
+
+import collection.JavaConversions._
 
 /**
  * helper class to store Class object
@@ -26,10 +28,9 @@ object CaseClassDeserializer extends Log {
     /**
      * Method Map cache for method serialize
      */
-//    private val methodCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
-//        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
-    private val methodCache = new concurrent.TrieMap[Class[_], Map[String, java.lang.reflect.Method]]()
+    private val methodCache = new ConcurrentHashMap[Class[_], Map[String, java.lang.reflect.Method]]()
 
+    private val methodSetterCache = new ConcurrentHashMap[Class[_], Map[String, java.lang.reflect.Method]]()
 
 //    private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
 //        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
@@ -38,9 +39,7 @@ object CaseClassDeserializer extends Log {
     /**
      * signature parser cache
      */
-//    private val sigParserCache = new mutable.HashMap[Class[_], Seq[(String, JavaType)]]()
-//        with mutable.SynchronizedMap[Class[_], Seq[(String, JavaType)]]
-    private val sigParserCache = new concurrent.TrieMap[Class[_], Seq[(String, JavaType)]]()
+    private val sigParserCache = new ConcurrentHashMap[Class[_], Seq[(String, JavaType)]]()
 
     /**
      * default behaviour for T == serialized class
@@ -67,31 +66,7 @@ object CaseClassDeserializer extends Log {
         val constructor = javaTypeTarget.c.getConstructors.head
         val params = sigParserCache.getOrElseUpdate(javaTypeTarget.c, CaseClassSigParser.parse(javaTypeTarget.c))
 
-        val values = new ArrayBuffer[AnyRef]
-        for ((paramName, paramType) <- params) {
-            val field = m.getOrElse(paramName, null)
-
-            field match {
-                // use null if the property does not exist
-                case null =>
-                    values += null
-
-                case x:java.lang.Integer if paramType.c == classOf[java.lang.Long] =>
-
-                    values += x
-
-                // if the value is directly assignable: use it
-                case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
-                    values += x
-                case x: Array[_] =>
-                    values += x
-                // otherwise try to create an instance using der String Constructor
-                case x: AnyRef =>
-                    val paramCtor = paramType.c.getConstructor(classOf[String])
-                    val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
-                    values += value
-            }
-        }
+        val values = buildValues(m, params)
 
         val paramsCount = constructor.getParameterTypes.length
         val ccParams = values.slice(0, paramsCount)
@@ -126,7 +101,7 @@ object CaseClassDeserializer extends Log {
                 symbols ++= rv
 
                 curClazz = curClazz.getSuperclass
-                done = curClazz == classOf[java.lang.Object] || curClazz == null
+                done = curClazz == classOf[Object] || curClazz == null
             }
 
             symbols
@@ -140,11 +115,17 @@ object CaseClassDeserializer extends Log {
             val paramNameSet = paramName + "_$eq"
 
             field match {
-                // use null if the property does not exist
+                // option with value handled
+                case x: AnyRef if paramType.c == classOf[Option[_]] =>
+                    Some(x)
+                // option with null handled
+                case null if paramType.c == classOf[Option[_]] =>
+                    None
+
                 case null =>
                     // skip null
 
-                case x:java.lang.Integer if paramType.c == classOf[java.lang.Long] =>
+                case x:Integer if paramType.c == classOf[lang.Long] =>
 
                     methods.get(paramNameSet).map(_.invoke(summoned, x))
 
@@ -162,6 +143,53 @@ object CaseClassDeserializer extends Log {
         }
 
         summoned
+    }
+
+    def buildValues(vertexParams: Map[String, AnyRef], classParams: Seq[(String, JavaType)]): ArrayBuffer[AnyRef] = {
+        val values = new ArrayBuffer[AnyRef]
+        for ((paramName, paramType) <- classParams) {
+            val field = vertexParams.getOrElse(paramName, null)
+
+            if(paramType.c == classOf[Option[_]]) {
+                values += handleOption(paramName, paramType, field)
+            } else {
+                values += handleRegularValue(paramType, field)
+            }
+        }
+        values
+    }
+
+    def handleOption(paramName: String, paramType: JavaType, field: AnyRef): Option[AnyRef] = {
+        if (field != null) {
+            Some(field)
+        } else {
+            None
+        }
+    }
+
+    def handleRegularValue(paramType: JavaType, field: AnyRef): AnyRef = {
+        field match {
+            // use null if the property does not exist
+            case null =>
+                if (paramType.c == classOf[Option[_]]) {
+                    None
+                } else {
+                    null
+                }
+            // if there is Long in case class and Integer in graph
+            case x: Integer if paramType.c == classOf[lang.Long] =>
+                x
+            // if the value is directly assignable: use it
+            case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
+                x
+            case x: Array[_] =>
+                x
+            // otherwise try to create an instance using der String Constructor
+            case x: AnyRef =>
+                val paramCtor = paramType.c.getConstructor(classOf[String])
+                val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
+                value
+        }
     }
 
     /**
@@ -262,13 +290,11 @@ object CaseClassSigParser extends Log {
         }
     }
 
-    private val persistedVarCache = new mutable.HashMap[Class[_], Array[String]]()
-        with mutable.SynchronizedMap[Class[_], Array[String]]
+    private val persistedVarCache: mutable.Map[Class[_], Array[String]] = new ConcurrentHashMap[Class[_], Array[String]]()
 //    private val traitItCache = new mutable.HashMap[Class[_], Seq[Class[_]]]()
 //        with mutable.SynchronizedMap[Class[_], Seq[Class[_]]]
 
-    private val classesTreeCache = new mutable.HashMap[Class[_], Array[Class[_]]]()
-        with mutable.SynchronizedMap[Class[_], Array[Class[_]]]
+    private val classesTreeCache = new ConcurrentHashMap[Class[_], Array[Class[_]]]()
 
     private def isExcluded(clazz: Class[_]) = {
         if (clazz == null)

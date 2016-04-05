@@ -274,7 +274,7 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   ) as "type"
 
   lazy val literal = oneOf(
-    24 -^ (),
+    24 -^ (Unit),
     25 -~ longValue ^^ (_ != 0L),
     26 -~ longValue ^^ (_.toByte),
     27 -~ longValue ^^ (_.toShort),

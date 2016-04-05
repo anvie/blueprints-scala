@@ -16,16 +16,14 @@ class DbObjectComplexSpec extends Specification with PerfTiming {
     import com.ansvia.graph.testing.model._
     import BlueprintsWrapper._
 
-    def is =
-        s2"""
-           Complex DbObject inheritance should
-              get level 1 var    $getLevel1Var
-              get level 1b var   $getLevel1bVar
-              get level 2 var    $getLevel2Var
-              get level 2b var   $getLevel2bVar
-              get level 2c var   $getLevel2cVar
-              performance test   $perfTest
-          """
+    def is = s2"""$sequential ^
+       "Complex DbObject inheritance should
+            get level 1 var             ${cdbo.getLevel1Var}
+            get level 1b var            ${cdbo.getLevel1bVar}
+            get level 2 var             ${cdbo.getLevel2Var}
+            get level 2b var            ${cdbo.getLevel2bVar}
+            get level 2c var            ${cdbo.getLevel2cVar}
+    """
 
     implicit val db = TinkerGraphFactory.createTinkerGraph()
 
