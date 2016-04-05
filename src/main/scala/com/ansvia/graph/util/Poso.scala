@@ -32,10 +32,6 @@ object CaseClassDeserializer extends Log {
 
     private val methodSetterCache = new ConcurrentHashMap[Class[_], Map[String, java.lang.reflect.Method]]()
 
-//    private val methodSetterCache = new mutable.HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
-//        with mutable.SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
-    private val methodSetterCache = new concurrent.TrieMap[Class[_], Map[String, java.lang.reflect.Method]]()
-
     /**
      * signature parser cache
      */
@@ -125,7 +121,7 @@ object CaseClassDeserializer extends Log {
                 case null =>
                     // skip null
 
-                case x:Integer if paramType.c == classOf[lang.Long] =>
+                case x:Integer if paramType.c == classOf[java.lang.Long] =>
 
                     methods.get(paramNameSet).map(_.invoke(summoned, x))
 
@@ -177,7 +173,7 @@ object CaseClassDeserializer extends Log {
                     null
                 }
             // if there is Long in case class and Integer in graph
-            case x: Integer if paramType.c == classOf[lang.Long] =>
+            case x: Integer if paramType.c == classOf[java.lang.Long] =>
                 x
             // if the value is directly assignable: use it
             case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
@@ -463,4 +459,3 @@ object CaseClassSigParser extends Log {
         case name => Class.forName(name)
     }
 }
-

@@ -6,7 +6,7 @@ organization := "com.ansvia.graph"
 
 name := "blueprints-scala"
 
-version := "0.1.61-SNAPSHOT"
+version := "0.1.61"
 
 scalaVersion := "2.11.0"
 
@@ -70,6 +70,8 @@ credentials += Credentials {
     else
         Path.userHome / ".ivy2" / ".credentials"
 }
+
+useGpg := true
 
 publishArtifact in Test := false
 
